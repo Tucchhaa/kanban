@@ -15,8 +15,11 @@ export interface IEventEmitter {
 export class EventEmitter implements IEventEmitter {
     private events: IDictionary<CallableFunction[]>;
     
+    // private componentName: string;
+
     constructor() {
         this.events = {};
+        // this.componentName = componentName;
     }
     
     public on(event: string, listener: CallableFunction): EventEmitter {
@@ -41,9 +44,9 @@ export class EventEmitter implements IEventEmitter {
         return this;
     }
 
-    public emit(event: string, param?: any) {
+    public emit(event: string, ...param: any) {
         for(const listener of (this.events[event] || [])) {
-            listener(param);
+            listener(...param);
         }
     }
 }

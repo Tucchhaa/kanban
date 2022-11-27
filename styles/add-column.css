@@ -1,0 +1,47 @@
+.kanban > .add-column {
+    min-height: 40px;
+    line-height: 40px; 
+    background-color: black;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+}
+.kanban > .add-column.state-opened {
+    text-align: left;
+    padding: 10px 15px;
+    line-height: normal;
+}
+
+.kanban > .add-column input {
+    height: 30px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 5px 0 3px;
+    outline-color: aquamarine;
+    padding: 0 8px;
+}
+
+.kanban > .add-column .validation-msg {
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.kanban > .add-column .buttons {
+    line-height: 35px;
+}
+
+.kanban > .add-column .submit {
+    padding: 6px 15px; 
+    background-color: blueviolet;
+    color: white;
+    cursor: pointer;
+} 
+
+.kanban > .add-column .cancel {
+    padding: 6px 15px; 
+    margin-left: 10px;
+    border: none;
+    background-color: transparent;
+    color: white;
+    cursor: pointer;
+} 

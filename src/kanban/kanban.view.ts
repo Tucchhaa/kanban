@@ -1,22 +1,28 @@
-import { throws } from "assert";
 import { BaseView } from "../base/view";
 import { ColumnComponent } from "../components/column.component";
+import { TogglableInputComponent } from "../components/togglable-input.component";
+import { EditableFieldController } from "../editable-field/editable-field.controller";
+import { Column, TogglableInputOptions } from "../types";
 import { KanbanModel } from "./kanban.model";
 
 export class KanbanView extends BaseView<KanbanModel> {
+    private renderedColumns: Column[] = [];
+    
     constructor(model: KanbanModel, container: HTMLElement) {
         super(model, container, ['kanban']);
     }
 
     protected _render(fragment: DocumentFragment): void {
         this._renderColumns(fragment);
-        this._renderAddColumnsBtn(fragment);
+        this._renderAddColumn(fragment);
     }
 
     private _renderColumns(fragment: DocumentFragment) {
-        const columns = this.model.getColumns();
+        const columns = this.model.columns;
 
-        for(const column of columns) {
+        for(let index = 0; index < columns.length; index++) {
+            const column = columns[index];
+
             const columnContainer = this.createDOMElement('div', ['column']);
 
             new ColumnComponent(columnContainer, column);
@@ -25,12 +31,25 @@ export class KanbanView extends BaseView<KanbanModel> {
         }
     }
 
-    private _renderAddColumnsBtn(fragment: DocumentFragment) {
-        const addColumnBtn = this.createDOMElement('div', ['column', 'add-column']);
+    private _renderAddColumn(fragment: DocumentFragment) {
+        const addColumnContainer = this.createDOMElement('div', ['column', 'add-column']);
 
-        addColumnBtn.innerText = '+ Add column';
+        const options = Object.assign(new TogglableInputOptions(), {
+            btnText: '+ Add new column',
+            placeholder: 'Enter new column\'s name',
+            onSubmit: (value: string) => this.emit('create-new-column', value),
+            validation: (value: string) => {
+                if(value.length === 0)
+                    return [false, 'Column name can\'t be empty'];
+                
+                if(value.length > 40)
+                    return [false, 'Column name is too long'];
 
-        fragment.appendChild(addColumnBtn);
+                return [true];
+            }
+        });
+        new TogglableInputComponent(addColumnContainer, options);
+        
+        fragment.append(addColumnContainer);
     }
 }
-

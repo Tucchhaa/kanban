@@ -1,5 +1,5 @@
 import { BaseView } from "../base/view";
-import { Card } from "./card";
+import { Card } from "../types";
 import { CardModel } from "./card.model";
 
 export class CardView extends BaseView<CardModel> {
@@ -8,10 +8,8 @@ export class CardView extends BaseView<CardModel> {
     }
 
     protected _render(fragment: DocumentFragment): void {
-        const card = this.model.getCard();
-        
         const text = this.createDOMElement('span');
-        text.innerText = card.name;
+        text.innerText = this.model.name;
         
         fragment.appendChild(text);
     }

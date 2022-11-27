@@ -25,13 +25,13 @@ body {
     width: 250px;
     box-sizing: border-box;
     border-radius: 3px;
+    word-wrap: break-word;
 }
 
-.kanban > .add-column {
-    height: 40px;
-    line-height: 40px; 
-    background-color: black;
-    color: white;
-    text-align: center;
-    cursor: pointer;
+.kanban > .add-column, 
+.kanban-column > .add-card {
+    -webkit-user-select: none;  
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

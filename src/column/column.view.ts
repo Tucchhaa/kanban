@@ -1,7 +1,8 @@
 import { BaseView } from "../base/view";
-import { Card } from "../card/card";
+import { Card, TogglableInputOptions } from "../types";
 import { CardComponent } from "../components/card.component";
 import { ColumnModel } from "./column.model";
+import { TogglableInputComponent } from "../components/togglable-input.component";
 
 export class ColumnView extends BaseView<ColumnModel> {
     constructor(model: ColumnModel, container: HTMLElement) {
@@ -9,10 +10,10 @@ export class ColumnView extends BaseView<ColumnModel> {
     }
 
     protected _render(fragment: DocumentFragment): void {
-        const column = this.model.getColumn();
-        
-        this.renderHeading(fragment, column.name);
-        this.renderContent(fragment, column.cards);
+        console.log(this.model);
+        this.renderHeading(fragment, this.model.name);
+        this.renderContent(fragment, this.model.cards);
+        this.renderAddCard(fragment);
     }
 
     private renderHeading(fragment: DocumentFragment, text: string) {
@@ -35,5 +36,27 @@ export class ColumnView extends BaseView<ColumnModel> {
         }
 
         fragment.appendChild(content);
+    }
+
+    private renderAddCard(fragment: DocumentFragment) {
+        const addCardContainer = this.createDOMElement('div', 'add-card');
+
+        const options = Object.assign(new TogglableInputOptions(), {
+            btnText: '+ Add new card',
+            placeholder: 'Enter new card\'s name',
+            onSubmit: (value: string) => this.emit('create-new-card', value),
+            validation: (value: string) => {
+                if(value.length === 0)
+                    return [false, 'Card name can\'t be empty'];
+                
+                if(value.length > 40)
+                    return [false, 'Card name is too long'];
+
+                return [true];
+            }
+        });
+        new TogglableInputComponent(addCardContainer, options);
+        
+        fragment.append(addCardContainer);
     }
 }

@@ -1,10 +1,10 @@
 import { EventEmitter } from "./event-emitter";
 
-export abstract class BaseView<T> extends EventEmitter {
+export abstract class BaseView<T extends EventEmitter> extends EventEmitter {
     protected model: T;
     protected container: HTMLElement;
     
-    constructor(model: any, container: HTMLElement, classes?: string[] | string) {
+    constructor(model: T, container: HTMLElement, classes?: string[] | string) {
         super();
         
         this.model = model;
@@ -17,6 +17,8 @@ export abstract class BaseView<T> extends EventEmitter {
         }
 
         this.render();
+
+        this.model.on('render', () => this.render());
     }
 
     protected abstract _render(fragment: DocumentFragment): void;

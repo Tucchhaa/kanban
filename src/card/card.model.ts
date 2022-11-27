@@ -1,13 +1,17 @@
-import { Card } from "./card";
+import { EventEmitter } from "../base/event-emitter";
+import { BaseState } from "../base/state";
+import { Card } from "../types";
 
-export class CardModel {
-    private card;
-
-    constructor(card: Card) {
-        this.card = card;
+export class CardModel extends BaseState<Card> {
+    public get name() {
+        return this.state.name!;
     }
 
-    getCard(): Card {
-        return Object.assign({}, this.card);
+    constructor(state: Card) {
+        const defaultState = {
+            name: null
+        }
+        
+        super(state, defaultState);
     }
 }
