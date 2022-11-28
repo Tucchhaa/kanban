@@ -1,0 +1,43 @@
+.kanban-column {
+    min-height: 50px;
+    padding: 5px 0 0;
+    max-height: 100%; 
+    margin-right: 10px;
+
+    display: flex;
+    flex-direction: column;
+    
+    background-color: aliceblue;
+}
+
+.kanban-column > .heading {
+    padding: 5px 11px 10px 11px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.kanban-column > .content {
+    overflow-y: auto;
+}
+
+.kanban-column .card {
+    background-color: aquamarine;
+    margin: 5px 10px;
+    padding: 12px 15px;
+}
+
+/* Column 'Add card' btn */
+.kanban-column > .add-card {
+    /* height: 30px; */
+    background-color: grey;
+    text-align: center;
+    font-size: 14px;
+    line-height: 30px;
+    border-radius: 0 0 3px 3px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.kanban-column > .add-card.state-opened {
+    /* height: 80px; */
+}

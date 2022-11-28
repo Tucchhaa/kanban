@@ -1,13 +1,17 @@
-import { isDefined } from "../helpers";
+import { KanbanOptions } from "../types";
+import { KanbanController } from "../kanban/kanban.controller";
+import { KanbanModel } from "../kanban/kanban.model";
 import { KanbanView } from "../kanban/kanban.view";
 
 export class KanbanComponent {
-    constructor(container: HTMLElement|null) {
-        if(!isDefined(container)) {
-            console.error('container is not defined');
-            return;
+    constructor(container: HTMLElement | null, options: KanbanOptions) {
+        if(!container) {
+            throw new Error('KanbanComponent container is not defined');
         }
 
-        new KanbanView(container!);
+        const model = new KanbanModel(options);
+        const view = new KanbanView(model, container);
+        
+        new KanbanController(model, view);
     }
 }
