@@ -1,4 +1,4 @@
-export interface IDictionary<TValue> {
+export interface Dictionary<TValue> {
     [id: string]: TValue;
 }
 

@@ -1,6 +1,8 @@
 import { BaseState } from "../base/state";
 import { BaseView } from "../base/view";
 
+export type BaseComponentType = BaseComponent<object, BaseState<object>, BaseView<BaseState<object>>, object>;
+
 export class BaseComponent<
     TOptions extends object, 
     TState extends BaseState<TOptions>, 
@@ -25,5 +27,9 @@ export class BaseComponent<
         this.state = new modelType(options);
         this.view = new viewType(this.state, container);
         this.controller = new controllerType(this.state, this.view);
+    }
+
+    dispose() {
+        this.view.dispose();
     }
 }

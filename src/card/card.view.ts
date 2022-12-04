@@ -12,7 +12,7 @@ abstract class DraggableView<TState extends EventEmitter> extends BaseView<TStat
         super(model, container, _classes);
     }
 
-    protected _render(fragment: DocumentFragment): void {
+    protected render(fragment: DocumentFragment): void {
         let sizes: { width: number, height: number }; 
         let offset: { x: number, y: number };
 
@@ -37,11 +37,18 @@ abstract class DraggableView<TState extends EventEmitter> extends BaseView<TStat
         }
 
         const dragEnd = (e: MouseEvent) => {
-            document.removeEventListener('mousemove', drag);
-            document.removeEventListener('mouseup', dragEnd);
+            unsubscribe();
         };
         
+        const unsubscribe = () => {
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', dragEnd);
+
+        }
+
         this.container.addEventListener('mousedown', dragStart);
+
+        this.onDispose.push(unsubscribe);
     }
 
     private getElementSizes(element: HTMLElement) {
@@ -73,13 +80,13 @@ export class CardView extends DraggableView<CardModel> {
         super(model, container, ['card']);
     }
 
-    protected _render(fragment: DocumentFragment): void {
+    protected render(fragment: DocumentFragment): void {
         const text = this.createDOMElement('span');
         text.innerText = this.model.name;
         
         fragment.appendChild(text);
 
-        super._render(fragment);
+        super.render(fragment);
     }
 
 }

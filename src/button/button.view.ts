@@ -6,7 +6,7 @@ export class ButtonView extends BaseView<ButtonModel> {
         super(model, container);
     }
 
-    protected _render(fragment: DocumentFragment): void {
+    protected render(fragment: DocumentFragment): void {
         const btn = this.createDOMElement('button');
 
         btn.innerText = this.model.text;

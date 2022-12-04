@@ -1,4 +1,4 @@
-import { IDictionary } from "../types";
+import { Dictionary } from "../types";
 
 export interface IEventEmitter {
     on(event: string, listener: CallableFunction): IEventEmitter;
@@ -11,7 +11,7 @@ export interface IEventEmitter {
 // ===
 
 export class EventEmitter implements IEventEmitter {
-    private events: IDictionary<CallableFunction[]>;
+    private events: Dictionary<CallableFunction[]>;
     
     // private componentName: string;
 

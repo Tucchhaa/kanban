@@ -9,7 +9,7 @@ export class KanbanView extends BaseView<KanbanModel> {
         super(model, container, ['kanban']);
     }
 
-    protected _render(fragment: DocumentFragment): void {
+    protected render(fragment: DocumentFragment): void {
         this._renderColumns(fragment);
         this._renderAddColumn(fragment);
     }

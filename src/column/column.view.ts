@@ -4,12 +4,16 @@ import { CardComponent } from "../components/card.component";
 import { ColumnModel } from "./column.model";
 import { EditableFieldComponent } from "../components/editable-field.component";
 
+class Droppable {
+    
+}
+
 export class ColumnView extends BaseView<ColumnModel> {
     constructor(model: ColumnModel, container: HTMLElement) {
         super(model, container, 'kanban-column');
     }
 
-    protected _render(fragment: DocumentFragment): void {
+    protected render(fragment: DocumentFragment): void {
         this.renderHeading(fragment, this.model.name);
         this.renderContent(fragment, this.model.cards);
         this.renderAddCard(fragment);

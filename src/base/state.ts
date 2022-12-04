@@ -1,3 +1,4 @@
+import { isObject } from "../helpers";
 import { EventEmitter } from "./event-emitter";
 
 interface State {
@@ -7,13 +8,16 @@ interface State {
 export class BaseState<TOptions extends State> extends EventEmitter {
     protected state: TOptions;
     
+    public getState() {
+        return this.state;
+    }
+
     constructor(state: TOptions, defaultState: TOptions) {
         super();
 
         this.state = this.updateRecusively(defaultState, state);
-
     }
-    
+
     public update(newState: TOptions, needRender = true) {
         this.state = this.updateRecusively(Object.assign({}, this.state), newState);
 
@@ -27,7 +31,7 @@ export class BaseState<TOptions extends State> extends EventEmitter {
             if(!this.checkKey(state, key) || newState[key] === undefined)
                 continue;
             
-            if(typeof(state[key]) === 'object' && typeof(newState[key]) === 'object')
+            if(isObject(state[key]) && isObject(newState[key]))
                 (state[key] as State) = this.updateRecusively(state[key], newState[key]);
             else 
                 state[key] = newState[key];

@@ -1,4 +1,4 @@
-import { IDictionary } from "../types";
+import { Dictionary } from "../types";
 import { KanbanModel } from "./kanban.model";
 import { KanbanView } from "./kanban.view";
 
