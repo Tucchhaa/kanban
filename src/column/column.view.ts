@@ -1,5 +1,5 @@
 import { BaseView } from "../base/view";
-import { Card, TogglableInputOptions } from "../types";
+import { Card, EditableFieldOptions } from "../types";
 import { CardComponent } from "../components/card.component";
 import { ColumnModel } from "./column.model";
 import { TogglableInputComponent } from "../components/togglable-input.component";
@@ -41,7 +41,7 @@ export class ColumnView extends BaseView<ColumnModel> {
     private renderAddCard(fragment: DocumentFragment) {
         const addCardContainer = this.createDOMElement('div', 'add-card');
 
-        const options = Object.assign(new TogglableInputOptions(), {
+        const options = Object.assign(new EditableFieldOptions(), {
             btnText: '+ Add new card',
             placeholder: 'Enter new card\'s name',
             onSubmit: (value: string) => this.emit('create-new-card', value),

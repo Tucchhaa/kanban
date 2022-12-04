@@ -5,7 +5,7 @@ export class ButtonOptions {
     onClick?: (event: MouseEvent) => any;
 }
 
-export class TogglableInputOptions {
+export class EditableFieldOptions {
     isOpen?: boolean;
     btnText?: string;
     value?: string;

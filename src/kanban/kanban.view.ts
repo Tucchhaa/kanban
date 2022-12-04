@@ -2,7 +2,7 @@ import { BaseView } from "../base/view";
 import { ColumnComponent } from "../components/column.component";
 import { TogglableInputComponent } from "../components/togglable-input.component";
 import { EditableFieldController } from "../editable-field/editable-field.controller";
-import { Column, TogglableInputOptions } from "../types";
+import { Column, EditableFieldOptions } from "../types";
 import { KanbanModel } from "./kanban.model";
 
 export class KanbanView extends BaseView<KanbanModel> {
@@ -34,7 +34,7 @@ export class KanbanView extends BaseView<KanbanModel> {
     private _renderAddColumn(fragment: DocumentFragment) {
         const addColumnContainer = this.createDOMElement('div', ['column', 'add-column']);
 
-        const options = Object.assign(new TogglableInputOptions(), {
+        const options = Object.assign(new EditableFieldOptions(), {
             btnText: '+ Add new column',
             placeholder: 'Enter new column\'s name',
             onSubmit: (value: string) => this.emit('create-new-column', value),
