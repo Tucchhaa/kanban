@@ -47,14 +47,16 @@ export class EditableFieldView extends BaseView<EditableFieldModel> {
         const buttons = this.createDOMElement('div', 'buttons');
         
         const submitBtn = this.createDOMElement('span');
-        new ButtonComponent(submitBtn, {
-            text: 'submit', onClick: () => this.emit('submit', input.value)
-        });
+        this.createComponent(submitBtn, ButtonComponent, {
+            text: 'submit', 
+            onClick: () => this.emit('submit', input.value)
+        }, 'submit-btn');
 
         const cancelBtn = this.createDOMElement('span');
-        new ButtonComponent(cancelBtn, {
-            text: 'cancel', onClick: () => this.emit('close')
-        });
+        this.createComponent(cancelBtn, ButtonComponent, {
+            text: 'cancel', 
+            onClick: () => this.emit('close', input.value)
+        }, 'cancel-btn');
         
         buttons.append(submitBtn, cancelBtn);
 

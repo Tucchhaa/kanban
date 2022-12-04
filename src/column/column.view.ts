@@ -30,10 +30,12 @@ export class ColumnView extends BaseView<ColumnModel> {
     private renderContent(fragment: DocumentFragment, cards: Card[]) {
         const content = this.createDOMElement('div', 'content');
 
-        for(const card of cards) {
+        for(let index=0; index < cards.length; index++) {
+            const card = cards[index];
             const cardContainer = this.createDOMElement('div');
 
             new CardComponent(cardContainer, card);
+            this.createComponent(cardContainer, CardComponent, card, `card${index}`);
 
             content.appendChild(cardContainer);
         }
@@ -58,7 +60,7 @@ export class ColumnView extends BaseView<ColumnModel> {
                 return [true];
             }
         });
-        new EditableFieldComponent(addCardContainer, options);
+        this.createComponent(addCardContainer, EditableFieldComponent, options, 'add-card-field');
         
         fragment.append(addCardContainer);
     }

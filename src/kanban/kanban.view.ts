@@ -22,7 +22,7 @@ export class KanbanView extends BaseView<KanbanModel> {
 
             const columnContainer = this.createDOMElement('div', ['column']);
 
-            new ColumnComponent(columnContainer, column);
+            this.createComponent(columnContainer, ColumnComponent, column, `column${index}`);
 
             fragment.appendChild(columnContainer);
         }
@@ -45,7 +45,8 @@ export class KanbanView extends BaseView<KanbanModel> {
                 return [true];
             }
         });
-        new EditableFieldComponent(addColumnContainer, options);
+        
+        this.createComponent(addColumnContainer, EditableFieldComponent, options, 'add-column-field');
         
         fragment.append(addColumnContainer);
     }
