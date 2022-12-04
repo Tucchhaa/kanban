@@ -1,4 +1,4 @@
-import { EditableFieldController } from "../editable-field/editable-field.controller";
+import { IDictionary } from "../types";
 import { KanbanModel } from "./kanban.model";
 import { KanbanView } from "./kanban.view";
 

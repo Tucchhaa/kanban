@@ -1,13 +1,10 @@
 import { BaseView } from "../base/view";
 import { ColumnComponent } from "../components/column.component";
-import { TogglableInputComponent } from "../components/togglable-input.component";
-import { EditableFieldController } from "../editable-field/editable-field.controller";
+import { EditableFieldComponent } from "../components/editable-field.component";
 import { Column, EditableFieldOptions } from "../types";
 import { KanbanModel } from "./kanban.model";
 
 export class KanbanView extends BaseView<KanbanModel> {
-    private renderedColumns: Column[] = [];
-    
     constructor(model: KanbanModel, container: HTMLElement) {
         super(model, container, ['kanban']);
     }
@@ -48,7 +45,7 @@ export class KanbanView extends BaseView<KanbanModel> {
                 return [true];
             }
         });
-        new TogglableInputComponent(addColumnContainer, options);
+        new EditableFieldComponent(addColumnContainer, options);
         
         fragment.append(addColumnContainer);
     }

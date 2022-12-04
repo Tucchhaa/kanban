@@ -4,17 +4,17 @@ interface State {
     [id: string]: any;
 }
 
-export class BaseState<T extends State> extends EventEmitter {
-    protected state: T;
+export class BaseState<TOptions extends State> extends EventEmitter {
+    protected state: TOptions;
     
-    constructor(state: T, defaultState: T) {
+    constructor(state: TOptions, defaultState: TOptions) {
         super();
 
         this.state = this.updateRecusively(defaultState, state);
 
     }
     
-    public update(newState: T, needRender = true) {
+    public update(newState: TOptions, needRender = true) {
         this.state = this.updateRecusively(Object.assign({}, this.state), newState);
 
         if(needRender) {
@@ -22,7 +22,7 @@ export class BaseState<T extends State> extends EventEmitter {
         }
     }
 
-    private updateRecusively(state: T, newState: T) {
+    private updateRecusively(state: TOptions, newState: TOptions) {
         for(const key in newState) {
             if(!this.checkKey(state, key) || newState[key] === undefined)
                 continue;
@@ -55,7 +55,7 @@ export class BaseState<T extends State> extends EventEmitter {
         return undefined;
     }
 
-    private checkKey(object: T, key: string) {
+    private checkKey(object: TOptions, key: string) {
         if(Array.isArray(object) || object.hasOwnProperty(key)) {
             return true;
         }

@@ -1,20 +1,17 @@
+import { processClasses } from "../helpers";
 import { EventEmitter } from "./event-emitter";
 
-export abstract class BaseView<T extends EventEmitter> extends EventEmitter {
-    protected model: T;
+export abstract class BaseView<TState extends EventEmitter> extends EventEmitter {
+    protected model: TState;
     protected container: HTMLElement;
     
-    constructor(model: T, container: HTMLElement, classes?: string[] | string) {
+    constructor(model: TState, container: HTMLElement, classes?: string[] | string) {
         super();
         
         this.model = model;
         this.container = container;
 
-        if(classes) {
-            typeof(classes) === 'string' ?
-                container.classList.add(classes) :
-                container.classList.add(...classes);
-        }
+        this.container.classList.add(...processClasses(classes));
 
         this.render();
 

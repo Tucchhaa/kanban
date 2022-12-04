@@ -1,4 +1,6 @@
-const noop = () => {};
+export interface IDictionary<TValue> {
+    [id: string]: TValue;
+}
 
 export class ButtonOptions {
     text?: string;

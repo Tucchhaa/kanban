@@ -1,6 +1,4 @@
-interface IDictionary<TValue> {
-    [id: string]: TValue;
-}
+import { IDictionary } from "../types";
 
 export interface IEventEmitter {
     on(event: string, listener: CallableFunction): IEventEmitter;

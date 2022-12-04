@@ -2,7 +2,7 @@ import { BaseView } from "../base/view";
 import { Card, EditableFieldOptions } from "../types";
 import { CardComponent } from "../components/card.component";
 import { ColumnModel } from "./column.model";
-import { TogglableInputComponent } from "../components/togglable-input.component";
+import { EditableFieldComponent } from "../components/editable-field.component";
 
 export class ColumnView extends BaseView<ColumnModel> {
     constructor(model: ColumnModel, container: HTMLElement) {
@@ -10,7 +10,6 @@ export class ColumnView extends BaseView<ColumnModel> {
     }
 
     protected _render(fragment: DocumentFragment): void {
-        console.log(this.model);
         this.renderHeading(fragment, this.model.name);
         this.renderContent(fragment, this.model.cards);
         this.renderAddCard(fragment);
@@ -55,7 +54,7 @@ export class ColumnView extends BaseView<ColumnModel> {
                 return [true];
             }
         });
-        new TogglableInputComponent(addCardContainer, options);
+        new EditableFieldComponent(addCardContainer, options);
         
         fragment.append(addCardContainer);
     }
