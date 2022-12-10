@@ -1,5 +1,6 @@
 import { BaseState } from "../base/state";
 import { BaseView } from "../base/view";
+import { Dictionary } from "../types";
 import { IDisposable } from "./idisposable";
 
 export type BaseComponentType = BaseComponent<object, BaseState<object>, BaseView<BaseState<object>>, object>;
@@ -12,10 +13,11 @@ export class BaseComponent<
 > implements IDisposable {
     private _name: string;
     private _container: HTMLElement;
-
-    private state: TState;
+    
+    private _state: TState;
     private _view: TView;
     private controller: TController;
+    private controllers: Dictionary<object | undefined> = {};
 
     constructor(
         name: string,
@@ -31,24 +33,13 @@ export class BaseComponent<
         this._name = name;
         this._container = container;
         
-        this.state = new modelType(options);
-        this._view = new viewType(this.state, container);
-        this.controller = new controllerType(this.state, this._view);
-    }
-
-    public getController<T extends object>(name: string): T {
-        return this._view.getController(name) as T;
-    }
-
-    public getRequiredController<T extends object>(name: string): T {
-        return this._view.getRequiredController(name) as T;
-    }
-
-    public dispose() {
-        this._view.dispose();
+        this._state = new modelType(options);
+        this._view = new viewType(this._state, container);
+        this.controller = new controllerType(this._state, this._view);
     }
 
     // ===
+
     public get name() {
         return this._name;
     }
@@ -57,5 +48,33 @@ export class BaseComponent<
     }
     public get view() {
         return this._view;
+    }
+    public get state() {
+        return this._state;
+    }
+
+    // ===
+
+    public registerController(controller: object, name?: string) {
+        name = name ?? controller.constructor.name;
+
+        if(this.controllers[name])
+            throw new Error(`Controller with ${name} is already registered`);
+
+        this.controllers[name] = controller;
+    }
+
+    public getController<T extends object>(name: string) {
+        return this.controllers[name] as T;
+    }
+
+    public getRequiredController<T extends object>(name: string) {
+        return this.controllers[name]! as T;
+    }
+
+    // ===
+
+    public dispose() {
+        this._view.dispose();
     }
 }

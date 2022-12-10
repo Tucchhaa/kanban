@@ -1,14 +1,11 @@
 import { EventEmitter } from "../base/event-emitter";
 import { BaseView } from "../base/view";
 import { processClasses } from "../helpers";
-import { DragController } from "./drag.controller";
 
 export abstract class DragView<TState extends EventEmitter> extends BaseView<TState> {
     constructor(state: TState, container: HTMLElement, classes?: string[] | string) {
         const _classes = ['draggable', ...processClasses(classes)];
         super(state, container, _classes);
-
-        this.registerController('draggable', new DragController(this, container));
     }
 
     protected render(fragment: DocumentFragment): void {

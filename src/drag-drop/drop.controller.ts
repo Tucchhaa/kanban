@@ -24,7 +24,7 @@ export class DroppableController {
     public processDraggable(drag: BaseComponentType) {
         this.drags.push(drag);
         
-        const dragController = drag.getRequiredController<DragController>('draggable');
+        const dragController = drag.getRequiredController<DragController>(DragController.name);
         
         drag.view.on('drag-start', (e: MouseEvent) => this.dragStart(e, dragController));
         drag.view.on('drag', (e: MouseEvent) => this.drag(e, dragController));
@@ -71,5 +71,12 @@ export class DroppableController {
 
     private dragEnd(e: MouseEvent, dragController: DragController) {
         this.shadowElement.style.display = 'none';
+
+        // ===
+        
+    }
+
+    protected updateOrder() {
+
     }
 }

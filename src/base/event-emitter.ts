@@ -1,6 +1,5 @@
 import { Dictionary } from "../types";
 import { IDisposable } from "./idisposable";
-import { Module } from "./module";
 
 export interface IEventEmitter {
     on(event: string, listener: CallableFunction): IEventEmitter;
@@ -12,12 +11,10 @@ export interface IEventEmitter {
 
 // ===
 
-export class EventEmitter extends Module implements IEventEmitter, IDisposable {
+export class EventEmitter implements IEventEmitter, IDisposable {
     private events: Dictionary<CallableFunction[]>;
 
     constructor() {
-        super();
-
         this.events = {};
     }
     
