@@ -22,7 +22,8 @@ export abstract class BaseView<TState extends BaseStateType> extends ComponentMo
 
         this.container.classList.add(...processClasses(classes));
 
-        setTimeout(() => this._render());
+        // setTimeout(() => this._render());
+        this._render();
 
         this.eventEmitter.on('render', () => this._render());
     }

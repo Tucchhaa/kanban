@@ -45,7 +45,7 @@ export class BaseComponent<
         this._view = new viewType(this._state, container);
 
         if(controllerType)
-            this.registerControllerCore(new controllerType(this._state, this._view));
+            this.registerController(() => new controllerType(this._state, this._view));
 
         this.afterCreateComponentModules();
     }
@@ -68,30 +68,26 @@ export class BaseComponent<
     // ===
 
     private beforeCreateComponentModules() {
-        (ComponentModule.prototype as any)._eventEmitter = this.eventEmitter;
+        ComponentModule.startCreatingComponent(this.eventEmitter);
     }
     private afterCreateComponentModules() {
-        (ComponentModule.prototype as any)._eventEmitter = undefined;
+        ComponentModule.endCreatingComponent();
     }
 
     // ===
 
-    public registerController(createController: () => BaseController, name?: string) {
+    public registerController(controllerFactory: () => BaseController, name?: string) {
         this.beforeCreateComponentModules();
         
-        const controller = createController();
-        this.registerControllerCore(controller, name);
-
-        this.afterCreateComponentModules();
-    }
-
-    private registerControllerCore(controller: BaseController, name?: string) {
+        const controller = controllerFactory();
         name = name ?? controller.constructor.name;
 
         if(this.controllers[name])
             throw new Error(`Controller with ${name} is already registered`);
 
         this.controllers[name] = controller;
+
+        this.afterCreateComponentModules();
     }
 
     public getController<T extends object>(name: string) {

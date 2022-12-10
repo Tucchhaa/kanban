@@ -13,4 +13,20 @@ export class ComponentModule implements IDisposable {
     }
 
     public dispose(): void { }
+
+    // ===
+
+    static emitters: IEventEmitter[] = [];
+
+    static startCreatingComponent(eventEmitter: IEventEmitter) {
+        ComponentModule.emitters.push((ComponentModule.prototype as any)._eventEmitter);
+
+        (ComponentModule.prototype as any)._eventEmitter = eventEmitter;
+    }
+
+    static endCreatingComponent() {
+        const eventEmitter = ComponentModule.emitters.pop();
+    
+        (ComponentModule.prototype as any)._eventEmitter = eventEmitter;
+    }
 }

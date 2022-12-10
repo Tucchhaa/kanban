@@ -31,7 +31,7 @@ export class ColumnView extends DroppableView<ColumnModel> {
             const cardContainer = this.createDOMElement('div');
 
             const cardCompoment = this.createComponent(cardContainer, CardComponent, card, `card${index}`);
-            this.eventEmitter.emit('draggable-rendered', cardCompoment);
+            setTimeout(() => this.eventEmitter.emit('draggable-rendered', cardCompoment));
             
             content.appendChild(cardContainer);
         }
