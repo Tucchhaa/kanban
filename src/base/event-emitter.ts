@@ -1,4 +1,6 @@
 import { Dictionary } from "../types";
+import { IDisposable } from "./idisposable";
+import { Module } from "./module";
 
 export interface IEventEmitter {
     on(event: string, listener: CallableFunction): IEventEmitter;
@@ -10,14 +12,13 @@ export interface IEventEmitter {
 
 // ===
 
-export class EventEmitter implements IEventEmitter {
+export class EventEmitter extends Module implements IEventEmitter, IDisposable {
     private events: Dictionary<CallableFunction[]>;
-    
-    // private componentName: string;
 
     constructor() {
+        super();
+
         this.events = {};
-        // this.componentName = componentName;
     }
     
     public on(event: string, listener: CallableFunction): EventEmitter {
@@ -47,4 +48,6 @@ export class EventEmitter implements IEventEmitter {
             listener(...param);
         }
     }
+
+    public dispose(): void { }
 }

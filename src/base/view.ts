@@ -19,7 +19,7 @@ export abstract class BaseView<TState extends EventEmitter> extends EventEmitter
 
         this.container.classList.add(...processClasses(classes));
 
-        this._render();
+        setTimeout(() => this._render());
 
         this.model.on('render', () => this._render());
     }
@@ -29,6 +29,8 @@ export abstract class BaseView<TState extends EventEmitter> extends EventEmitter
     public dispose(): void {
         for(const func of this.onDispose)
             func();
+
+        super.dispose();
     }
 
     protected _render() {
