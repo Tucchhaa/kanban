@@ -1,14 +1,16 @@
 import { Card } from "../types";
 import { CardModel } from "../card/card.model";
 import { CardView } from "../card/card.view";
+import { BaseComponent } from "../base/component";
 
-export class CardComponent {
+export class CardComponent extends BaseComponent<Card, CardModel, CardView, object> {
     constructor(container: HTMLElement | null, card: Card) {
-        if(!container) {
-            throw new Error('CardComponent container is not defined');
-        }
+        super('Card', CardModel, CardView, CardController, container, card);
+    }
+}
 
-        const model = new CardModel(card);
-        const view = new CardView(model, container);
+class CardController {
+    constructor(model: CardModel, view: CardView) {
+
     }
 }

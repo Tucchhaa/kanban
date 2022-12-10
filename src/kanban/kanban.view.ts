@@ -1,18 +1,15 @@
 import { BaseView } from "../base/view";
 import { ColumnComponent } from "../components/column.component";
-import { TogglableInputComponent } from "../components/togglable-input.component";
-import { EditableFieldController } from "../editable-field/editable-field.controller";
-import { Column, TogglableInputOptions } from "../types";
+import { EditableFieldComponent } from "../components/editable-field.component";
+import { Column, EditableFieldOptions } from "../types";
 import { KanbanModel } from "./kanban.model";
 
 export class KanbanView extends BaseView<KanbanModel> {
-    private renderedColumns: Column[] = [];
-    
     constructor(model: KanbanModel, container: HTMLElement) {
         super(model, container, ['kanban']);
     }
 
-    protected _render(fragment: DocumentFragment): void {
+    protected render(fragment: DocumentFragment): void {
         this._renderColumns(fragment);
         this._renderAddColumn(fragment);
     }
@@ -25,7 +22,7 @@ export class KanbanView extends BaseView<KanbanModel> {
 
             const columnContainer = this.createDOMElement('div', ['column']);
 
-            new ColumnComponent(columnContainer, column);
+            this.createComponent(columnContainer, ColumnComponent, column, `column${index}`);
 
             fragment.appendChild(columnContainer);
         }
@@ -34,7 +31,7 @@ export class KanbanView extends BaseView<KanbanModel> {
     private _renderAddColumn(fragment: DocumentFragment) {
         const addColumnContainer = this.createDOMElement('div', ['column', 'add-column']);
 
-        const options = Object.assign(new TogglableInputOptions(), {
+        const options = Object.assign(new EditableFieldOptions(), {
             btnText: '+ Add new column',
             placeholder: 'Enter new column\'s name',
             onSubmit: (value: string) => this.emit('create-new-column', value),
@@ -48,7 +45,8 @@ export class KanbanView extends BaseView<KanbanModel> {
                 return [true];
             }
         });
-        new TogglableInputComponent(addColumnContainer, options);
+        
+        this.createComponent(addColumnContainer, EditableFieldComponent, options, 'add-column-field');
         
         fragment.append(addColumnContainer);
     }

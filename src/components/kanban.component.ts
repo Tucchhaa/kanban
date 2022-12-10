@@ -2,16 +2,10 @@ import { KanbanOptions } from "../types";
 import { KanbanController } from "../kanban/kanban.controller";
 import { KanbanModel } from "../kanban/kanban.model";
 import { KanbanView } from "../kanban/kanban.view";
+import { BaseComponent } from "../base/component";
 
-export class KanbanComponent {
+export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanModel, KanbanView, KanbanController> {
     constructor(container: HTMLElement | null, options: KanbanOptions) {
-        if(!container) {
-            throw new Error('KanbanComponent container is not defined');
-        }
-
-        const model = new KanbanModel(options);
-        const view = new KanbanView(model, container);
-        
-        new KanbanController(model, view);
+        super('Kanban', KanbanModel, KanbanView, KanbanController, container, options);
     }
 }

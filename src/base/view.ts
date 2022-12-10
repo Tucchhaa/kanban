@@ -1,34 +1,44 @@
+import { processClasses } from "../helpers";
+import { Dictionary } from "../types";
+import { BaseComponentType } from "./component";
 import { EventEmitter } from "./event-emitter";
 
-export abstract class BaseView<T extends EventEmitter> extends EventEmitter {
-    protected model: T;
+export abstract class BaseView<TState extends EventEmitter> extends EventEmitter {
+    protected model: TState;
     protected container: HTMLElement;
     
-    constructor(model: T, container: HTMLElement, classes?: string[] | string) {
+    private components: Dictionary<BaseComponentType> = {};
+
+    protected onDispose: { (): void }[] = [];
+
+    constructor(model: TState, container: HTMLElement, classes?: string[] | string) {
         super();
         
         this.model = model;
         this.container = container;
 
-        if(classes) {
-            typeof(classes) === 'string' ?
-                container.classList.add(classes) :
-                container.classList.add(...classes);
-        }
+        this.container.classList.add(...processClasses(classes));
 
-        this.render();
+        setTimeout(() => this._render());
 
-        this.model.on('render', () => this.render());
+        this.model.on('render', () => this._render());
     }
 
-    protected abstract _render(fragment: DocumentFragment): void;
+    protected abstract render(fragment: DocumentFragment): void;
 
-    public render() {
+    public dispose(): void {
+        for(const func of this.onDispose)
+            func();
+
+        super.dispose();
+    }
+
+    protected _render() {
         this.container.innerHTML = "";
 
         const fragment = document.createDocumentFragment();
         
-        this._render(fragment);
+        this.render(fragment);
 
         this.container.appendChild(fragment);
     }
@@ -43,5 +53,19 @@ export abstract class BaseView<T extends EventEmitter> extends EventEmitter {
         }
 
         return element;
+    }
+
+    protected createComponent(container: HTMLElement, componentType: new(container: HTMLElement, options: object) => BaseComponentType, options: object, key?: string) {
+        const newComponent = new componentType(container, options);
+        
+        if(key) {
+            const component = this.components[key];
+
+            component && component.dispose();
+
+            this.components[key] = newComponent;
+        }
+
+        return newComponent;
     }
 }

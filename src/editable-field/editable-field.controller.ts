@@ -16,11 +16,7 @@ export class EditableFieldController {
     }
 
     public toggleForm(isOpen: boolean) {
-        if(isOpen === false) {
-            this.model.updateByKey('validationMsg', null);
-        }
-        
-        this.model.updateByKey('isOpen', isOpen);
+        this.model.update({ isOpen, validationMsg: null, value: "" });
     }
 
     private _submit(value: string) {

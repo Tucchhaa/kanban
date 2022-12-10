@@ -1,8 +1,8 @@
 import { BaseState } from "../base/state";
 import { noop } from "../helpers";
-import { TogglableInputOptions } from "../types";
+import { EditableFieldOptions } from "../types";
 
-export class EditableFieldModel extends BaseState<TogglableInputOptions> {
+export class EditableFieldModel extends BaseState<EditableFieldOptions> {
     get isOpen() {
         return this.state.isOpen!;
     }
@@ -31,8 +31,8 @@ export class EditableFieldModel extends BaseState<TogglableInputOptions> {
         return this.state.onSubmit!;
     }
 
-    constructor(state: TogglableInputOptions) {
-        const defaultState: TogglableInputOptions = {
+    constructor(state: EditableFieldOptions) {
+        const defaultState: EditableFieldOptions = {
             isOpen: false,
             btnText: 'toggle',
             value: "",

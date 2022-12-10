@@ -1,11 +1,13 @@
-const noop = () => {};
+export interface Dictionary<TValue> {
+    [id: string]: TValue;
+}
 
 export class ButtonOptions {
     text?: string;
     onClick?: (event: MouseEvent) => any;
 }
 
-export class TogglableInputOptions {
+export class EditableFieldOptions {
     isOpen?: boolean;
     btnText?: string;
     value?: string;

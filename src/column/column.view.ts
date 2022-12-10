@@ -1,16 +1,15 @@
-import { BaseView } from "../base/view";
-import { Card, TogglableInputOptions } from "../types";
+import { Card, EditableFieldOptions } from "../types";
 import { CardComponent } from "../components/card.component";
 import { ColumnModel } from "./column.model";
-import { TogglableInputComponent } from "../components/togglable-input.component";
+import { EditableFieldComponent } from "../components/editable-field.component";
+import { DroppableView } from "../drag-drop/drop.view";
 
-export class ColumnView extends BaseView<ColumnModel> {
+export class ColumnView extends DroppableView<ColumnModel> {
     constructor(model: ColumnModel, container: HTMLElement) {
         super(model, container, 'kanban-column');
     }
 
-    protected _render(fragment: DocumentFragment): void {
-        console.log(this.model);
+    protected render(fragment: DocumentFragment): void {
         this.renderHeading(fragment, this.model.name);
         this.renderContent(fragment, this.model.cards);
         this.renderAddCard(fragment);
@@ -27,11 +26,13 @@ export class ColumnView extends BaseView<ColumnModel> {
     private renderContent(fragment: DocumentFragment, cards: Card[]) {
         const content = this.createDOMElement('div', 'content');
 
-        for(const card of cards) {
+        for(let index = 0; index < cards.length; index++) {
+            const card = cards[index];
             const cardContainer = this.createDOMElement('div');
 
-            new CardComponent(cardContainer, card);
-
+            const cardCompoment = this.createComponent(cardContainer, CardComponent, card, `card${index}`);
+            this.emit('draggable-rendered', cardCompoment);
+            
             content.appendChild(cardContainer);
         }
 
@@ -41,7 +42,7 @@ export class ColumnView extends BaseView<ColumnModel> {
     private renderAddCard(fragment: DocumentFragment) {
         const addCardContainer = this.createDOMElement('div', 'add-card');
 
-        const options = Object.assign(new TogglableInputOptions(), {
+        const options = Object.assign(new EditableFieldOptions(), {
             btnText: '+ Add new card',
             placeholder: 'Enter new card\'s name',
             onSubmit: (value: string) => this.emit('create-new-card', value),
@@ -55,7 +56,7 @@ export class ColumnView extends BaseView<ColumnModel> {
                 return [true];
             }
         });
-        new TogglableInputComponent(addCardContainer, options);
+        this.createComponent(addCardContainer, EditableFieldComponent, options, 'add-card-field');
         
         fragment.append(addCardContainer);
     }
