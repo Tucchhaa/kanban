@@ -7,6 +7,6 @@ import { ButtonOptions } from "../types";
 
 export class ButtonComponent extends BaseComponent<ButtonOptions, ButtonModel, ButtonView, ButtonController> {
     constructor(container: HTMLElement | null, options: ButtonOptions) {
-        super('Button', ButtonModel, ButtonView, ButtonController, container, options);
+        super('Button', ButtonModel, ButtonView, container, options, ButtonController);
     }
 }

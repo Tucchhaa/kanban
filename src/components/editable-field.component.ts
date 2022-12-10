@@ -6,6 +6,6 @@ import { EditableFieldOptions } from "../types";
 
 export class EditableFieldComponent extends BaseComponent<EditableFieldOptions, EditableFieldModel, EditableFieldView, EditableFieldController> {
     constructor(container: HTMLElement | null, options: EditableFieldOptions) {
-        super('EditableField', EditableFieldModel, EditableFieldView, EditableFieldController, container, options);
+        super('EditableField', EditableFieldModel, EditableFieldView, container, options, EditableFieldController);
     }
 }

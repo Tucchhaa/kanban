@@ -4,7 +4,7 @@ import { MouseDirection } from "../utils/mouse-direction";
 import { DragController } from "./drag.controller";
 import { DropState } from "./drop.state";
 
-export class DroppableController {
+export class DropController {
     private state: DropState;
     private view: EventEmitter;
     private element: HTMLElement;

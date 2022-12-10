@@ -6,6 +6,6 @@ import { BaseComponent } from "../base/component";
 
 export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanModel, KanbanView, KanbanController> {
     constructor(container: HTMLElement | null, options: KanbanOptions) {
-        super('Kanban', KanbanModel, KanbanView, KanbanController, container, options);
+        super('Kanban', KanbanModel, KanbanView, container, options, KanbanController);
     }
 }

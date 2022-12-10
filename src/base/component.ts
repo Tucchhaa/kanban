@@ -16,15 +16,14 @@ export class BaseComponent<
     
     private _state: TState;
     private _view: TView;
-    private controller: TController;
     private controllers: Dictionary<object | undefined> = {};
 
     constructor(
         name: string,
         modelType: new(options: TOptions) => TState, 
         viewType: new(state: TState, container: HTMLElement) => TView, 
-        controllerType: new(state: TState, view: TView) => TController,
-        container: HTMLElement | null, options: TOptions
+        container: HTMLElement | null, options: TOptions,
+        controllerType?: new(state: TState, view: TView) => TController
     ) {
         if(!container) {
             throw new Error(`${name}Component container is not defined`);
@@ -35,7 +34,9 @@ export class BaseComponent<
         
         this._state = new modelType(options);
         this._view = new viewType(this._state, container);
-        this.controller = new controllerType(this._state, this._view);
+
+        if(controllerType)
+            this.registerController(new controllerType(this._state, this._view));
     }
 
     // ===

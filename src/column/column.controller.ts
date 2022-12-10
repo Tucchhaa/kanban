@@ -1,4 +1,3 @@
-import { EditableFieldController } from "../editable-field/editable-field.controller";
 import { ColumnModel } from "./column.model";
 import { ColumnView } from "./column.view";
 
