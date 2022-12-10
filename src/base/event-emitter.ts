@@ -6,7 +6,7 @@ export interface IEventEmitter {
 
     onMany(events: string[], listener: CallableFunction): IEventEmitter;
 
-    emit(event: string, param?: any): void;
+    emit(event: string, ...param: any): void;
 }
 
 // ===

@@ -22,7 +22,7 @@ export class EditableFieldView extends BaseView<EditableFieldModel> {
         const btn = this.createDOMElement('div');
 
         btn.innerText = this.model.btnText;
-        btn.addEventListener('click', () => this.emit('open'));
+        btn.addEventListener('click', () => this.eventEmitter.emit('open'));
 
         fragment.appendChild(btn);
     }
@@ -32,7 +32,7 @@ export class EditableFieldView extends BaseView<EditableFieldModel> {
         const input = this.createDOMElement('input') as HTMLInputElement;
         input.setAttribute('type', 'text');
         input.setAttribute('placeholder', this.model.placeholder);
-        input.addEventListener('input', (e) => this.emit('value-change', (e.target as HTMLInputElement).value));
+        input.addEventListener('input', (e) => this.eventEmitter.emit('value-change', (e.target as HTMLInputElement).value));
         input.value = this.model.value;
         fragment.appendChild(input);
 
@@ -49,13 +49,13 @@ export class EditableFieldView extends BaseView<EditableFieldModel> {
         const submitBtn = this.createDOMElement('span');
         this.createComponent(submitBtn, ButtonComponent, {
             text: 'submit', 
-            onClick: () => this.emit('submit', input.value)
+            onClick: () => this.eventEmitter.emit('submit', input.value)
         }, 'submit-btn');
 
         const cancelBtn = this.createDOMElement('span');
         this.createComponent(cancelBtn, ButtonComponent, {
             text: 'cancel', 
-            onClick: () => this.emit('close', input.value)
+            onClick: () => this.eventEmitter.emit('close', input.value)
         }, 'cancel-btn');
         
         buttons.append(submitBtn, cancelBtn);

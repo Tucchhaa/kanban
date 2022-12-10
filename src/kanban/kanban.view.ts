@@ -34,7 +34,7 @@ export class KanbanView extends BaseView<KanbanModel> {
         const options = Object.assign(new EditableFieldOptions(), {
             btnText: '+ Add new column',
             placeholder: 'Enter new column\'s name',
-            onSubmit: (value: string) => this.emit('create-new-column', value),
+            onSubmit: (value: string) => this.eventEmitter.emit('create-new-column', value),
             validation: (value: string) => {
                 if(value.length === 0)
                     return [false, 'Column name can\'t be empty'];

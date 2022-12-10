@@ -1,9 +1,12 @@
 import { processClasses } from "../helpers";
 import { Dictionary } from "../types";
 import { BaseComponentType } from "./component";
-import { EventEmitter } from "./event-emitter";
+import { ComponentModule } from "./component-module";
+import { BaseStateType } from "./state";
 
-export abstract class BaseView<TState extends EventEmitter> extends EventEmitter {
+export type BaseViewType = BaseView<BaseStateType>;
+
+export abstract class BaseView<TState extends BaseStateType> extends ComponentModule {
     protected model: TState;
     protected container: HTMLElement;
     
@@ -21,7 +24,7 @@ export abstract class BaseView<TState extends EventEmitter> extends EventEmitter
 
         setTimeout(() => this._render());
 
-        this.model.on('render', () => this._render());
+        this.eventEmitter.on('render', () => this._render());
     }
 
     protected abstract render(fragment: DocumentFragment): void;

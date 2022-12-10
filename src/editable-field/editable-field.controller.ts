@@ -1,18 +1,21 @@
+import { BaseController } from "../base/controller";
 import { EditableFieldModel } from "./editable-field.model";
 import { EditableFieldView } from "./editable-field.view";
 
-export class EditableFieldController {
+export class EditableFieldController extends BaseController {
     private model: EditableFieldModel;
     private view: EditableFieldView;
     
     constructor(model: EditableFieldModel, view: EditableFieldView) {
+        super();
+
         this.model = model;
         this.view = view;
         
-        this.view.on('open', () => this.toggleForm(true));
-        this.view.on('close', () => this.toggleForm(false));
-        this.view.on('submit', (value: string) => this._submit(value));
-        this.view.on('value-change', (value: string) => this._updateValue(value));
+        this.eventEmitter.on('open', () => this.toggleForm(true));
+        this.eventEmitter.on('close', () => this.toggleForm(false));
+        this.eventEmitter.on('submit', (value: string) => this._submit(value));
+        this.eventEmitter.on('value-change', (value: string) => this._updateValue(value));
     }
 
     public toggleForm(isOpen: boolean) {

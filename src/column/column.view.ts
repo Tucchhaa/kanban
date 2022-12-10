@@ -31,7 +31,7 @@ export class ColumnView extends DroppableView<ColumnModel> {
             const cardContainer = this.createDOMElement('div');
 
             const cardCompoment = this.createComponent(cardContainer, CardComponent, card, `card${index}`);
-            this.emit('draggable-rendered', cardCompoment);
+            this.eventEmitter.emit('draggable-rendered', cardCompoment);
             
             content.appendChild(cardContainer);
         }
@@ -45,7 +45,7 @@ export class ColumnView extends DroppableView<ColumnModel> {
         const options = Object.assign(new EditableFieldOptions(), {
             btnText: '+ Add new card',
             placeholder: 'Enter new card\'s name',
-            onSubmit: (value: string) => this.emit('create-new-card', value),
+            onSubmit: (value: string) => this.eventEmitter.emit('create-new-card', value),
             validation: (value: string) => {
                 if(value.length === 0)
                     return [false, 'Card name can\'t be empty'];

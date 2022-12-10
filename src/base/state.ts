@@ -1,11 +1,13 @@
 import { isObject } from "../helpers";
-import { EventEmitter } from "./event-emitter";
+import { ComponentModule } from "./component-module";
 
-interface State {
+export interface OptionsType {
     [id: string]: any;
 }
 
-export class BaseState<TOptions extends State> extends EventEmitter {
+export type BaseStateType = BaseState<OptionsType>;
+
+export class BaseState<TOptions extends OptionsType> extends ComponentModule {
     protected state: TOptions;
     
     public getState() {
@@ -22,7 +24,7 @@ export class BaseState<TOptions extends State> extends EventEmitter {
         this.state = this.updateRecusively(Object.assign({}, this.state), newState);
 
         if(needRender) {
-            this.emit('render');
+            this.eventEmitter.emit('render');
         }
     }
 
@@ -32,7 +34,7 @@ export class BaseState<TOptions extends State> extends EventEmitter {
                 continue;
             
             if(isObject(state[key]) && isObject(newState[key]))
-                (state[key] as State) = this.updateRecusively(state[key], newState[key]);
+                (state[key] as OptionsType) = this.updateRecusively(state[key], newState[key]);
             else 
                 state[key] = newState[key];
         } 
@@ -44,10 +46,10 @@ export class BaseState<TOptions extends State> extends EventEmitter {
         if(!this.checkKey(this.state, key))
             return;
 
-        (this.state[key] as State) = value;
+        (this.state[key] as OptionsType) = value;
 
         if(needRender) {
-            this.emit('render');
+            this.eventEmitter.emit('render');
         }
     }
 

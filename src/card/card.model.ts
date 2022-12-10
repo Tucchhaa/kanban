@@ -1,4 +1,3 @@
-import { EventEmitter } from "../base/event-emitter";
 import { BaseState } from "../base/state";
 import { Card } from "../types";
 

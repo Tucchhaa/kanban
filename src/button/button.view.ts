@@ -11,7 +11,7 @@ export class ButtonView extends BaseView<ButtonModel> {
 
         btn.innerText = this.model.text;
         btn.className = this.model.text;
-        btn.addEventListener('click', () => this.emit('click'));
+        btn.addEventListener('click', () => this.eventEmitter.emit('click'));
 
         fragment.appendChild(btn);
     }

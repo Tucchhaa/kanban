@@ -11,7 +11,6 @@ export class ColumnComponent extends BaseComponent<Column, ColumnModel, ColumnVi
         super('Column', ColumnModel, ColumnView, container, column, ColumnController);
 
         const state = new DropState({});
-        const dropController = new DropController(state, this.view, this.container);
-        this.registerController(dropController);
+        this.registerController(() => new DropController(state, this.view, this.container));
     }
 }

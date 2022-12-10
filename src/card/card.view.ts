@@ -9,7 +9,7 @@ export class CardView extends DragView<CardModel> {
     protected render(fragment: DocumentFragment): void {
         const text = this.createDOMElement('span');
         text.innerText = this.model.name;
-        
+
         fragment.appendChild(text);
 
         super.render(fragment);

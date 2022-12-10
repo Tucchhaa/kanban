@@ -1,20 +1,24 @@
+import { BaseController } from "../base/controller";
 import { EventEmitter } from "../base/event-emitter";
+import { BaseViewType } from "../base/view";
 
-export class DragController {
-    private view: EventEmitter;
+export class DragController extends BaseController {
+    private view: BaseViewType;
     
     private _dragElement: HTMLElement;
     public get dragElement() {
         return this._dragElement;
     }
     
-    constructor(view: EventEmitter, element: HTMLElement) {
+    constructor(view: BaseViewType, element: HTMLElement) {
+        super();
+
         this.view = view;
         this._dragElement = element;
         
-        this.view.on('drag-start', (e: MouseEvent) => this.dragStart(e));
-        this.view.on('drag', (e: MouseEvent) => this.drag(e));
-        this.view.on('drag-end', (e: MouseEvent) => this.dragEnd(e));
+        this.eventEmitter.on('drag-start', (e: MouseEvent) => this.dragStart(e));
+        this.eventEmitter.on('drag', (e: MouseEvent) => this.drag(e));
+        this.eventEmitter.on('drag-end', (e: MouseEvent) => this.dragEnd(e));
     }
 
     private _sizes: { width: number, height: number } = { width: 50, height: 50 };
