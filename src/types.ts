@@ -1,3 +1,5 @@
+import { generateID } from "./helpers";
+
 export interface Dictionary<TValue> {
     [id: string]: TValue;
 }
@@ -10,7 +12,7 @@ export class Column {
     constructor(name: string) {
         this.name = name;
         this.cards = [];
-        this.id = "id";
+        this.id = generateID(Column.name);
     }
 }
 
@@ -19,7 +21,7 @@ export class Card {
     name?: string;
 
     constructor(name: string) {
-        this.id = '__'
+        this.id = generateID(Card.name);
         this.name = name;
     }
 }
