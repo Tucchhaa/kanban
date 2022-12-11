@@ -23,12 +23,10 @@ export class KanbanView extends BaseView<KanbanState> {
             const column = columns[index];
 
             const columnContainer = this.createDOMElement('div', ['column']);
-            const columnOptions: ColumnOptions = {
-                column,
-                onUpdateColumn: (column: Column) => this.eventEmitter.emit('update-column', column)
-            }
+            const columnOptions: ColumnOptions = { column }
 
-            this.createComponent(columnContainer, ColumnComponent, columnOptions, `column${index}`);
+            const columnComponent = this.createComponent(columnContainer, ColumnComponent, columnOptions, `column${index}`);
+            columnComponent.eventEmitter.on('column-updated', (column: Column) => this.eventEmitter.emit('update-column', column));
 
             fragment.appendChild(columnContainer);
         }
