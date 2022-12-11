@@ -36,7 +36,10 @@ export class DragController<ItemType extends object> extends BaseController {
 
     private dragStart(e: MouseEvent) {
         e.preventDefault();
-            
+
+        this.element.classList.add('state-dragging');
+        this.element.style.cursor = 'grabbing';
+
         this._sizes = this.getElementSizes(this._element);
         this.offset = this.getMouseOffsetInElement(this._element, e);
 
@@ -53,6 +56,9 @@ export class DragController<ItemType extends object> extends BaseController {
     }
     
     private dragEnd(e: MouseEvent) {
+        this.element.classList.remove('state-dragging');
+        this.element.style.cursor = 'auto';
+
         this._element.style.position = "";
         this._element.style.top = "";
         this._element.style.left = "";

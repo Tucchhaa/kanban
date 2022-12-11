@@ -1,47 +1,39 @@
-.kanban > .add-column {
+.add-column {
     min-height: 40px;
     line-height: 40px; 
-    background-color: black;
-    color: white;
+    background-color: rgba(0, 0, 0, 0.7);
     text-align: center;
     cursor: pointer;
 }
-.kanban > .add-column.state-opened {
+.add-column:hover {
+    background-color: rgba(0, 0, 0, 1);
+}
+
+.add-column.state-opened {
+    background-color: #e3e3e3;
     text-align: left;
-    padding: 10px 15px;
+    padding: 10px 11px 5px 11px;
     line-height: normal;
+    cursor: auto;
+    color: black;
 }
 
-.kanban > .add-column input {
-    height: 30px;
-    width: 100%;
-    box-sizing: border-box;
-    margin: 5px 0 3px;
-    outline-color: aquamarine;
-    padding: 0 8px;
+.add-column .title {
+    color: #efefef;
 }
 
-.kanban > .add-column .validation-msg {
-    font-size: 14px;
-    margin-bottom: 5px;
+.add-column .validation-msg {
+    font-size: 15px;
+    margin-top: 2px;
+    padding-left: 5px;
 }
 
-.kanban > .add-column .buttons {
-    line-height: 35px;
+.add-column .input-wrapper {
+    background-color: #fbfbfb;
+    border: 2px solid #1581c9;
+    padding: 5px 8px;
 }
 
-.kanban > .add-column .submit {
-    padding: 6px 15px; 
-    background-color: blueviolet;
-    color: white;
-    cursor: pointer;
-} 
-
-.kanban > .add-column .cancel {
-    padding: 6px 15px; 
-    margin-left: 10px;
-    border: none;
-    background-color: transparent;
-    color: white;
-    cursor: pointer;
-} 
+/* .add-column.editable-field .buttons {
+    margin-top: 10px;
+} */
