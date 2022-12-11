@@ -14,6 +14,6 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
             items: this.state.columnCards,
             isEqual: (cardA, cardB) => cardA.id === cardB.id
         });
-        this.registerController(() => new DropController(state));
+        this.registerController(() => new DropController<Card>(state));
     }
 }
