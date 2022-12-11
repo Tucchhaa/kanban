@@ -1,16 +1,14 @@
 import { BaseController } from "../base/controller";
-import { EventEmitter } from "../base/event-emitter";
-import { BaseViewType } from "../base/view";
 
-export class DragController extends BaseController {
-    private _item: any;
-    private _dragElement: HTMLElement;
+export class DragController<ItemType extends object> extends BaseController {
+    private _item: ItemType;
+    private _element: HTMLElement;
     
-    constructor(item: any, element: HTMLElement) {
+    constructor(item: ItemType, element: HTMLElement) {
         super();
 
         this._item = item;
-        this._dragElement = element;
+        this._element = element;
         
         this.eventEmitter.on('drag-start', (e: MouseEvent) => this.dragStart(e));
         this.eventEmitter.on('drag', (e: MouseEvent) => this.drag(e));
@@ -26,8 +24,8 @@ export class DragController extends BaseController {
         return this._item;
     }
     
-    public get dragElement() {
-        return this._dragElement;
+    public get element() {
+        return this._element;
     }
 
     public get sizes() {
@@ -38,26 +36,32 @@ export class DragController extends BaseController {
 
     private dragStart(e: MouseEvent) {
         e.preventDefault();
-            
-        this._sizes = this.getElementSizes(this._dragElement);
-        this.offset = this.getMouseOffsetInElement(this._dragElement, e);
 
-        this._dragElement.style.position = 'absolute';
-        this._dragElement.style.width = this._sizes.width + 'px';
-        this._dragElement.style.height = this._sizes.height + 'px';
+        this.element.classList.add('state-dragging');
+        this.element.style.cursor = 'grabbing';
+
+        this._sizes = this.getElementSizes(this._element);
+        this.offset = this.getMouseOffsetInElement(this._element, e);
+
+        this._element.style.position = 'absolute';
+        this._element.style.width = this._sizes.width + 'px';
+        this._element.style.height = this._sizes.height + 'px';
 
         this.drag(e);
     }
 
     private drag(e: MouseEvent) {
-        this._dragElement.style.top = (e.clientY - this.offset.y) + 'px';
-        this._dragElement.style.left = (e.clientX - this.offset.x) + 'px';
+        this._element.style.top = (e.clientY - this.offset.y) + 'px';
+        this._element.style.left = (e.clientX - this.offset.x) + 'px';
     }
     
     private dragEnd(e: MouseEvent) {
-        this._dragElement.style.position = "";
-        this._dragElement.style.top = "";
-        this._dragElement.style.left = "";
+        this.element.classList.remove('state-dragging');
+        this.element.style.cursor = 'auto';
+
+        this._element.style.position = "";
+        this._element.style.top = "";
+        this._element.style.left = "";
     }
 
     private getElementSizes(element: HTMLElement) {

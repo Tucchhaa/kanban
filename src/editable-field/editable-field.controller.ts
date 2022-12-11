@@ -14,15 +14,15 @@ export class EditableFieldController extends BaseController {
         
         this.eventEmitter.on('open', () => this.toggleForm(true));
         this.eventEmitter.on('close', () => this.toggleForm(false));
-        this.eventEmitter.on('submit', (value: string) => this._submit(value));
-        this.eventEmitter.on('value-change', (value: string) => this._updateValue(value));
+        this.eventEmitter.on('submit', (value: string) => this.submit(value));
+        this.eventEmitter.on('value-change', (value: string, placeholder: HTMLElement) => this.updateValue(value, placeholder));
     }
 
     public toggleForm(isOpen: boolean) {
         this.state.update({ isOpen, validationMsg: null, value: "" });
     }
 
-    private _submit(value: string) {
+    private submit(value: string) {
         const [result, msg] = this.state.validation(value);
 
         if(result) {
@@ -34,7 +34,9 @@ export class EditableFieldController extends BaseController {
         }
     }
 
-    private _updateValue(value: string) {
+    private updateValue(value: string, placeholder: HTMLElement) {
         this.state.updateByKey('value', value, false);
+
+        placeholder.style.display = value.length ? 'none' : 'block';
     }
 }

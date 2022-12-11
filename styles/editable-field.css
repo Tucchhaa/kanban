@@ -1,0 +1,58 @@
+/* Input */
+.editable-field .input-container {
+    position: relative;
+    line-height: normal;
+}
+
+.editable-field .placeholder {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: grey;
+}
+
+.editable-field .input {
+    display: block;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    outline: none;
+}
+
+/* Validation message */
+.editable-field .validation-msg {
+    color: #df2c19;
+}
+
+/* Buttons */
+.editable-field .buttons {
+    margin-top: 5px;
+}
+
+.editable-field .buttons button {
+    outline: none;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    padding: 7px 18px;
+}
+
+.editable-field .buttons .submit {
+    background-color: #1581c9;
+    color: #efefef;
+}
+
+.editable-field .buttons .submit:hover {
+    background-color: #136fad;
+}
+
+.editable-field .buttons .cancel {
+    background-color: transparent;
+    margin-left: 5px;
+    color: #1d2934;
+}
+
+.editable-field .buttons .cancel:hover {
+    background-color: #c3bfbf;
+}

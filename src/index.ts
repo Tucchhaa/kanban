@@ -1,6 +1,12 @@
 import { KanbanComponent } from "./components/kanban.component";
 import { KanbanOptions } from "./kanban/kanban.state";
 
+/*
+Known issues:
+no auto focus in editable-field
+no trimming editable-field value
+*/
+
 window.addEventListener("load", () => {    
     const container = document.getElementById("kanban");
 

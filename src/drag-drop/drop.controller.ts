@@ -5,10 +5,8 @@ import { MouseDirection } from "../utils/mouse-direction";
 import { DragController } from "./drag.controller";
 import { DropState } from "./drop.state";
 
-export class DropController extends BaseController {
-    private state: DropState;
-    private view: BaseViewType;
-    private element: HTMLElement;
+export class DropController<TItem extends object> extends BaseController {
+    private state: DropState<TItem>;
     
     private drags: BaseComponentType[] = [];
     private shadowElement: HTMLElement = document.createElement('div');
@@ -16,12 +14,10 @@ export class DropController extends BaseController {
     private shadowIndex: number = -1;
     private isItemsEqual: (itemA: any, itemB: any) => boolean;
 
-    constructor(state: DropState, view: BaseViewType, element: HTMLElement) {
+    constructor(state: DropState<TItem>) {
         super();
 
         this.state = state;
-        this.view = view;
-        this.element = element;
         this.isItemsEqual = this.state.isEqual();
         
         this.eventEmitter.on('draggable-rendered', (drag: BaseComponentType) => this.processDraggable(drag))
@@ -31,26 +27,17 @@ export class DropController extends BaseController {
     public processDraggable(drag: BaseComponentType) {
         this.drags.push(drag);
         
-        const dragController = drag.getRequiredController<DragController>(DragController.name);
+        const dragController = drag.getRequiredController<DragController<TItem>>(DragController.name);
         
         drag.eventEmitter.on('drag-start', (e: MouseEvent) => this.dragStart(e, dragController));
         drag.eventEmitter.on('drag', (e: MouseEvent) => this.drag(e, dragController));
         drag.eventEmitter.on('drag-end', (e: MouseEvent) => this.dragEnd(e, dragController))
     }
 
-    private dragStart(e: MouseEvent, dragController: DragController) {
-        this.shadowElement.style.display = 'block';
-        this.shadowElement.style.backgroundColor = 'lightgrey';
-        this.shadowElement.style.margin = getComputedStyle(dragController.dragElement).margin;
-        this.shadowElement.style.width = dragController.dragElement.clientWidth + 'px';
-        this.shadowElement.style.height = dragController.dragElement.clientHeight + 'px';
-
-        dragController.dragElement.before(this.shadowElement);
-
-        // ===
+    private dragStart(e: MouseEvent, dragController: DragController<TItem>) {
+        this.showShadow(dragController.element)
 
         this.shadowIndex = this.getIndex(dragController.item);
-
         this.mouseDirection.setMousePosition(e);
     }
 
@@ -66,8 +53,8 @@ export class DropController extends BaseController {
         return -1;
     }
 
-    private drag(e: MouseEvent, dragController: DragController) {
-        const currentDragElement = dragController.dragElement;
+    private drag(e: MouseEvent, dragController: DragController<TItem>) {
+        const currentDragElement = dragController.element;
 
         this.mouseDirection.calculateMouseDirection(e);
 
@@ -98,15 +85,12 @@ export class DropController extends BaseController {
         }
     }
 
-    private dragEnd(e: MouseEvent, dragController: DragController) {
-        this.shadowElement.style.display = 'none';
-
-        // ===
-
+    private dragEnd(e: MouseEvent, dragController: DragController<TItem>) {
+        this.hideShadow();
         this.updateItemsOrder(dragController);
     }
 
-    private updateItemsOrder(dragController: DragController) {
+    private updateItemsOrder(dragController: DragController<TItem>) {
         const items = this.state.items;
         const currentItem = dragController.item;
         const newOrder: any[] = [];
@@ -133,5 +117,19 @@ export class DropController extends BaseController {
     private onUpdateItems(items: any) {
         this.drags = [];
         this.state.updateItems(items);
+    }
+
+    private showShadow(element: HTMLElement) {
+        this.shadowElement.classList.add('shadow');
+        this.shadowElement.style.display = 'block';
+        this.shadowElement.style.margin = getComputedStyle(element).margin;
+        this.shadowElement.style.width = element.clientWidth + 'px';
+        this.shadowElement.style.height = element.clientHeight + 'px';
+
+        element.before(this.shadowElement);
+    }
+
+    private hideShadow() {
+        this.shadowElement.style.display = 'none';
     }
 }

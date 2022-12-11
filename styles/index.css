@@ -18,7 +18,8 @@ body {
     display: flex;
     align-items: flex-start;
 
-    background-color: lightgrey;
+    background-color: #023e3d;
+    /* background-color: #01483d; */
 }
 
 .kanban > .column {
@@ -29,7 +30,8 @@ body {
 }
 
 .kanban > .add-column, 
-.kanban-column > .add-card {
+.kanban-column > .add-card,
+.kanban-column > .card {
     -webkit-user-select: none;  
     -moz-user-select: none;
     -ms-user-select: none;

@@ -1,12 +1,11 @@
 import { BaseState } from "../base/state";
 
-type DropOptions = {
-    draggingItem?: any | null;
-    items?: any[] | null;
-    isEqual?: ((itemA: any, itemB: any) => boolean) | null;
+type DropOptions<ItemType extends object> = {
+    items?: ItemType[] | null;
+    isEqual?: ((itemA: ItemType, itemB: ItemType) => boolean) | null;
 }
 
-export class DropState extends BaseState<DropOptions> {
+export class DropState<TItem extends object> extends BaseState<DropOptions<TItem>> {
     public isEqual() {
         return this.state.isEqual!;
     }
@@ -15,7 +14,7 @@ export class DropState extends BaseState<DropOptions> {
         return this.state.items!;
     }
 
-    constructor(state: DropOptions) {
+    constructor(state: DropOptions<TItem>) {
         const defaultState = {
             draggingItem: null,
             items: null,
