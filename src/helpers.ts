@@ -39,3 +39,7 @@ export const isDeepEqual = (object1: any, object2: any) => {
     }
     return true;
 };
+
+export const generateID = (prefix: string = "") => {
+    return prefix + `__id${Math.floor(Math.random() * Date.now())}`;
+}
