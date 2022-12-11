@@ -3,17 +3,13 @@ import { EventEmitter } from "../base/event-emitter";
 import { BaseViewType } from "../base/view";
 
 export class DragController extends BaseController {
-    private view: BaseViewType;
-    
+    private _item: any;
     private _dragElement: HTMLElement;
-    public get dragElement() {
-        return this._dragElement;
-    }
     
-    constructor(view: BaseViewType, element: HTMLElement) {
+    constructor(item: any, element: HTMLElement) {
         super();
 
-        this.view = view;
+        this._item = item;
         this._dragElement = element;
         
         this.eventEmitter.on('drag-start', (e: MouseEvent) => this.dragStart(e));
@@ -22,11 +18,21 @@ export class DragController extends BaseController {
     }
 
     private _sizes: { width: number, height: number } = { width: 50, height: 50 };
+    private offset: { x: number, y: number } = { x: 50, y: 50 };
+    
+    // ===
+
+    public get item() {
+        return this._item;
+    }
+    
+    public get dragElement() {
+        return this._dragElement;
+    }
+
     public get sizes() {
         return this._sizes;
     }
-    
-    private offset: { x: number, y: number } = { x: 50, y: 50 };
 
     // ===
 

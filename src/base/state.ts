@@ -53,6 +53,14 @@ export class BaseState<TOptions extends OptionsType> extends ComponentModule {
         }
     }
 
+    public updateBy(func: (state: TOptions) => void, needRender = true) {
+        func(this.state);
+        
+        if(needRender) {
+            this.eventEmitter.emit('render');
+        }
+    }
+
     public get(key: string): any {
         if(this.checkKey(this.state, key)) {
             return this.state[key];

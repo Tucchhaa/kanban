@@ -1,17 +1,17 @@
 import { Card, EditableFieldOptions } from "../types";
 import { CardComponent } from "../components/card.component";
-import { ColumnModel } from "./column.model";
+import { ColumnState } from "./column.state";
 import { EditableFieldComponent } from "../components/editable-field.component";
 import { DroppableView } from "../drag-drop/drop.view";
 
-export class ColumnView extends DroppableView<ColumnModel> {
-    constructor(model: ColumnModel, container: HTMLElement) {
-        super(model, container, 'kanban-column');
+export class ColumnView extends DroppableView<ColumnState> {
+    constructor(state: ColumnState, container: HTMLElement) {
+        super(state, container, 'kanban-column');
     }
 
     protected render(fragment: DocumentFragment): void {
-        this.renderHeading(fragment, this.model.name);
-        this.renderContent(fragment, this.model.cards);
+        this.renderHeading(fragment, this.state.column.name!);
+        this.renderContent(fragment, this.state.columnCards);
         this.renderAddCard(fragment);
     }
 
@@ -31,6 +31,7 @@ export class ColumnView extends DroppableView<ColumnModel> {
             const cardContainer = this.createDOMElement('div');
 
             const cardCompoment = this.createComponent(cardContainer, CardComponent, card, `card${index}`);
+
             setTimeout(() => this.eventEmitter.emit('draggable-rendered', cardCompoment));
             
             content.appendChild(cardContainer);

@@ -1,6 +1,7 @@
 import { BaseComponentType } from "../base/component";
 import { BaseController } from "../base/controller";
 import { EventEmitter } from "../base/event-emitter";
+import { BaseStateType } from "../base/state";
 import { BaseViewType } from "../base/view";
 import { MouseDirection } from "../utils/mouse-direction";
 import { DragController } from "./drag.controller";
@@ -78,9 +79,5 @@ export class DropController extends BaseController {
 
         // ===
         
-    }
-
-    protected updateOrder() {
-
     }
 }

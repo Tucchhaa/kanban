@@ -10,7 +10,7 @@ export abstract class DragView<TState extends BaseStateType> extends BaseView<TS
 
     protected render(fragment: DocumentFragment): void {
         const dragStart = (e: MouseEvent) => {
-            this.eventEmitter.emit('drag-start', e, this.container)
+            this.eventEmitter.emit('drag-start', e);
             
             document.addEventListener('mousemove', drag);
             document.addEventListener('mouseup', dragEnd);

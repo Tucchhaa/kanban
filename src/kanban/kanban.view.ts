@@ -1,12 +1,12 @@
 import { BaseView } from "../base/view";
 import { ColumnComponent } from "../components/column.component";
 import { EditableFieldComponent } from "../components/editable-field.component";
-import { Column, EditableFieldOptions } from "../types";
-import { KanbanModel } from "./kanban.model";
+import { Column, ColumnOptions, EditableFieldOptions } from "../types";
+import { KanbanState } from "./kanban.state";
 
-export class KanbanView extends BaseView<KanbanModel> {
-    constructor(model: KanbanModel, container: HTMLElement) {
-        super(model, container, ['kanban']);
+export class KanbanView extends BaseView<KanbanState> {
+    constructor(state: KanbanState, container: HTMLElement) {
+        super(state, container, ['kanban']);
     }
 
     protected render(fragment: DocumentFragment): void {
@@ -15,14 +15,18 @@ export class KanbanView extends BaseView<KanbanModel> {
     }
 
     private _renderColumns(fragment: DocumentFragment) {
-        const columns = this.model.columns;
+        const columns = this.state.columns;
 
         for(let index = 0; index < columns.length; index++) {
             const column = columns[index];
 
             const columnContainer = this.createDOMElement('div', ['column']);
+            const columnOptions: ColumnOptions = {
+                column,
+                onUpdateColumn: (column: Column) => this.eventEmitter.emit('update-column', column)
+            }
 
-            this.createComponent(columnContainer, ColumnComponent, column, `column${index}`);
+            this.createComponent(columnContainer, ColumnComponent, columnOptions, `column${index}`);
 
             fragment.appendChild(columnContainer);
         }

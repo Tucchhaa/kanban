@@ -1,21 +1,33 @@
 import { BaseController } from "../base/controller";
-import { KanbanModel } from "./kanban.model";
+import { Column } from "../types";
+import { KanbanState } from "./kanban.state";
 import { KanbanView } from "./kanban.view";
 
 export class KanbanController extends BaseController {
-    private model: KanbanModel;
+    private state: KanbanState;
     private view: KanbanView;
     
-    constructor(model: KanbanModel, view: KanbanView) {
+    constructor(state: KanbanState, view: KanbanView) {
         super();
 
-        this.model = model;
+        this.state = state;
         this.view = view;
         
-        this.eventEmitter.on('create-new-column', (columnName: string) => this._createNewColumn(columnName));
+        this.eventEmitter.on('create-new-column', (columnName: string) => this.createNewColumn(columnName));
+        this.eventEmitter.on('update-column', (column: Column) => this.updateColumn(column));
     }
 
-    private _createNewColumn(columnName: string) {   
-        this.model.createColumn(columnName);
+    private createNewColumn(columnName: string) {
+        const column = new Column(columnName);
+
+        this.state.createColumn(column);
+    }
+
+    private updateColumn(column: Column) {
+        const isUpdated = this.state.updateColumn(column);
+
+        if(!isUpdated) {
+            throw new Error(`${this.componentName} can not update column with id: ${column.id}, because it does not exist`);
+        }
     }
 }

@@ -1,17 +1,17 @@
 import { BaseController } from "../base/controller";
-import { ButtonModel } from "./button.model";
+import { ButtonState } from "./button.state";
 import { ButtonView } from "./button.view";
 
 export class ButtonController extends BaseController {
-    private model: ButtonModel;
+    private state: ButtonState;
     private view: ButtonView;
     
-    constructor(model: ButtonModel, view: ButtonView) {
+    constructor(state: ButtonState, view: ButtonView) {
         super();
 
-        this.model = model;
+        this.state = state;
         this.view = view;
         
-        this.eventEmitter.on('click', (event: MouseEvent) => this.model.onClick(event));
+        this.eventEmitter.on('click', (event: MouseEvent) => this.state.onClick(event));
     }
 }

@@ -7,17 +7,17 @@ import { BaseStateType } from "./state";
 export type BaseViewType = BaseView<BaseStateType>;
 
 export abstract class BaseView<TState extends BaseStateType> extends ComponentModule {
-    protected model: TState;
+    protected state: TState;
     protected container: HTMLElement;
     
     private components: Dictionary<BaseComponentType> = {};
 
     protected onDispose: { (): void }[] = [];
 
-    constructor(model: TState, container: HTMLElement, classes?: string[] | string) {
+    constructor(state: TState, container: HTMLElement, classes?: string[] | string) {
         super();
         
-        this.model = model;
+        this.state = state;
         this.container = container;
 
         this.container.classList.add(...processClasses(classes));

@@ -25,7 +25,7 @@ export class BaseComponent<
 
     constructor(
         name: string,
-        modelType: new(options: TOptions) => TState, 
+        stateType: new(options: TOptions) => TState, 
         viewType: new(state: TState, container: HTMLElement) => TView, 
         container: HTMLElement | null, options: TOptions,
         controllerType?: new(state: TState, view: TView) => TController
@@ -41,7 +41,7 @@ export class BaseComponent<
         
         this.beforeCreateComponentModules();
 
-        this._state = new modelType(options);
+        this._state = new stateType(options);
         this._view = new viewType(this._state, container);
 
         if(controllerType)
@@ -68,7 +68,8 @@ export class BaseComponent<
     // ===
 
     private beforeCreateComponentModules() {
-        ComponentModule.startCreatingComponent(this.eventEmitter);
+        const componentProps = { componentName: this._name, emitter: this.eventEmitter };
+        ComponentModule.startCreatingComponent(componentProps);
     }
     private afterCreateComponentModules() {
         ComponentModule.endCreatingComponent();
