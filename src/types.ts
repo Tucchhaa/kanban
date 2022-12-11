@@ -51,6 +51,7 @@ export class CardOptions {
 }
 
 export class Card {
+    id?: number | string;
     name?: string;
 
     constructor(name: string) {

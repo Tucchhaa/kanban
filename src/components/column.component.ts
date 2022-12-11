@@ -11,7 +11,15 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
         super('Column', ColumnState, ColumnView, container, columnOptions, ColumnController);
 
         const state = new DropState({
-            items: this.state.columnCards
+            items: this.state.columnCards,
+            getIndex: (items, item) => {
+                for(let i=0; i < items.length; i++) {
+                    if(item.id === items[i].id)
+                        return i;
+                }
+                
+                return 0;
+            }
         });
         this.registerController(() => new DropController(state, this.view, this.container));
     }

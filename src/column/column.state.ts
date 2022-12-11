@@ -23,12 +23,14 @@ export class ColumnState extends BaseState<ColumnOptions> {
         super(state, defaultState);
     }
 
+    public updateCards(cards: Card[]) {
+        this.updateBy((state) => { state.column!.cards = cards });
+    }
+
     public createCard(cardName: string) {
         const created = new Card(cardName);
         const updatedCards = [...this.columnCards!, created];
 
-        this.updateBy((state) => { state.column!.cards = updatedCards })
-
-        return created;
+        this.updateCards(updatedCards);
     }
 }
