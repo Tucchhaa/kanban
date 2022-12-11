@@ -2,7 +2,7 @@ import { BaseState } from "../base/state";
 import { noop } from "../helpers";
 import { EditableFieldOptions } from "../types";
 
-export class EditableFieldModel extends BaseState<EditableFieldOptions> {
+export class EditableFieldState extends BaseState<EditableFieldOptions> {
     get isOpen() {
         return this.state.isOpen!;
     }

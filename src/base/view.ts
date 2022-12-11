@@ -1,27 +1,31 @@
 import { processClasses } from "../helpers";
 import { Dictionary } from "../types";
 import { BaseComponentType } from "./component";
-import { EventEmitter } from "./event-emitter";
+import { ComponentModule } from "./component-module";
+import { BaseStateType } from "./state";
 
-export abstract class BaseView<TState extends EventEmitter> extends EventEmitter {
-    protected model: TState;
+export type BaseViewType = BaseView<BaseStateType>;
+
+export abstract class BaseView<TState extends BaseStateType> extends ComponentModule {
+    protected state: TState;
     protected container: HTMLElement;
     
     private components: Dictionary<BaseComponentType> = {};
 
     protected onDispose: { (): void }[] = [];
 
-    constructor(model: TState, container: HTMLElement, classes?: string[] | string) {
+    constructor(state: TState, container: HTMLElement, classes?: string[] | string) {
         super();
         
-        this.model = model;
+        this.state = state;
         this.container = container;
 
         this.container.classList.add(...processClasses(classes));
 
-        setTimeout(() => this._render());
+        // setTimeout(() => this._render());
+        this._render();
 
-        this.model.on('render', () => this._render());
+        this.eventEmitter.on('render', () => this._render());
     }
 
     protected abstract render(fragment: DocumentFragment): void;

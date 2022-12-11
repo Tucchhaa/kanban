@@ -21,10 +21,19 @@ export class KanbanOptions {
     columns?: Column[];
 }
 
+export class ColumnOptions {
+    column?: Column | null;
+    onUpdateColumn?: ((column: Column) => void) | null;
+
+    constructor(column: Column) {
+        this.column = column;
+    }
+}
+
 export class Column {
-    name?: string | null;
-    id?: number | string | null;
-    cards?: Card[] | null;
+    name?: string;
+    id?: number | string;
+    cards?: Card[];
 
     constructor(name: string) {
         this.name = name;
@@ -33,8 +42,16 @@ export class Column {
     }
 }
 
+export class CardOptions {
+    card?: Card | null;
+
+    constructor(card: Card) {
+        this.card = card;
+    }
+}
+
 export class Card {
-    name?: string | null;
+    name?: string;
 
     constructor(name: string) {
         this.name = name;

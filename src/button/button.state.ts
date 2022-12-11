@@ -2,7 +2,7 @@ import { BaseState } from "../base/state";
 import { noop } from "../helpers";
 import { ButtonOptions } from "../types";
 
-export class ButtonModel extends BaseState<ButtonOptions> {
+export class ButtonState extends BaseState<ButtonOptions> {
     get text() {
         return this.state.text!;
     }

@@ -1,14 +1,14 @@
 import { BaseView } from "../base/view";
 import { ButtonComponent } from "../components/button.component";
-import { EditableFieldModel } from "./editable-field.model";
+import { EditableFieldState } from "./editable-field.state";
 
-export class EditableFieldView extends BaseView<EditableFieldModel> {
-    constructor(model: EditableFieldModel, container: HTMLElement) {
-        super(model, container);
+export class EditableFieldView extends BaseView<EditableFieldState> {
+    constructor(state: EditableFieldState, container: HTMLElement) {
+        super(state, container);
     }
 
     protected render(fragment: DocumentFragment): void {
-        if(this.model.isOpen) {
+        if(this.state.isOpen) {
             this._renderOpened(fragment);
             this.container.classList.add('state-opened');
         }
@@ -21,8 +21,8 @@ export class EditableFieldView extends BaseView<EditableFieldModel> {
     private _renderClosed(fragment: DocumentFragment) {
         const btn = this.createDOMElement('div');
 
-        btn.innerText = this.model.btnText;
-        btn.addEventListener('click', () => this.emit('open'));
+        btn.innerText = this.state.btnText;
+        btn.addEventListener('click', () => this.eventEmitter.emit('open'));
 
         fragment.appendChild(btn);
     }
@@ -31,15 +31,15 @@ export class EditableFieldView extends BaseView<EditableFieldModel> {
         // Input
         const input = this.createDOMElement('input') as HTMLInputElement;
         input.setAttribute('type', 'text');
-        input.setAttribute('placeholder', this.model.placeholder);
-        input.addEventListener('input', (e) => this.emit('value-change', (e.target as HTMLInputElement).value));
-        input.value = this.model.value;
+        input.setAttribute('placeholder', this.state.placeholder);
+        input.addEventListener('input', (e) => this.eventEmitter.emit('value-change', (e.target as HTMLInputElement).value));
+        input.value = this.state.value;
         fragment.appendChild(input);
 
         // Validation message
-        if(this.model.validationMsg) {
+        if(this.state.validationMsg) {
             const message = this.createDOMElement('div', 'validation-msg');
-            message.innerText = this.model.validationMsg;
+            message.innerText = this.state.validationMsg;
             fragment.appendChild(message);
         }
 
@@ -49,13 +49,13 @@ export class EditableFieldView extends BaseView<EditableFieldModel> {
         const submitBtn = this.createDOMElement('span');
         this.createComponent(submitBtn, ButtonComponent, {
             text: 'submit', 
-            onClick: () => this.emit('submit', input.value)
+            onClick: () => this.eventEmitter.emit('submit', input.value)
         }, 'submit-btn');
 
         const cancelBtn = this.createDOMElement('span');
         this.createComponent(cancelBtn, ButtonComponent, {
             text: 'cancel', 
-            onClick: () => this.emit('close', input.value)
+            onClick: () => this.eventEmitter.emit('close', input.value)
         }, 'cancel-btn');
         
         buttons.append(submitBtn, cancelBtn);

@@ -1,34 +1,39 @@
 import { BaseComponentType } from "../base/component";
+import { BaseController } from "../base/controller";
 import { EventEmitter } from "../base/event-emitter";
+import { BaseStateType } from "../base/state";
+import { BaseViewType } from "../base/view";
 import { MouseDirection } from "../utils/mouse-direction";
 import { DragController } from "./drag.controller";
 import { DropState } from "./drop.state";
 
-export class DroppableController {
+export class DropController extends BaseController {
     private state: DropState;
-    private view: EventEmitter;
+    private view: BaseViewType;
     private element: HTMLElement;
     
     private drags: BaseComponentType[] = [];
     private shadowElement: HTMLElement = document.createElement('div');
     private mouseDirection: MouseDirection = new MouseDirection();
 
-    constructor(state: DropState, view: EventEmitter, element: HTMLElement) {
+    constructor(state: DropState, view: BaseViewType, element: HTMLElement) {
+        super();
+
         this.state = state;
         this.view = view;
         this.element = element;
         
-        view.on('draggable-rendered', (drag: BaseComponentType) => this.processDraggable(drag))
+        this.eventEmitter.on('draggable-rendered', (drag: BaseComponentType) => this.processDraggable(drag))
     }
 
     public processDraggable(drag: BaseComponentType) {
         this.drags.push(drag);
         
-        const dragController = drag.getRequiredController<DragController>('draggable');
+        const dragController = drag.getRequiredController<DragController>(DragController.name);
         
-        drag.view.on('drag-start', (e: MouseEvent) => this.dragStart(e, dragController));
-        drag.view.on('drag', (e: MouseEvent) => this.drag(e, dragController));
-        drag.view.on('drag-end', (e: MouseEvent) => this.dragEnd(e, dragController))
+        drag.eventEmitter.on('drag-start', (e: MouseEvent) => this.dragStart(e, dragController));
+        drag.eventEmitter.on('drag', (e: MouseEvent) => this.drag(e, dragController));
+        drag.eventEmitter.on('drag-end', (e: MouseEvent) => this.dragEnd(e, dragController))
     }
 
     private dragStart(e: MouseEvent, dragController: DragController) {
@@ -71,5 +76,8 @@ export class DroppableController {
 
     private dragEnd(e: MouseEvent, dragController: DragController) {
         this.shadowElement.style.display = 'none';
+
+        // ===
+        
     }
 }
