@@ -32,9 +32,8 @@ export class ColumnState extends BaseState<ColumnOptions> {
         this.updateBy((state) => { state.column!.cards = cards });
     }
 
-    public createCard(cardName: string) {
-        const created = new Card(cardName);
-        const updatedCards = [...this.columnCards!, created];
+    public createCard(newCard: Card) {
+        const updatedCards = [...this.columnCards!, newCard];
 
         this.updateCards(updatedCards);
     }
