@@ -1,5 +1,4 @@
-import { ColumnOptions } from "../types";
-import { ColumnState } from "../column/column.state";
+import { ColumnOptions, ColumnState } from "../column/column.state";
 import { ColumnView } from "../column/column.view";
 import { ColumnController } from "../column/column.controller";
 import { BaseComponent } from "../base/component";

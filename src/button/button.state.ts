@@ -1,6 +1,10 @@
 import { BaseState } from "../base/state";
 import { noop } from "../helpers";
-import { ButtonOptions } from "../types";
+
+export type ButtonOptions = {
+    text?: string;
+    onClick?: (event: MouseEvent) => any;
+}
 
 export class ButtonState extends BaseState<ButtonOptions> {
     get text() {

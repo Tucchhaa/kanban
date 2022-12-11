@@ -1,6 +1,15 @@
 import { BaseState } from "../base/state";
 import { noop } from "../helpers";
-import { EditableFieldOptions } from "../types";
+
+export type EditableFieldOptions = {
+    isOpen?: boolean;
+    btnText?: string;
+    value?: string;
+    validationMsg?: string | null;
+    placeholder?: string;
+    onSubmit?: (value: string) => any;
+    validation?: (value: string) => [boolean, string];
+}
 
 export class EditableFieldState extends BaseState<EditableFieldOptions> {
     get isOpen() {
@@ -16,7 +25,7 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
     }
 
     get placeholder() {
-        return (this.state.placeholder as string);
+        return this.state.placeholder!;
     }
 
     get validationMsg() {

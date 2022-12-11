@@ -1,5 +1,5 @@
 import { KanbanComponent } from "./components/kanban.component";
-import { KanbanOptions } from "./types";
+import { KanbanOptions } from "./kanban/kanban.state";
 
 window.addEventListener("load", () => {    
     const container = document.getElementById("kanban");

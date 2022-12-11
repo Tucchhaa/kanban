@@ -1,6 +1,9 @@
-import { EventEmitter } from "../base/event-emitter";
 import { BaseState } from "../base/state";
-import { Column, KanbanOptions } from "../types";
+import { Column } from "../types";
+
+export type KanbanOptions = {
+    columns?: Column[];
+}
 
 export class KanbanState extends BaseState<KanbanOptions> {
     public get columns() {

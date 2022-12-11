@@ -1,5 +1,10 @@
 import { BaseState } from "../base/state";
-import { Card, Column, ColumnOptions } from "../types";
+import { Card, Column } from "../types";
+
+export type ColumnOptions = {
+    column?: Column;
+    onUpdateColumn?: ((column: Column) => void);
+}
 
 export class ColumnState extends BaseState<ColumnOptions> {
     public get column() {

@@ -1,7 +1,9 @@
 import { BaseView } from "../base/view";
+import { ColumnOptions } from "../column/column.state";
 import { ColumnComponent } from "../components/column.component";
 import { EditableFieldComponent } from "../components/editable-field.component";
-import { Column, ColumnOptions, EditableFieldOptions } from "../types";
+import { EditableFieldOptions } from "../editable-field/editable-field.state";
+import { Column } from "../types";
 import { KanbanState } from "./kanban.state";
 
 export class KanbanView extends BaseView<KanbanState> {
@@ -35,7 +37,7 @@ export class KanbanView extends BaseView<KanbanState> {
     private _renderAddColumn(fragment: DocumentFragment) {
         const addColumnContainer = this.createDOMElement('div', ['column', 'add-column']);
 
-        const options = Object.assign(new EditableFieldOptions(), {
+        const options: EditableFieldOptions = {
             btnText: '+ Add new column',
             placeholder: 'Enter new column\'s name',
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-column', value),
@@ -46,9 +48,9 @@ export class KanbanView extends BaseView<KanbanState> {
                 if(value.length > 40)
                     return [false, 'Column name is too long'];
 
-                return [true];
+                return [true, ''];
             }
-        });
+        };
         
         this.createComponent(addColumnContainer, EditableFieldComponent, options, 'add-column-field');
         
