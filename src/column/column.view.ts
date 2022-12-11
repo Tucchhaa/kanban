@@ -1,8 +1,10 @@
-import { Card, EditableFieldOptions } from "../types";
+import { Card } from "../types";
 import { CardComponent } from "../components/card.component";
 import { ColumnState } from "./column.state";
 import { EditableFieldComponent } from "../components/editable-field.component";
 import { DroppableView } from "../drag-drop/drop.view";
+import { EditableFieldOptions } from "../editable-field/editable-field.state";
+import { CardOptions } from "../card/card.state";
 
 export class ColumnView extends DroppableView<ColumnState> {
     constructor(state: ColumnState, container: HTMLElement) {
@@ -30,7 +32,8 @@ export class ColumnView extends DroppableView<ColumnState> {
             const card = cards[index];
             const cardContainer = this.createDOMElement('div');
 
-            const cardCompoment = this.createComponent(cardContainer, CardComponent, card, `card${index}`);
+            const cardOptions: CardOptions = { card };
+            const cardCompoment = this.createComponent(cardContainer, CardComponent, cardOptions, `card${index}`);
 
             setTimeout(() => this.eventEmitter.emit('draggable-rendered', cardCompoment));
             
@@ -43,7 +46,7 @@ export class ColumnView extends DroppableView<ColumnState> {
     private renderAddCard(fragment: DocumentFragment) {
         const addCardContainer = this.createDOMElement('div', 'add-card');
 
-        const options = Object.assign(new EditableFieldOptions(), {
+        const options: EditableFieldOptions = {
             btnText: '+ Add new card',
             placeholder: 'Enter new card\'s name',
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-card', value),
@@ -54,9 +57,9 @@ export class ColumnView extends DroppableView<ColumnState> {
                 if(value.length > 40)
                     return [false, 'Card name is too long'];
 
-                return [true];
+                return [true, ''];
             }
-        });
+        };
         this.createComponent(addCardContainer, EditableFieldComponent, options, 'add-card-field');
         
         fragment.append(addCardContainer);

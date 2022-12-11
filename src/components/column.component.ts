@@ -1,5 +1,4 @@
-import { ColumnOptions } from "../types";
-import { ColumnState } from "../column/column.state";
+import { ColumnOptions, ColumnState } from "../column/column.state";
 import { ColumnView } from "../column/column.view";
 import { ColumnController } from "../column/column.controller";
 import { BaseComponent } from "../base/component";
@@ -11,7 +10,8 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
         super('Column', ColumnState, ColumnView, container, columnOptions, ColumnController);
 
         const state = new DropState({
-            items: this.state.columnCards
+            items: this.state.columnCards,
+            isEqual: (cardA, cardB) => cardA.id === cardB.id
         });
         this.registerController(() => new DropController(state, this.view, this.container));
     }

@@ -1,6 +1,5 @@
-import { KanbanOptions } from "../types";
 import { KanbanController } from "../kanban/kanban.controller";
-import { KanbanState } from "../kanban/kanban.state";
+import { KanbanOptions, KanbanState } from "../kanban/kanban.state";
 import { KanbanView } from "../kanban/kanban.view";
 import { BaseComponent } from "../base/component";
 

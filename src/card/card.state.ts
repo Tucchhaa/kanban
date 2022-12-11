@@ -1,5 +1,9 @@
 import { BaseState } from "../base/state";
-import { Card, CardOptions } from "../types";
+import { Card } from "../types";
+
+export type CardOptions = {
+    card?: Card;
+}
 
 export class CardState extends BaseState<CardOptions> {
     public get card() {
@@ -8,7 +12,7 @@ export class CardState extends BaseState<CardOptions> {
 
     constructor(state: CardOptions) {
         const defaultState = {
-            card: null
+            card: new Card("__empty-card__")
         }
         
         super(state, defaultState);
