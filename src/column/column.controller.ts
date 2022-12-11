@@ -23,7 +23,6 @@ export class ColumnController extends BaseController {
     }
 
     private updateCardsOrder(cards: Card[]) {
-        console.log(cards);
         this.state.updateCards(cards);
         this.eventEmitter.emit('items-updated', this.state.columnCards);
     }

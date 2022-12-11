@@ -3,12 +3,12 @@ import { BaseState } from "../base/state";
 type DropOptions = {
     draggingItem?: any | null;
     items?: any[] | null;
-    getIndex?: ((items: any, item: any) => number) | null;
+    isEqual?: ((itemA: any, itemB: any) => boolean) | null;
 }
 
 export class DropState extends BaseState<DropOptions> {
-    public getIndex(item: any) {
-        return this.state.getIndex!(this.state.items, item);
+    public isEqual() {
+        return this.state.isEqual!;
     }
 
     public get items() {
@@ -19,7 +19,7 @@ export class DropState extends BaseState<DropOptions> {
         const defaultState = {
             draggingItem: null,
             items: null,
-            getIndex: null
+            isEqual: (itemA: any, itemB: any) => itemA === itemB
         };
 
         super(state, defaultState);

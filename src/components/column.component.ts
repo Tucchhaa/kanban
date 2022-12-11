@@ -11,14 +11,7 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
 
         const state = new DropState({
             items: this.state.columnCards,
-            getIndex: (items, item) => {
-                for(let i=0; i < items.length; i++) {
-                    if(item.id === items[i].id)
-                        return i;
-                }
-                
-                return 0;
-            }
+            isEqual: (cardA, cardB) => cardA.id === cardB.id
         });
         this.registerController(() => new DropController(state, this.view, this.container));
     }

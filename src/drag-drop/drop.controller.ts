@@ -14,7 +14,7 @@ export class DropController extends BaseController {
     private shadowElement: HTMLElement = document.createElement('div');
     private mouseDirection: MouseDirection = new MouseDirection();
     private shadowIndex: number = -1;
-    private startIndex: number = -1;
+    private isItemsEqual: (itemA: any, itemB: any) => boolean;
 
     constructor(state: DropState, view: BaseViewType, element: HTMLElement) {
         super();
@@ -22,6 +22,7 @@ export class DropController extends BaseController {
         this.state = state;
         this.view = view;
         this.element = element;
+        this.isItemsEqual = this.state.isEqual();
         
         this.eventEmitter.on('draggable-rendered', (drag: BaseComponentType) => this.processDraggable(drag))
         this.eventEmitter.on('items-updated', (items: any) => this.onUpdateItems(items));
@@ -48,10 +49,21 @@ export class DropController extends BaseController {
 
         // ===
 
-        this.startIndex = this.state.getIndex(dragController.item);
-        this.shadowIndex = this.startIndex;
+        this.shadowIndex = this.getIndex(dragController.item);
 
         this.mouseDirection.setMousePosition(e);
+    }
+
+    private getIndex(item: any): number {
+        for(let index=0; index < this.state.items.length; index++) {
+            const itemB = this.state.items[index];
+
+            if(this.isItemsEqual(itemB, item)) {
+                return index;
+            }
+        }
+
+        return -1;
     }
 
     private drag(e: MouseEvent, dragController: DragController) {
@@ -105,7 +117,7 @@ export class DropController extends BaseController {
             if(index === this.shadowIndex)
                 newOrder.push(currentItem);
 
-            if(item === currentItem) {
+            if(this.isItemsEqual(item, currentItem)) {
                 continue;
             }
             
