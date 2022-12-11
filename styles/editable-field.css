@@ -1,0 +1,21 @@
+.editable-field .input-container {
+    position: relative;
+    min-height: 35px;
+    line-height: normal;
+}
+
+.editable-field .placeholder {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: grey;
+}
+
+.editable-field .input {
+    display: block;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    outline: none;
+}

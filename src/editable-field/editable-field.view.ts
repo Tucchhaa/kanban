@@ -4,7 +4,7 @@ import { EditableFieldState } from "./editable-field.state";
 
 export class EditableFieldView extends BaseView<EditableFieldState> {
     constructor(state: EditableFieldState, container: HTMLElement) {
-        super(state, container);
+        super(state, container, 'editable-field');
     }
 
     protected render(fragment: DocumentFragment): void {
@@ -28,34 +28,51 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
     }
 
     private _renderOpened(fragment: DocumentFragment) {
-        // Input
-        const input = this.createDOMElement('input') as HTMLInputElement;
-        input.setAttribute('type', 'text');
-        input.setAttribute('placeholder', this.state.placeholder);
-        input.addEventListener('input', (e) => this.eventEmitter.emit('value-change', (e.target as HTMLInputElement).value));
-        input.value = this.state.value;
-        fragment.appendChild(input);
+        this.renderInput(fragment);
+        this.renderValidationMessage(fragment);
+        this.renderButtons(fragment);
+    }
 
-        // Validation message
+    private renderInput(fragment: DocumentFragment) {
+        const placeholder = this.createDOMElement('div', 'placeholder');
+        placeholder.innerText = this.state.placeholder;
+
+        const input = this.createDOMElement('span', 'input') as HTMLInputElement;
+        input.setAttribute('contenteditable', 'true');
+        input.setAttribute('role', 'textbox');
+        input.addEventListener('input', e => this.eventEmitter.emit('value-change', (e.target as HTMLInputElement).innerText, placeholder));
+        input.value = this.state.value;
+
+        const container = this.createDOMElement('div', 'input-container');
+        container.append(placeholder, input);
+
+        const wrapper = this.createDOMElement('div', 'input-wrapper');
+        wrapper.append(container);
+
+        fragment.appendChild(wrapper);
+    }
+
+    private renderValidationMessage(fragment: DocumentFragment) {
         if(this.state.validationMsg) {
             const message = this.createDOMElement('div', 'validation-msg');
             message.innerText = this.state.validationMsg;
             fragment.appendChild(message);
         }
+    }
 
-        // Buttons
+    private renderButtons(fragment: DocumentFragment) {
         const buttons = this.createDOMElement('div', 'buttons');
         
         const submitBtn = this.createDOMElement('span');
         this.createComponent(submitBtn, ButtonComponent, {
             text: 'submit', 
-            onClick: () => this.eventEmitter.emit('submit', input.value)
+            onClick: () => this.eventEmitter.emit('submit', this.state.value)
         }, 'submit-btn');
 
         const cancelBtn = this.createDOMElement('span');
         this.createComponent(cancelBtn, ButtonComponent, {
             text: 'cancel', 
-            onClick: () => this.eventEmitter.emit('close', input.value)
+            onClick: () => this.eventEmitter.emit('close', this.state.value)
         }, 'cancel-btn');
         
         buttons.append(submitBtn, cancelBtn);
