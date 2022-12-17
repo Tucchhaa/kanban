@@ -1,43 +1,57 @@
 import { IEventEmitter } from "./event-emitter";
 import { IDisposable } from "./idisposable";
 
-export type ComponentProps = { componentName: string, emitter: IEventEmitter };
+export type ComponentProps = { 
+    componentName: string,
+    getContainer: () => HTMLElement,
+    getIsFirstRender: () => boolean,
+    emitter: IEventEmitter
+};
 
 export class ComponentModule implements IDisposable {
-    private _eventEmitter: IEventEmitter;
-    private _componentName: string;
+    protected componentName: string;
+    protected getContainer: () => HTMLElement;
+    protected getIsFirstRender: () => boolean;
+    protected eventEmitter: IEventEmitter;
 
-    protected get eventEmitter() {
-        return this._eventEmitter!;
+    protected get container() {
+        return this.getContainer();
+    }
+    protected get isFirstRender() {
+        return this.getIsFirstRender();
     }
 
-    protected get componentName() {
-        return this._componentName!;
-    }
     constructor() {
-        this._eventEmitter = (ComponentModule.prototype as any)._eventEmitter;
-        this._componentName = (ComponentModule.prototype as any)._componentName;
+        this.componentName = (ComponentModule.prototype as any)._componentName;
+        this.getContainer = (ComponentModule.prototype as any)._getContainer;
+        this.getIsFirstRender = (ComponentModule.prototype as any)._getIsFirstRender;
+        this.eventEmitter = (ComponentModule.prototype as any)._eventEmitter;
     }
 
     public dispose(): void { }
 
     // ===
 
-    static props: ComponentProps[] = [];
+    private static props: ComponentProps[] = [];
 
-    static startCreatingComponent(componentProps: ComponentProps) {
-        ComponentModule.props.push(componentProps);
-
-        (ComponentModule.prototype as any)._componentName = componentProps.componentName;
-        (ComponentModule.prototype as any)._eventEmitter = componentProps.emitter;
+    private static setPropsToPrototype(props: ComponentProps) {
+        (ComponentModule.prototype as any)._componentName = props.componentName;
+        (ComponentModule.prototype as any)._getContainer = props.getContainer;
+        (ComponentModule.prototype as any)._getIsFirstRender = props.getIsFirstRender;
+        (ComponentModule.prototype as any)._eventEmitter = props.emitter;
     }
 
-    static endCreatingComponent() {
+    public static startCreatingComponent(componentProps: ComponentProps) {
+        ComponentModule.props.push(componentProps);
+
+        ComponentModule.setPropsToPrototype(componentProps)
+    }
+
+    public static endCreatingComponent() {
         const componentProps = ComponentModule.props.pop();
         
         if(componentProps) {
-            (ComponentModule.prototype as any)._componentName = componentProps.componentName;
-            (ComponentModule.prototype as any)._eventEmitter = componentProps.emitter;
+            this.setPropsToPrototype(componentProps);
         }
     }
 }

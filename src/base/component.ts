@@ -1,7 +1,7 @@
 import { BaseState } from "../base/state";
 import { BaseView } from "../base/view";
 import { Dictionary } from "../types";
-import { ComponentModule } from "./component-module";
+import { ComponentModule, ComponentProps } from "./component-module";
 import { BaseController } from "./controller";
 import { EventEmitter, IEventEmitter } from "./event-emitter";
 import { IDisposable } from "./idisposable"; 
@@ -15,7 +15,8 @@ export class BaseComponent<
     TController extends BaseController
 > implements IDisposable {
     private _name: string;
-    private _container: HTMLElement;
+    public container: HTMLElement;
+    public isFirstRender: boolean;
     
     private _state: TState;
     private _view: TView;
@@ -26,7 +27,7 @@ export class BaseComponent<
     constructor(
         name: string,
         stateType: new(options: TOptions) => TState, 
-        viewType: new(state: TState, container: HTMLElement) => TView, 
+        viewType: new(state: TState) => TView, 
         container: HTMLElement | null, options: TOptions,
         controllerType?: new(state: TState, view: TView) => TController
     ) {
@@ -35,14 +36,15 @@ export class BaseComponent<
         }
 
         this._name = name;
-        this._container = container;
+        this.container = container;
+        this.isFirstRender = true;
 
         this.eventEmitter = new EventEmitter();
         
         this.beforeCreateComponentModules();
 
         this._state = new stateType(options);
-        this._view = new viewType(this._state, container);
+        this._view = new viewType(this._state);
 
         if(controllerType)
             this.registerController(() => new controllerType(this._state, this._view));
@@ -55,9 +57,6 @@ export class BaseComponent<
     public get name() {
         return this._name;
     }
-    public get container() {
-        return this._container;
-    }
     public get view() {
         return this._view;
     }
@@ -68,7 +67,13 @@ export class BaseComponent<
     // ===
 
     private beforeCreateComponentModules() {
-        const componentProps = { componentName: this._name, emitter: this.eventEmitter };
+        const componentProps: ComponentProps = { 
+            componentName: this._name, 
+            getContainer: () => this.container,
+            getIsFirstRender: () => this.isFirstRender,
+            emitter: this.eventEmitter 
+        };
+
         ComponentModule.startCreatingComponent(componentProps);
     }
     private afterCreateComponentModules() {

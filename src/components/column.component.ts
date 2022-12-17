@@ -12,7 +12,7 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
 
         const state = new DropState<Card>({
             items: this.state.columnCards,
-            isEqual: (cardA, cardB) => cardA.id === cardB.id
+            isItemsEqual: (cardA, cardB) => cardA.id === cardB.id
         });
         this.registerController(() => new DropController<Card>(state));
     }

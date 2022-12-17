@@ -9,7 +9,7 @@ export class CardComponent extends BaseComponent<CardOptions, CardState, CardVie
     constructor(container: HTMLElement | null, cardOptions: CardOptions) {
         super('Card', CardState, CardView, container, cardOptions, CardController);
         
-        this.registerController(() => new DragController<Card>(this.state.card, this.container));
+        this.registerController(() => new DragController<Card>(this.state.card));
     }
 }
 

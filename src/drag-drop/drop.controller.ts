@@ -18,7 +18,7 @@ export class DropController<TItem extends object> extends BaseController {
         super();
 
         this.state = state;
-        this.isItemsEqual = this.state.isEqual();
+        this.isItemsEqual = this.state.isitemsEqual();
         
         this.eventEmitter.on('draggable-rendered', (drag: BaseComponentType) => this.processDraggable(drag))
         this.eventEmitter.on('items-updated', (items: any) => this.onUpdateItems(items));
@@ -27,11 +27,13 @@ export class DropController<TItem extends object> extends BaseController {
     public processDraggable(drag: BaseComponentType) {
         this.drags.push(drag);
         
-        const dragController = drag.getRequiredController<DragController<TItem>>(DragController.name);
+        if(drag.isFirstRender) {
+            const dragController = drag.getRequiredController<DragController<TItem>>(DragController.name);
         
-        drag.eventEmitter.on('drag-start', (e: MouseEvent) => this.dragStart(e, dragController));
-        drag.eventEmitter.on('drag', (e: MouseEvent) => this.drag(e, dragController));
-        drag.eventEmitter.on('drag-end', (e: MouseEvent) => this.dragEnd(e, dragController))
+            drag.eventEmitter.on('drag-start', (e: MouseEvent) => this.dragStart(e, dragController));
+            drag.eventEmitter.on('drag', (e: MouseEvent) => this.drag(e, dragController));
+            drag.eventEmitter.on('drag-end', (e: MouseEvent) => this.dragEnd(e, dragController));
+        }
     }
 
     private dragStart(e: MouseEvent, dragController: DragController<TItem>) {
@@ -94,22 +96,24 @@ export class DropController<TItem extends object> extends BaseController {
         const items = this.state.items;
         const currentItem = dragController.item;
         const newOrder: any[] = [];
+        const insertBeforeIndex = this.shadowIndex;
 
         for(let index=0; index < items.length; index++) {
             const item = items[index];
 
-            if(index === this.shadowIndex)
+            if(index === insertBeforeIndex)
                 newOrder.push(currentItem);
 
             if(this.isItemsEqual(item, currentItem)) {
                 continue;
             }
             
-            newOrder.push(item);
+            newOrder.push(items[index]);
         }
 
-        if(this.shadowIndex === items.length)
+        if(insertBeforeIndex === items.length) {
             newOrder.push(currentItem);
+        }
 
         this.eventEmitter.emit('update-items-order', newOrder);
     }

@@ -8,21 +8,18 @@ export type BaseViewType = BaseView<BaseStateType>;
 
 export abstract class BaseView<TState extends BaseStateType> extends ComponentModule {
     protected state: TState;
-    protected container: HTMLElement;
     
-    private components: Dictionary<BaseComponentType> = {};
+    private components: Dictionary<BaseComponentType | undefined> = {};
 
     protected onDispose: { (): void }[] = [];
 
-    constructor(state: TState, container: HTMLElement, classes?: string[] | string) {
+    constructor(state: TState, classes?: string[] | string) {
         super();
         
         this.state = state;
-        this.container = container;
 
         this.container.classList.add(...processClasses(classes));
 
-        // setTimeout(() => this._render());
         this._render();
 
         this.eventEmitter.on('render', () => this._render());
@@ -30,7 +27,7 @@ export abstract class BaseView<TState extends BaseStateType> extends ComponentMo
 
     protected abstract render(fragment: DocumentFragment): void;
 
-    public dispose(): void {
+    public override dispose(): void {
         for(const func of this.onDispose)
             func();
 
@@ -45,6 +42,8 @@ export abstract class BaseView<TState extends BaseStateType> extends ComponentMo
         this.render(fragment);
 
         this.container.appendChild(fragment);
+
+        this.eventEmitter.emit('rendered');
     }
 
     protected createDOMElement(tagName: string, classes?: string[] | string) {
@@ -59,17 +58,49 @@ export abstract class BaseView<TState extends BaseStateType> extends ComponentMo
         return element;
     }
 
-    protected createComponent(container: HTMLElement, componentType: new(container: HTMLElement, options: object) => BaseComponentType, options: object, key?: string) {
-        const newComponent = new componentType(container, options);
+    // protected createComponent(container: HTMLElement, componentType: new(container: HTMLElement, options: object) => BaseComponentType, options: object, key?: string) {
+    //     const newComponent = new componentType(container, options);
         
+    //     if(key) {
+    //         const component = this.components[key];
+
+    //         component && component.dispose();
+    //         // compoennt.container = container;
+    //         // component.state.update(options, true);
+
+    //         this.components[key] = newComponent;
+    //     }
+
+    //     return newComponent;
+    // }
+
+    protected createComponent(container: HTMLElement, componentType: new(container: HTMLElement, options: object) => BaseComponentType, options: object, key?: string): BaseComponentType {
         if(key) {
             const component = this.components[key];
 
-            component && component.dispose();
+            if(component) {
+                component.dispose();
 
-            this.components[key] = newComponent;
+                this.copyAttributes(component.container, container);
+                component.isFirstRender = false;
+                component.container = container;
+                component.state.update(options);
+            }
+            else {
+                this.components[key] = new componentType(container, options);
+            }
+
+            return this.components[key]!;
         }
 
-        return newComponent;
+        return new componentType(container, options)
+    }
+
+    private copyAttributes(from: HTMLElement, to: HTMLElement) {
+        for(const name of from.getAttributeNames()) {
+            const value = from.getAttribute(name);
+
+            value && to.setAttribute(name, value);
+        }
     }
 }

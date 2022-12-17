@@ -7,8 +7,8 @@ import { Column } from "../types";
 import { KanbanState } from "./kanban.state";
 
 export class KanbanView extends BaseView<KanbanState> {
-    constructor(state: KanbanState, container: HTMLElement) {
-        super(state, container, ['kanban']);
+    constructor(state: KanbanState) {
+        super(state, ['kanban']);
     }
 
     protected render(fragment: DocumentFragment): void {

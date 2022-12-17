@@ -2,13 +2,11 @@ import { BaseController } from "../base/controller";
 
 export class DragController<ItemType extends object> extends BaseController {
     private _item: ItemType;
-    private _element: HTMLElement;
     
-    constructor(item: ItemType, element: HTMLElement) {
+    constructor(item: ItemType) {
         super();
 
         this._item = item;
-        this._element = element;
         
         this.eventEmitter.on('drag-start', (e: MouseEvent) => this.dragStart(e));
         this.eventEmitter.on('drag', (e: MouseEvent) => this.drag(e));
@@ -25,7 +23,7 @@ export class DragController<ItemType extends object> extends BaseController {
     }
     
     public get element() {
-        return this._element;
+        return this.container;
     }
 
     public get sizes() {
@@ -40,28 +38,31 @@ export class DragController<ItemType extends object> extends BaseController {
         this.element.classList.add('state-dragging');
         this.element.style.cursor = 'grabbing';
 
-        this._sizes = this.getElementSizes(this._element);
-        this.offset = this.getMouseOffsetInElement(this._element, e);
+        this._sizes = this.getElementSizes(this.element);
+        this.offset = this.getMouseOffsetInElement(this.element, e);
 
-        this._element.style.position = 'absolute';
-        this._element.style.width = this._sizes.width + 'px';
-        this._element.style.height = this._sizes.height + 'px';
+        this.element.style.position = 'absolute';
+        this.element.style.width = this._sizes.width + 'px';
+        this.element.style.height = this._sizes.height + 'px';
 
         this.drag(e);
     }
 
     private drag(e: MouseEvent) {
-        this._element.style.top = (e.clientY - this.offset.y) + 'px';
-        this._element.style.left = (e.clientX - this.offset.x) + 'px';
+        this.element.style.top = (e.clientY - this.offset.y) + 'px';
+        this.element.style.left = (e.clientX - this.offset.x) + 'px';
     }
     
     private dragEnd(e: MouseEvent) {
         this.element.classList.remove('state-dragging');
-        this.element.style.cursor = 'auto';
+        this.element.style.removeProperty('cursor');
+        
+        this.element.style.removeProperty('position');
+        this.element.style.removeProperty('top');
+        this.element.style.removeProperty('left');
 
-        this._element.style.position = "";
-        this._element.style.top = "";
-        this._element.style.left = "";
+        this.element.style.removeProperty('width');
+        this.element.style.removeProperty('height');
     }
 
     private getElementSizes(element: HTMLElement) {

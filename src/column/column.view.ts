@@ -7,8 +7,8 @@ import { EditableFieldOptions } from "../editable-field/editable-field.state";
 import { CardOptions } from "../card/card.state";
 
 export class ColumnView extends DroppableView<ColumnState> {
-    constructor(state: ColumnState, container: HTMLElement) {
-        super(state, container, 'kanban-column');
+    constructor(state: ColumnState) {
+        super(state, 'kanban-column');
     }
 
     protected render(fragment: DocumentFragment): void {
@@ -33,7 +33,7 @@ export class ColumnView extends DroppableView<ColumnState> {
             const cardContainer = this.createDOMElement('div');
 
             const cardOptions: CardOptions = { card };
-            const cardCompoment = this.createComponent(cardContainer, CardComponent, cardOptions, `card${index}`);
+            const cardCompoment = this.createComponent(cardContainer, CardComponent, cardOptions, `card-${card.id}`);
 
             setTimeout(() => this.eventEmitter.emit('draggable-rendered', cardCompoment));
             
@@ -49,6 +49,7 @@ export class ColumnView extends DroppableView<ColumnState> {
         const options: EditableFieldOptions = {
             btnText: '+ Add new card',
             placeholder: 'Enter new card\'s name',
+            prepareValue: (value: string) => value.trim().replace(/\s\s+/g, ' '),
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-card', value),
             validation: (value: string) => {
                 if(value.length === 0)

@@ -6,8 +6,8 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
     public input?: HTMLElement;
     public placeholder?: HTMLElement;
 
-    constructor(state: EditableFieldState, container: HTMLElement) {
-        super(state, container, 'editable-field');
+    constructor(state: EditableFieldState) {
+        super(state, 'editable-field');
     }
 
     protected render(fragment: DocumentFragment): void {
