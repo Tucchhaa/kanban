@@ -3,6 +3,9 @@ import { ButtonComponent } from "../components/button.component";
 import { EditableFieldState } from "./editable-field.state";
 
 export class EditableFieldView extends BaseView<EditableFieldState> {
+    public input?: HTMLElement;
+    public placeholder?: HTMLElement;
+
     constructor(state: EditableFieldState, container: HTMLElement) {
         super(state, container, 'editable-field');
     }
@@ -34,22 +37,36 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
     }
 
     private renderInput(fragment: DocumentFragment) {
-        const placeholder = this.createDOMElement('div', 'placeholder');
-        placeholder.innerText = this.state.placeholder;
-
-        const input = this.createDOMElement('span', 'input') as HTMLInputElement;
-        input.setAttribute('contenteditable', 'true');
-        input.setAttribute('role', 'textbox');
-        input.addEventListener('input', e => this.eventEmitter.emit('value-change', (e.target as HTMLInputElement).innerText, placeholder));
-        input.value = this.state.value;
+        this.placeholder = this.createPlaceholder();
+        this.input = this.createInput();
 
         const container = this.createDOMElement('div', 'input-container');
-        container.append(placeholder, input);
+        container.append(this.placeholder, this.input);
 
         const wrapper = this.createDOMElement('div', 'input-wrapper');
         wrapper.append(container);
 
         fragment.appendChild(wrapper);
+    }
+
+    private createPlaceholder() {
+        const placeholder = this.createDOMElement('div', 'placeholder');
+        placeholder.innerText = this.state.placeholder;
+
+        return placeholder;
+    }
+
+    private createInput() {
+        const input = this.createDOMElement('span', 'input') as HTMLInputElement;
+
+        input.setAttribute('contenteditable', 'true');
+        input.setAttribute('role', 'textbox');
+        
+        input.addEventListener('input', e => this.eventEmitter.emit('value-change', (e.target as HTMLInputElement).innerText));
+        input.addEventListener('keydown', (e: KeyboardEvent) => e.key === 'Enter' && this.eventEmitter.emit('enter-pressed'))
+        
+        input.value = this.state.value;
+        return input;
     }
 
     private renderValidationMessage(fragment: DocumentFragment) {
@@ -66,13 +83,13 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
         const submitBtn = this.createDOMElement('span');
         this.createComponent(submitBtn, ButtonComponent, {
             text: 'submit', 
-            onClick: () => this.eventEmitter.emit('submit', this.state.value)
+            onClick: () => this.eventEmitter.emit('submit')
         }, 'submit-btn');
 
         const cancelBtn = this.createDOMElement('span');
         this.createComponent(cancelBtn, ButtonComponent, {
             text: 'cancel', 
-            onClick: () => this.eventEmitter.emit('close', this.state.value)
+            onClick: () => this.eventEmitter.emit('close')
         }, 'cancel-btn');
         
         buttons.append(submitBtn, cancelBtn);
