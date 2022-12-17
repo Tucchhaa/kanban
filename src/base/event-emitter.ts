@@ -51,12 +51,12 @@ export class EventEmitter implements IEventEmitter, IDisposable {
     }
 
     public emit(event: string, ...param: any) {
-        for(const listener of (this.events[event] ?? [])) {
-            listener(...param);
-        }
-
         for(const listener of this.onAnyListeners) {
             listener(event, ...param);
+        }
+        
+        for(const listener of (this.events[event] ?? [])) {
+            listener(...param);
         }
     }
 
