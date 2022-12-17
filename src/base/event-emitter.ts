@@ -4,6 +4,8 @@ import { IDisposable } from "./idisposable";
 export interface IEventEmitter {
     on(event: string, listener: CallableFunction): IEventEmitter;
 
+    onAny(listener: CallableFunction): IEventEmitter;
+
     onMany(events: string[], listener: CallableFunction): IEventEmitter;
 
     emit(event: string, ...param: any): void;
@@ -13,9 +15,11 @@ export interface IEventEmitter {
 
 export class EventEmitter implements IEventEmitter, IDisposable {
     private events: Dictionary<CallableFunction[]>;
+    private onAnyListeners: CallableFunction[];
 
     constructor() {
         this.events = {};
+        this.onAnyListeners = [];
     }
     
     public on(event: string, listener: CallableFunction): EventEmitter {
@@ -23,6 +27,12 @@ export class EventEmitter implements IEventEmitter, IDisposable {
             this.events[event] = [];
 
         this.events[event].push(listener);
+
+        return this;
+    }
+
+    public onAny(listener: CallableFunction) {
+        this.onAnyListeners.push(listener);
 
         return this;
     }
@@ -41,7 +51,11 @@ export class EventEmitter implements IEventEmitter, IDisposable {
     }
 
     public emit(event: string, ...param: any) {
-        for(const listener of (this.events[event] || [])) {
+        for(const listener of this.onAnyListeners) {
+            listener(event, ...param);
+        }
+        
+        for(const listener of (this.events[event] ?? [])) {
             listener(...param);
         }
     }

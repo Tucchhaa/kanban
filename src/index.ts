@@ -3,8 +3,18 @@ import { KanbanOptions } from "./kanban/kanban.state";
 
 /*
 Known issues:
-no auto focus in editable-field
-no trimming editable-field value
+no auto focus in editable-field: DONE
+no trimming editable-field value DONE
+create card on enter
+close input on outside click
+css style for focused input
+remove repeating eventEmitter
+
+TODO:
+rename column
+rename card
+drag and drop columns
+drag and drop cards between columns
 */
 
 window.addEventListener("load", () => {    

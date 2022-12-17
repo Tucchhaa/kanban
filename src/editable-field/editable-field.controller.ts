@@ -12,21 +12,28 @@ export class EditableFieldController extends BaseController {
         this.state = state;
         this.view = view;
         
-        this.eventEmitter.on('open', () => this.toggleForm(true));
-        this.eventEmitter.on('close', () => this.toggleForm(false));
-        this.eventEmitter.on('submit', (value: string) => this.submit(value));
-        this.eventEmitter.on('value-change', (value: string, placeholder: HTMLElement) => this.updateValue(value, placeholder));
+        this.eventEmitter.on('rendered', () => this.focusInput());
+        this.eventEmitter.on('open', () => this.toggleInput(true));
+        this.eventEmitter.on('close', () => this.toggleInput(false));
+        this.eventEmitter.on('submit', () => this.submit());
+        this.eventEmitter.on('enter-pressed', () => this.onEnterPressed());
+        this.eventEmitter.on('value-change', (value: string) => this.updateValue(value));
     }
 
-    public toggleForm(isOpen: boolean) {
+    public toggleInput(isOpen: boolean) {
         this.state.update({ isOpen, validationMsg: null, value: "" });
     }
 
-    private submit(value: string) {
+    public focusInput() {
+        this.view.input?.focus();
+    }
+
+    private submit() {
+        const value = this.state.prepareValue(this.state.value);
         const [result, msg] = this.state.validation(value);
 
         if(result) {
-            this.toggleForm(false);
+            this.toggleInput(false);
             this.state.onSubmit(value);
         }
         else {
@@ -34,9 +41,13 @@ export class EditableFieldController extends BaseController {
         }
     }
 
-    private updateValue(value: string, placeholder: HTMLElement) {
+    private onEnterPressed() {
+        this.submit();
+    }
+
+    private updateValue(value: string) {
         this.state.updateByKey('value', value, false);
 
-        placeholder.style.display = value.length ? 'none' : 'block';
+        this.view.placeholder!.style.display = value.length ? 'none' : 'block';
     }
 }

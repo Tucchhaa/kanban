@@ -7,6 +7,7 @@ export type EditableFieldOptions = {
     value?: string;
     validationMsg?: string | null;
     placeholder?: string;
+    prepareValue?: (value: string) => string,
     onSubmit?: (value: string) => any;
     validation?: (value: string) => [boolean, string];
 }
@@ -32,6 +33,10 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
         return (this.state.validationMsg as string | null);
     }
 
+    get prepareValue() {
+        return this.state.prepareValue!;
+    }
+
     get validation() {
         return this.state.validation!;
     }
@@ -47,6 +52,7 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
             value: "",
             validationMsg: null,
             placeholder: "",
+            prepareValue: value => value,
             onSubmit: noop,
             validation: () => [true, ""]
         };
