@@ -4,6 +4,10 @@ import { KanbanOptions } from "./kanban/kanban.state";
 /*
 Known issues:
 reopen editable-field - нужно передавать старое состояние при ререндере
+единый column component - нужно расширять view
+refactor state
+box-sizing on drag column
+убрать методы в state которые меняют состояние. пример DropState.updateItems
 
 TODO:
 rename column

@@ -1,10 +1,18 @@
+import { BaseController } from "./controller";
 import { IEventEmitter } from "./event-emitter";
 import { IClearable } from "./idisposable";
+import { BaseStateType } from "./state";
 
 export type ComponentProps = { 
     componentName: string,
     getContainer: () => HTMLElement,
-    emitter: IEventEmitter
+    eventEmitter: IEventEmitter
+
+    getController: <T extends BaseController>(name: string) => T | undefined,
+    getRequiredController: <T extends BaseController>(name: string) => T,
+
+    getState: <T extends BaseStateType>(name: string) => T | undefined,
+    getRequiredState: <T extends BaseStateType>(name: string) => T,
 };
 
 export class ComponentModule implements IClearable {
@@ -12,14 +20,28 @@ export class ComponentModule implements IClearable {
     protected getContainer: () => HTMLElement;
     protected eventEmitter: IEventEmitter;
 
+    protected getController: <T extends BaseController>(name: string) => T | undefined;
+    protected getRequiredController: <T extends BaseController>(name: string) => T;
+
+    protected getState: <T extends BaseStateType>(name: string) => T | undefined;
+    protected getRequiredState: <T extends BaseStateType>(name: string) => T;
+
     protected get container() {
         return this.getContainer();
     }
 
     constructor() {
-        this.componentName = (ComponentModule.prototype as any)._componentName;
-        this.getContainer = (ComponentModule.prototype as any)._getContainer;
-        this.eventEmitter = (ComponentModule.prototype as any)._eventEmitter;
+        const props = ComponentModule.props[ComponentModule.props.length - 1];
+
+        this.componentName = props.componentName;
+        this.getContainer = props.getContainer;
+        this.eventEmitter = props.eventEmitter;
+
+        this.getController = props.getController;
+        this.getRequiredController = props.getRequiredController;
+
+        this.getState= props.getState;
+        this.getRequiredState = props.getRequiredState;
     }
 
     public clear(): void { }
@@ -28,23 +50,11 @@ export class ComponentModule implements IClearable {
 
     private static props: ComponentProps[] = [];
 
-    private static setPropsToPrototype(props: ComponentProps) {
-        (ComponentModule.prototype as any)._componentName = props.componentName;
-        (ComponentModule.prototype as any)._getContainer = props.getContainer;
-        (ComponentModule.prototype as any)._eventEmitter = props.emitter;
-    }
-
     public static startCreatingComponent(componentProps: ComponentProps) {
         ComponentModule.props.push(componentProps);
-
-        ComponentModule.setPropsToPrototype(componentProps)
     }
 
     public static endCreatingComponent() {
         const componentProps = ComponentModule.props.pop();
-        
-        if(componentProps) {
-            this.setPropsToPrototype(componentProps);
-        }
     }
 }

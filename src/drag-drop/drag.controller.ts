@@ -4,11 +4,11 @@ export class DragController<ItemType extends object> extends BaseController {
     private _item: ItemType;
     private _element: HTMLElement;
     
-    constructor(item: ItemType, element: HTMLElement) {
+    constructor(item: ItemType) {
         super();
 
         this._item = item;
-        this._element = element;
+        this._element = this.container;
         
         this.eventEmitter
             .on('drag-start', (e: MouseEvent) => this.dragStart(e))
@@ -58,11 +58,15 @@ export class DragController<ItemType extends object> extends BaseController {
     
     private dragEnd(e: MouseEvent) {
         this.element.classList.remove('state-dragging');
-        this.element.style.cursor = 'auto';
 
-        this._element.style.position = "";
-        this._element.style.top = "";
-        this._element.style.left = "";
+        this.element.style.removeProperty('cursor');
+        
+        this.element.style.removeProperty('position');
+        this.element.style.removeProperty('top');
+        this.element.style.removeProperty('left');
+
+        this.element.style.removeProperty('width');
+        this.element.style.removeProperty('height');
     }
 
     private getElementSizes(element: HTMLElement) {

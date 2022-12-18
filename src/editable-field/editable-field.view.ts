@@ -10,7 +10,7 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
         super(state, 'editable-field');
     }
 
-    protected render(fragment: DocumentFragment): void {
+    protected _render(fragment: DocumentFragment): void {
         if(this.state.isOpen) {
             this.renderOpened(fragment);
             this.container.classList.add('state-opened');

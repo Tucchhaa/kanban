@@ -6,6 +6,8 @@ import { BaseStateType } from "./state";
 
 export type BaseViewType = BaseView<BaseStateType>;
 
+type ComponentClass = new(container: HTMLElement, options: object) => BaseComponentType;
+
 export abstract class BaseView<TState extends BaseStateType> extends ComponentModule {
     protected state: TState;
     
@@ -20,42 +22,21 @@ export abstract class BaseView<TState extends BaseStateType> extends ComponentMo
 
         this.container.classList.add(...processClasses(classes));
 
-        // setTimeout(() => this._render());
-        this._render();
-
         this.eventEmitter.on('render', () => {
             this.clear();
-            this._render();
+            this.render();
         });
     }
 
-    protected abstract render(fragment: DocumentFragment): void;
+    protected abstract _render(fragment: DocumentFragment): void;
 
-    public clear(): void {
-        this.clearInternalComponents();
-
-        for(const func of this.onClear)
-            func();
-
-        super.clear();
-    }
-
-    private clearInternalComponents() {
-        for(const key in this.components) {
-            const component = this.components[key];
-
-            component.clear();
-        }
-
-        this.components = {};
-    }
-
-    protected _render() {
+    public render() {
+        // console.log('render', this.componentName);
         this.container.innerHTML = "";
 
         const fragment = document.createDocumentFragment();
         
-        this.render(fragment);
+        this._render(fragment);
 
         this.container.appendChild(fragment);
 
@@ -74,7 +55,7 @@ export abstract class BaseView<TState extends BaseStateType> extends ComponentMo
         return element;
     }
 
-    protected createComponent(container: HTMLElement, componentType: new(container: HTMLElement, options: object) => BaseComponentType, options: object, key?: string) {
+    protected createComponent(container: HTMLElement, componentType: ComponentClass, options: object, key?: string) {
         const newComponent = new componentType(container, options);
         key = key ?? newComponent.constructor.name;
 
@@ -85,5 +66,24 @@ export abstract class BaseView<TState extends BaseStateType> extends ComponentMo
         this.components[key] = newComponent;
 
         return newComponent;
+    }
+
+    public clear(): void {
+        this.clearInternalComponents();
+
+        for(const func of this.onClear)
+            func();
+
+        super.clear();
+    }
+
+    private clearInternalComponents() {
+        for(const key in this.components) {
+            const component = this.components[key];
+
+            component.clear();
+        }
+
+        this.components = {};
     }
 }

@@ -38,5 +38,9 @@ export class KanbanState extends BaseState<KanbanOptions> {
         }, false);
 
         return isUpdated;
-    } 
+    }
+    
+    public updateColumns(columns: Column[]) {
+        this.updateBy((state) => { state.columns = columns });
+    }
 }

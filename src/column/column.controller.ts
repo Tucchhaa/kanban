@@ -26,9 +26,10 @@ export class ColumnController extends BaseController {
     }
 
     private updateCardsOrder(cards: Card[]) {
+        this.eventEmitter.emit('items-updated', this.state.columnCards);
+
         this.state.updateCards(cards);
         
         this.eventEmitter.emit('column-updated', this.state.column);
-        this.eventEmitter.emit('items-updated', this.state.columnCards);
     }
 }
