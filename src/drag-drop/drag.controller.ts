@@ -70,16 +70,22 @@ export class DragController<ItemType extends object> extends BaseController {
     }
 
     private getElementSizes(element: HTMLElement) {
-        var css = getComputedStyle(element);
+        let css = getComputedStyle(element);
 
-        var paddingX = parseFloat(css.paddingLeft) + parseFloat(css.paddingRight);
-        var paddingY = parseFloat(css.paddingTop) + parseFloat(css.paddingBottom);
+        let paddingX = parseFloat(css.paddingLeft) + parseFloat(css.paddingRight);
+        let paddingY = parseFloat(css.paddingTop) + parseFloat(css.paddingBottom);
 
-        var borderX = parseFloat(css.borderLeftWidth) + parseFloat(css.borderRightWidth);
-        var borderY = parseFloat(css.borderTopWidth) + parseFloat(css.borderBottomWidth);
+        let borderX = parseFloat(css.borderLeftWidth) + parseFloat(css.borderRightWidth);
+        let borderY = parseFloat(css.borderTopWidth) + parseFloat(css.borderBottomWidth);
 
-        const width = element.offsetWidth - paddingX - borderX;
-        const height = element.offsetHeight - paddingY - borderY;
+
+        let width = element.offsetWidth;
+        let height = element.offsetHeight;
+
+        if(css.boxSizing !== 'border-box') {
+            width = width - paddingX - borderX;
+            height = height - paddingY - borderY;
+        }
 
         return { width, height };
     }
