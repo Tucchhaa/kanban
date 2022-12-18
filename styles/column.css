@@ -10,11 +10,16 @@
     background-color: #e3e3e3;
 }
 
+.kanban-column.state-dragging {
+    transform: rotate(2deg);
+}
+
 .kanban-column > .heading {
     padding: 5px 11px 4px 11px;
     font-size: 17px;
     font-weight: bold;
     color: #1d2934;
+    cursor: grab;
 }
 
 .kanban-column > .content {

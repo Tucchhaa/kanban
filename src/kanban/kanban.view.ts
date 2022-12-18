@@ -24,7 +24,7 @@ export class KanbanView extends DropView<KanbanState> {
         for(let index = 0; index < columns.length; index++) {
             const column = columns[index];
 
-            const columnContainer = this.createDOMElement('div', ['column']);
+            const columnContainer = this.createDOMElement('div');
             const columnOptions: ColumnOptions = { column }
 
             const columnComponent = this.createComponent(columnContainer, DraggableColumnComponent, columnOptions, `column${column.id}`);
@@ -37,7 +37,7 @@ export class KanbanView extends DropView<KanbanState> {
     }
 
     private _renderAddColumn(fragment: DocumentFragment) {
-        const addColumnContainer = this.createDOMElement('div', ['column', 'add-column']);
+        const addColumnContainer = this.createDOMElement('div', ['add-column']);
 
         const options: EditableFieldOptions = {
             btnText: '+ Add new column',
