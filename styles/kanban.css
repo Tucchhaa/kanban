@@ -1,0 +1,34 @@
+.kanban {
+    height: 100vh;
+    min-width: min-content;
+    padding: 15px 25px;
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: flex-start;
+
+    background-color: #023e3d;
+    /* background-color: #01483d; */
+}
+
+.kanban > .kanban-column,
+.kanban > .add-column {
+    width: 250px;
+    box-sizing: border-box;
+    border-radius: 3px;
+    word-wrap: break-word;
+}
+
+.kanban > .add-column, 
+.kanban-column > .add-card,
+.kanban-column > .card {
+    -webkit-user-select: none;  
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.kanban > .shadow {
+    background-color: #012928;
+    border-radius: 3px;
+}
