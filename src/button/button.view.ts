@@ -2,11 +2,11 @@ import { BaseView } from "../base/view";
 import { ButtonState } from "./button.state";
 
 export class ButtonView extends BaseView<ButtonState> {
-    constructor(state: ButtonState, container: HTMLElement) {
-        super(state, container);
+    constructor(state: ButtonState) {
+        super(state);
     }
 
-    protected render(fragment: DocumentFragment): void {
+    protected _render(fragment: DocumentFragment): void {
         const btn = this.createDOMElement('button');
 
         btn.innerText = this.state.text;

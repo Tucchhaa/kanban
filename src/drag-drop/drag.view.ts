@@ -1,14 +1,15 @@
 import { BaseState, BaseStateType } from "../base/state";
 import { BaseView } from "../base/view";
 import { processClasses } from "../helpers";
+import { DragState } from "./drag.state";
 
 export abstract class DragView<TState extends BaseStateType> extends BaseView<TState> {
-    constructor(state: TState, container: HTMLElement, classes?: string[] | string) {
+    constructor(state: TState, classes?: string[] | string) {
         const _classes = ['draggable', ...processClasses(classes)];
-        super(state, container, _classes);
+        super(state, _classes);
     }
 
-    protected render(fragment: DocumentFragment): void {
+    protected _render(fragment: DocumentFragment): void {
         const dragStart = (e: MouseEvent) => {
             this.eventEmitter.emit('drag-start', e);
             
@@ -20,19 +21,20 @@ export abstract class DragView<TState extends BaseStateType> extends BaseView<TS
 
         const dragEnd = (e: MouseEvent) => {
             this.eventEmitter.emit('drag-end', e);
-            unsubscribe();
+            unsubscribeDocumentListeners();
         };
 
         // ===
 
-        this.container.addEventListener('mousedown', dragStart);
+        const { draggableArea } = this.getRequiredState<DragState>(DragState.name);
+        draggableArea.addEventListener('mousedown', dragStart)
 
-        const unsubscribe = () => {
+        const unsubscribeDocumentListeners = () => {
             document.removeEventListener('mousemove', drag);
             document.removeEventListener('mouseup', dragEnd);
         }
 
-        this.onDispose.push(unsubscribe);
+        this.onClear.push(unsubscribeDocumentListeners);
+        this.onClear.push(() => draggableArea.removeEventListener('mousedown', dragStart));
     }
-
 }

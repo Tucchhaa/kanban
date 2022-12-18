@@ -1,6 +1,5 @@
 import { BaseComponentType } from "../base/component";
 import { BaseController } from "../base/controller";
-import { BaseViewType } from "../base/view";
 import { MouseDirection } from "../utils/mouse-direction";
 import { DragController } from "./drag.controller";
 import { DropState } from "./drop.state";
@@ -8,20 +7,23 @@ import { DropState } from "./drop.state";
 export class DropController<TItem extends object> extends BaseController {
     private state: DropState<TItem>;
     
+    private draggingDirection: 'horizontal' | 'vertical';
     private drags: BaseComponentType[] = [];
     private shadowElement: HTMLElement = document.createElement('div');
     private mouseDirection: MouseDirection = new MouseDirection();
     private shadowIndex: number = -1;
     private isItemsEqual: (itemA: any, itemB: any) => boolean;
 
-    constructor(state: DropState<TItem>) {
+    constructor() {
         super();
 
-        this.state = state;
+        this.state = this.getRequiredState<DropState<TItem>>(DropState.name);
+        this.draggingDirection = this.state.direction;
         this.isItemsEqual = this.state.isEqual();
         
-        this.eventEmitter.on('draggable-rendered', (drag: BaseComponentType) => this.processDraggable(drag))
-        this.eventEmitter.on('items-updated', (items: any) => this.onUpdateItems(items));
+        this.eventEmitter
+            .on('draggable-rendered', (drag: BaseComponentType) => this.processDraggable(drag))
+            .on('items-updated', (items: any) => this.onUpdateItems(items));
     }
 
     public processDraggable(drag: BaseComponentType) {
@@ -45,7 +47,7 @@ export class DropController<TItem extends object> extends BaseController {
         for(let index=0; index < this.state.items.length; index++) {
             const itemB = this.state.items[index];
 
-            if(this.isItemsEqual(itemB, item)) {
+            if(this.isItemsEqual(item, itemB)) {
                 return index;
             }
         }
@@ -69,7 +71,7 @@ export class DropController<TItem extends object> extends BaseController {
                 e.clientX >= position.x && e.clientX <= position.x + position.width &&
                 e.clientY >= position.y && e.clientY <= position.y + position.height
             ) {
-                const isInsertBefore = this.mouseDirection.vertical === 'up';
+                const isInsertBefore = this.isInsertBefore();
                 
                 if(isInsertBefore) {
                     dragElement.before(this.shadowElement);
@@ -94,11 +96,12 @@ export class DropController<TItem extends object> extends BaseController {
         const items = this.state.items;
         const currentItem = dragController.item;
         const newOrder: any[] = [];
+        const insertBeforeIndex = this.shadowIndex;
 
         for(let index=0; index < items.length; index++) {
             const item = items[index];
 
-            if(index === this.shadowIndex)
+            if(index === insertBeforeIndex)
                 newOrder.push(currentItem);
 
             if(this.isItemsEqual(item, currentItem)) {
@@ -108,15 +111,16 @@ export class DropController<TItem extends object> extends BaseController {
             newOrder.push(item);
         }
 
-        if(this.shadowIndex === items.length)
+        if(insertBeforeIndex === items.length)
             newOrder.push(currentItem);
 
         this.eventEmitter.emit('update-items-order', newOrder);
     }
 
     private onUpdateItems(items: any) {
-        this.drags = [];
+        this.shadowIndex = -1;
         this.state.updateItems(items);
+        this.drags = [];
     }
 
     private showShadow(element: HTMLElement) {
@@ -131,5 +135,9 @@ export class DropController<TItem extends object> extends BaseController {
 
     private hideShadow() {
         this.shadowElement.style.display = 'none';
+    }
+
+    private isInsertBefore() {
+        return this.draggingDirection === 'vertical' ? this.mouseDirection.vertical === 'up' : this.mouseDirection.horizontal === 'left'
     }
 }

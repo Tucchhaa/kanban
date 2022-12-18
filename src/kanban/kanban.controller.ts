@@ -13,14 +13,17 @@ export class KanbanController extends BaseController {
         this.state = state;
         this.view = view;
         
-        this.eventEmitter.on('create-new-column', (columnName: string) => this.createNewColumn(columnName));
-        this.eventEmitter.on('update-column', (column: Column) => this.updateColumn(column));
+        this.eventEmitter
+            .on('create-new-column', (columnName: string) => this.createNewColumn(columnName))
+            .on('update-column', (column: Column) => this.updateColumn(column))
+            .on('update-items-order', (columns: Column[]) => this.updateColumnsOrder(columns));
     }
 
     private createNewColumn(columnName: string) {
         const column = new Column(columnName);
 
         this.state.createColumn(column);
+        this.eventEmitter.emit('items-updated', this.state.columns);
     }
 
     private updateColumn(column: Column) {
@@ -29,5 +32,10 @@ export class KanbanController extends BaseController {
         if(!isUpdated) {
             throw new Error(`${this.componentName} can not update column with id: ${column.id}, because it does not exist`);
         }
+    }
+
+    private updateColumnsOrder(columns: Column[]) {
+        this.state.updateColumns(columns);
+        this.eventEmitter.emit('items-updated', this.state.columns);
     }
 }

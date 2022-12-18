@@ -5,14 +5,20 @@ export interface OptionsType {
     [id: string]: any;
 }
 
+interface IState<TOptions extends OptionsType> {
+    getOptions(): TOptions;
+
+    update(newState: TOptions, needRender: boolean): void;
+
+    updateBy(func: (state: TOptions) => void, needRender: boolean): void;
+
+    updateByKey(key: string, value: any, needRender: boolean): void;
+}
+
 export type BaseStateType = BaseState<OptionsType>;
 
 export class BaseState<TOptions extends OptionsType> extends ComponentModule {
     protected state: TOptions;
-    
-    public getState() {
-        return this.state;
-    }
 
     constructor(state: TOptions, defaultState: TOptions) {
         super();

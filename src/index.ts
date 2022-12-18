@@ -3,12 +3,11 @@ import { KanbanOptions } from "./kanban/kanban.state";
 
 /*
 Known issues:
-no auto focus in editable-field: DONE
-no trimming editable-field value DONE
-create card on enter
-close input on outside click
-css style for focused input
-remove repeating eventEmitter
+reopen editable-field - нужно передавать старое состояние при ререндере
+единый column component - нужно расширять view
+refactor state
+box-sizing on drag column
+убрать методы в state которые меняют состояние. пример DropState.updateItems
 
 TODO:
 rename column

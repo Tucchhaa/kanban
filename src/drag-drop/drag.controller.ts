@@ -4,15 +4,16 @@ export class DragController<ItemType extends object> extends BaseController {
     private _item: ItemType;
     private _element: HTMLElement;
     
-    constructor(item: ItemType, element: HTMLElement) {
+    constructor(item: ItemType) {
         super();
 
         this._item = item;
-        this._element = element;
+        this._element = this.container;
         
-        this.eventEmitter.on('drag-start', (e: MouseEvent) => this.dragStart(e));
-        this.eventEmitter.on('drag', (e: MouseEvent) => this.drag(e));
-        this.eventEmitter.on('drag-end', (e: MouseEvent) => this.dragEnd(e));
+        this.eventEmitter
+            .on('drag-start', (e: MouseEvent) => this.dragStart(e))
+            .on('drag', (e: MouseEvent) => this.drag(e))
+            .on('drag-end', (e: MouseEvent) => this.dragEnd(e));
     }
 
     private _sizes: { width: number, height: number } = { width: 50, height: 50 };
@@ -57,11 +58,15 @@ export class DragController<ItemType extends object> extends BaseController {
     
     private dragEnd(e: MouseEvent) {
         this.element.classList.remove('state-dragging');
-        this.element.style.cursor = 'auto';
 
-        this._element.style.position = "";
-        this._element.style.top = "";
-        this._element.style.left = "";
+        this.element.style.removeProperty('cursor');
+        
+        this.element.style.removeProperty('position');
+        this.element.style.removeProperty('top');
+        this.element.style.removeProperty('left');
+
+        this.element.style.removeProperty('width');
+        this.element.style.removeProperty('height');
     }
 
     private getElementSizes(element: HTMLElement) {
