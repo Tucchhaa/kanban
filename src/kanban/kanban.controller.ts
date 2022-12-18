@@ -13,8 +13,9 @@ export class KanbanController extends BaseController {
         this.state = state;
         this.view = view;
         
-        this.eventEmitter.on('create-new-column', (columnName: string) => this.createNewColumn(columnName));
-        this.eventEmitter.on('update-column', (column: Column) => this.updateColumn(column));
+        this.eventEmitter
+            .on('create-new-column', (columnName: string) => this.createNewColumn(columnName))
+            .on('update-column', (column: Column) => this.updateColumn(column));
     }
 
     private createNewColumn(columnName: string) {

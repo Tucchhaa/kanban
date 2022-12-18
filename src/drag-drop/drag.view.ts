@@ -3,9 +3,9 @@ import { BaseView } from "../base/view";
 import { processClasses } from "../helpers";
 
 export abstract class DragView<TState extends BaseStateType> extends BaseView<TState> {
-    constructor(state: TState, container: HTMLElement, classes?: string[] | string) {
+    constructor(state: TState, classes?: string[] | string) {
         const _classes = ['draggable', ...processClasses(classes)];
-        super(state, container, _classes);
+        super(state, _classes);
     }
 
     protected render(fragment: DocumentFragment): void {
@@ -32,7 +32,7 @@ export abstract class DragView<TState extends BaseStateType> extends BaseView<TS
             document.removeEventListener('mouseup', dragEnd);
         }
 
-        this.onDispose.push(unsubscribe);
+        this.onClear.push(unsubscribe);
     }
 
 }

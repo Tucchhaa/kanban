@@ -8,33 +8,46 @@ export type BaseViewType = BaseView<BaseStateType>;
 
 export abstract class BaseView<TState extends BaseStateType> extends ComponentModule {
     protected state: TState;
-    protected container: HTMLElement;
     
     private components: Dictionary<BaseComponentType> = {};
 
-    protected onDispose: { (): void }[] = [];
+    protected onClear: { (): void }[] = [];
 
-    constructor(state: TState, container: HTMLElement, classes?: string[] | string) {
+    constructor(state: TState, classes?: string[] | string) {
         super();
         
         this.state = state;
-        this.container = container;
 
         this.container.classList.add(...processClasses(classes));
 
         // setTimeout(() => this._render());
         this._render();
 
-        this.eventEmitter.on('render', () => this._render());
+        this.eventEmitter.on('render', () => {
+            this.clear();
+            this._render();
+        });
     }
 
     protected abstract render(fragment: DocumentFragment): void;
 
-    public dispose(): void {
-        for(const func of this.onDispose)
+    public clear(): void {
+        this.clearInternalComponents();
+
+        for(const func of this.onClear)
             func();
 
-        super.dispose();
+        super.clear();
+    }
+
+    private clearInternalComponents() {
+        for(const key in this.components) {
+            const component = this.components[key];
+
+            component.clear();
+        }
+
+        this.components = {};
     }
 
     protected _render() {
@@ -45,6 +58,8 @@ export abstract class BaseView<TState extends BaseStateType> extends ComponentMo
         this.render(fragment);
 
         this.container.appendChild(fragment);
+
+        this.eventEmitter.emit('rendered');
     }
 
     protected createDOMElement(tagName: string, classes?: string[] | string) {
@@ -61,14 +76,13 @@ export abstract class BaseView<TState extends BaseStateType> extends ComponentMo
 
     protected createComponent(container: HTMLElement, componentType: new(container: HTMLElement, options: object) => BaseComponentType, options: object, key?: string) {
         const newComponent = new componentType(container, options);
-        
-        if(key) {
-            const component = this.components[key];
+        key = key ?? newComponent.constructor.name;
 
-            component && component.dispose();
-
-            this.components[key] = newComponent;
+        if(this.components[key]) {
+            throw new Error('Render error: Elements of the same component must contain unique keys');    
         }
+
+        this.components[key] = newComponent;
 
         return newComponent;
     }

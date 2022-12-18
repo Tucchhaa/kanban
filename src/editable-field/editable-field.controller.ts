@@ -12,20 +12,43 @@ export class EditableFieldController extends BaseController {
         this.state = state;
         this.view = view;
         
-        this.eventEmitter.on('rendered', () => this.focusInput());
-        this.eventEmitter.on('open', () => this.toggleInput(true));
-        this.eventEmitter.on('close', () => this.toggleInput(false));
-        this.eventEmitter.on('submit', () => this.submit());
-        this.eventEmitter.on('enter-pressed', () => this.onEnterPressed());
-        this.eventEmitter.on('value-change', (value: string) => this.updateValue(value));
+        this.eventEmitter
+            .on('rendered', () => this.focusInput())
+            .on('open', () => this.toggleInput(true))
+            .on('close', () => this.toggleInput(false))
+
+            .on('document-mousedown', (e: MouseEvent) => this.onDocumentClick(e))
+            .on('focusin', () => this.setFocusState())
+            .on('focusout', () => this.resetFocusState())
+        
+            .on('submit', () => this.submit())
+            .on('enter-pressed', () => this.onEnterPressed())
+            .on('value-change', (value: string) => this.updateValue(value))
     }
 
-    public toggleInput(isOpen: boolean) {
+    private focusInput() {
+        this.view.input?.focus();
+    }
+
+    private toggleInput(isOpen: boolean) {
+        isOpen ? this.setFocusState() : this.resetFocusState();
         this.state.update({ isOpen, validationMsg: null, value: "" });
     }
 
-    public focusInput() {
-        this.view.input?.focus();
+    private onDocumentClick(e: MouseEvent) {
+        const isInnerClick = e.target === this.container || this.container.contains(e.target as Node);
+        
+        if(!isInnerClick) {
+            this.toggleInput(false);
+        }
+    }
+
+    private setFocusState() {
+        this.container.classList.add('state-focused');
+    }
+
+    private resetFocusState() {
+        this.container.classList.remove('state-focused');
     }
 
     private submit() {

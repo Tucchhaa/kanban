@@ -20,8 +20,9 @@ export class DropController<TItem extends object> extends BaseController {
         this.state = state;
         this.isItemsEqual = this.state.isEqual();
         
-        this.eventEmitter.on('draggable-rendered', (drag: BaseComponentType) => this.processDraggable(drag))
-        this.eventEmitter.on('items-updated', (items: any) => this.onUpdateItems(items));
+        this.eventEmitter
+            .on('draggable-rendered', (drag: BaseComponentType) => this.processDraggable(drag))
+            .on('items-updated', (items: any) => this.onUpdateItems(items));
     }
 
     public processDraggable(drag: BaseComponentType) {

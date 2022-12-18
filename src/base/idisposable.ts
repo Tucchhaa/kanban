@@ -1,3 +1,3 @@
-export interface IDisposable {
-    dispose(): void;
+export interface IClearable {
+    clear(): void;
 }

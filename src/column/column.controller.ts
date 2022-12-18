@@ -13,8 +13,9 @@ export class ColumnController extends BaseController {
         this.state = state;
         this.view = view;
         
-        this.eventEmitter.on('create-new-card', (cardName: string) => this.createNewCard(cardName));
-        this.eventEmitter.on('update-items-order', (cards: Card[]) => this.updateCardsOrder(cards))
+        this.eventEmitter
+            .on('create-new-card', (cardName: string) => this.createNewCard(cardName))
+            .on('update-items-order', (cards: Card[]) => this.updateCardsOrder(cards));
     }
 
     private createNewCard(cardName: string) {

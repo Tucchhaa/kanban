@@ -1,5 +1,5 @@
 import { Dictionary } from "../types";
-import { IDisposable } from "./idisposable";
+import { IClearable } from "./idisposable";
 
 export interface IEventEmitter {
     on(event: string, listener: CallableFunction): IEventEmitter;
@@ -13,7 +13,7 @@ export interface IEventEmitter {
 
 // ===
 
-export class EventEmitter implements IEventEmitter, IDisposable {
+export class EventEmitter implements IEventEmitter, IClearable {
     private events: Dictionary<CallableFunction[]>;
     private onAnyListeners: CallableFunction[];
 
@@ -60,5 +60,5 @@ export class EventEmitter implements IEventEmitter, IDisposable {
         }
     }
 
-    public dispose(): void { }
+    public clear(): void { }
 }

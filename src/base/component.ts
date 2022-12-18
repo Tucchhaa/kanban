@@ -1,10 +1,10 @@
 import { BaseState } from "../base/state";
 import { BaseView } from "../base/view";
 import { Dictionary } from "../types";
-import { ComponentModule } from "./component-module";
+import { ComponentModule, ComponentProps } from "./component-module";
 import { BaseController } from "./controller";
 import { EventEmitter, IEventEmitter } from "./event-emitter";
-import { IDisposable } from "./idisposable"; 
+import { IClearable } from "./idisposable"; 
 
 export type BaseComponentType = BaseComponent<object, BaseState<object>, BaseView<BaseState<object>>, BaseController>;
 
@@ -13,7 +13,7 @@ export class BaseComponent<
     TState extends BaseState<TOptions>, 
     TView extends BaseView<TState>, 
     TController extends BaseController
-> implements IDisposable {
+> implements IClearable {
     private _name: string;
     private _container: HTMLElement;
     
@@ -68,7 +68,11 @@ export class BaseComponent<
     // ===
 
     private beforeCreateComponentModules() {
-        const componentProps = { componentName: this._name, emitter: this.eventEmitter };
+        const componentProps: ComponentProps = { 
+            componentName: this._name,
+            getContainer: () => this.container,
+            emitter: this.eventEmitter 
+        };
         ComponentModule.startCreatingComponent(componentProps);
     }
     private afterCreateComponentModules() {
@@ -101,7 +105,7 @@ export class BaseComponent<
 
     // ===
 
-    public dispose() {
-        this._view.dispose();
+    public clear() {
+        this._view.clear();
     }
 }

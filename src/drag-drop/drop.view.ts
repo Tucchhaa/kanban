@@ -4,8 +4,8 @@ import { BaseView } from "../base/view";
 import { processClasses } from "../helpers";
 
 export abstract class DroppableView<TState extends BaseStateType> extends BaseView<TState> {
-    constructor(state: TState, container: HTMLElement, classes?: string[] | string) {
+    constructor(state: TState, classes?: string[] | string) {
         const _classes = ['droppable', ...processClasses(classes)];
-        super(state, container, _classes);
+        super(state, _classes);
     }
 }

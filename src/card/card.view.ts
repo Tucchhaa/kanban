@@ -2,8 +2,8 @@ import { DragView } from "../drag-drop/drag.view";
 import { CardState } from "./card.state";
 
 export class CardView extends DragView<CardState> {
-    constructor(state: CardState, container: HTMLElement) {
-        super(state, container, ['card']);
+    constructor(state: CardState) {
+        super(state, ['card']);
     }
 
     protected render(fragment: DocumentFragment): void {

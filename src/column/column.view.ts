@@ -7,8 +7,8 @@ import { EditableFieldOptions } from "../editable-field/editable-field.state";
 import { CardOptions } from "../card/card.state";
 
 export class ColumnView extends DroppableView<ColumnState> {
-    constructor(state: ColumnState, container: HTMLElement) {
-        super(state, container, 'kanban-column');
+    constructor(state: ColumnState) {
+        super(state, 'kanban-column');
     }
 
     protected render(fragment: DocumentFragment): void {

@@ -10,9 +10,10 @@ export class DragController<ItemType extends object> extends BaseController {
         this._item = item;
         this._element = element;
         
-        this.eventEmitter.on('drag-start', (e: MouseEvent) => this.dragStart(e));
-        this.eventEmitter.on('drag', (e: MouseEvent) => this.drag(e));
-        this.eventEmitter.on('drag-end', (e: MouseEvent) => this.dragEnd(e));
+        this.eventEmitter
+            .on('drag-start', (e: MouseEvent) => this.dragStart(e))
+            .on('drag', (e: MouseEvent) => this.drag(e))
+            .on('drag-end', (e: MouseEvent) => this.dragEnd(e));
     }
 
     private _sizes: { width: number, height: number } = { width: 50, height: 50 };
