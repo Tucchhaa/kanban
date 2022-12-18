@@ -8,6 +8,7 @@ reopen editable-field - нужно передавать старое состо�
 refactor state
 убрать методы в state которые меняют состояние. пример DropState.updateItems
 drag-drop cards when column has scroll
+user-select cards
 
 TODO:
 rename column
@@ -30,7 +31,10 @@ window.addEventListener("load", () => {
         }, {
             name: 'Done',
             id: 1,
-            cards: [{ id: 18, name: 'card 4' }, { id: 19, name: 'card 5' }, { id: 20, name: 'card 6' }]
+            cards: [
+                { id: 18, name: 'card 4' }, { id: 19, name: 'card 5' }, { id: 20, name: 'card 6' },
+                { id: 21, name: 'card 6 jsnda aksdn lsadm aas as lorem aksldm asdkl asld []wqekr saodj s wek nasda lskdan sdm lasjd kalns' }
+            ]
         }, {
             name: 'Waiting',
             id: 2,

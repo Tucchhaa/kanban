@@ -61,7 +61,7 @@ export class ColumnView extends DropView<ColumnState> {
                 if(value.length === 0)
                     return [false, 'Card name can\'t be empty'];
                 
-                if(value.length > 40)
+                if(value.length > 120)
                     return [false, 'Card name is too long'];
 
                 return [true, ''];

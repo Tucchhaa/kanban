@@ -18,8 +18,11 @@ export class MouseDirection {
     }
 
     public calculateMouseDirection(e: MouseEvent) {
-        this._horizontal = this.oldX > e.clientX ? 'left' : 'right';
-        this._vertical = this.oldY > e.clientY ? 'up' : 'down';
+        if(this.oldX !== e.clientX)
+            this._horizontal = this.oldX > e.clientX ? 'left' : 'right';
+
+        if(this.oldY !== e.clientY)
+            this._vertical = this.oldY > e.clientY ? 'up' : 'down';
 
         this.setMousePosition(e);
     }
