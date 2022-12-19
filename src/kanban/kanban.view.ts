@@ -30,7 +30,7 @@ export class KanbanView extends DropView<KanbanState> {
             const columnComponent = this.createComponent(columnContainer, DraggableColumnComponent, columnOptions, `column${column.id}`);
             columnComponent.eventEmitter.on('column-updated', (column: Column) => this.eventEmitter.emit('update-column', column));
 
-            setTimeout(() => this.eventEmitter.emit('draggable-rendered', columnComponent));
+            setTimeout(() => this.eventEmitter.emit('process-drag', columnComponent));
 
             fragment.appendChild(columnContainer);
         }

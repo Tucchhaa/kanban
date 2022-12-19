@@ -42,7 +42,7 @@ export class ColumnView extends DropView<ColumnState> {
             const cardOptions: CardOptions = { card };
             const cardCompoment = this.createComponent(cardContainer, CardComponent, cardOptions, `card${index}`);
 
-            setTimeout(() => this.eventEmitter.emit('draggable-rendered', cardCompoment));
+            setTimeout(() => this.eventEmitter.emit('process-drag', cardCompoment));
             
             content.appendChild(cardContainer);
         }
