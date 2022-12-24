@@ -5,7 +5,6 @@ import { ComponentModule, ComponentProps } from "./component-module";
 import { BaseController } from "./controller";
 import { EventEmitter, IEventEmitter } from "./event-emitter";
 import { IClearable } from "./idisposable"; 
-import { ViewExtender } from "./view-extender";
 
 export type BaseComponentType = BaseComponent<object, BaseState<object>, BaseView>;
 

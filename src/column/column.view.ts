@@ -2,7 +2,6 @@ import { Card } from "../types";
 import { CardComponent } from "../components/card.component";
 import { ColumnState } from "./column.state";
 import { EditableFieldComponent } from "../components/editable-field.component";
-import { DropView } from "../drag-drop/drop.view";
 import { EditableFieldOptions } from "../editable-field/editable-field.state";
 import { CardOptions } from "../card/card.state";
 import { BaseView } from "../base/view";
