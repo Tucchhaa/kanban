@@ -10,6 +10,8 @@ refactor state
 drag-drop cards when column has scroll
 user-select cards
 
+BUG: start edit column name -> click any card
+
 TODO:
 rename column
 rename card
