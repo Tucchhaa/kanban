@@ -9,6 +9,7 @@ export type EditableFieldOptions = {
 
     isOpen?: boolean;
     validationMsg?: string | null;
+    buttonsTemplate?: (close: () => void, submit: () => void) => HTMLElement | undefined,
     prepareValue?: (value: string) => string,
     onSubmit?: (value: string) => any;
     validation?: (value: string) => [boolean, string];
@@ -40,6 +41,10 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
         return (this.state.validationMsg as string | null);
     }
 
+    get buttonsTemplate() {
+        return this.state.buttonsTemplate;
+    }
+
     get prepareValue() {
         return this.state.prepareValue!;
     }
@@ -61,6 +66,7 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
 
             isOpen: false,
             validationMsg: null,
+            buttonsTemplate: undefined,
             prepareValue: value => value,
             onSubmit: noop,
             validation: () => [true, ""]

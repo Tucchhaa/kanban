@@ -18,7 +18,7 @@ export class EditableFieldController extends BaseController {
             .on('open', () => this.toggleInput(true))
             .on('close', () => this.toggleInput(false))
 
-            .on('document-mousedown', (e: MouseEvent) => this.onDocumentClick(e))
+            .on('document-click', (e: MouseEvent) => this.onDocumentClick(e))
             .on('focusin', () => this.setFocusState())
             .on('focusout', () => this.resetFocusState())
         
