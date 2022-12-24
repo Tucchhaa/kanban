@@ -114,7 +114,9 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
 
     private setDocumentMouseDownListener() {
         const onDocumentClick = (e: MouseEvent) => this.eventEmitter.emit('document-click', e);
-        document.addEventListener('click', onDocumentClick, true);
-        this.onClear.push(() => document.removeEventListener('click', onDocumentClick));
+        document.addEventListener('mousedown', onDocumentClick);
+        this.onClear.push(() => {
+            document.removeEventListener('mousedown', onDocumentClick)
+        });
     }
 }

@@ -14,8 +14,17 @@ export class ColumnController extends BaseController {
         this.view = view;
         
         this.eventEmitter
+            .on('change-column-name', (newName: string) => this.changeColumnName(newName))
             .on('create-new-card', (cardName: string) => this.createNewCard(cardName))
             .on('update-items-order', (cards: Card[]) => this.updateCardsOrder(cards));
+    }
+
+    private changeColumnName(newName: string) {
+        this.state.updateBy(state => {
+            state.column!.name = newName;
+        }, true);
+
+        this.eventEmitter.emit('column-updated', this.state.column);
     }
 
     private createNewCard(cardName: string) {

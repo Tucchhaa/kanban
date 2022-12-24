@@ -24,12 +24,33 @@ export class ColumnView extends DropView<ColumnState> {
     }
 
     private renderHeading(fragment: DocumentFragment, text: string) {
-        const heading = this.createDOMElement('div', 'heading');
-        this._draggableArea = heading;
+        const headingContainer = this.createDOMElement('div', 'heading');
 
-        heading.innerText = text;
+        const options: EditableFieldOptions = {
+            title: text,
+            defaultValue: text,
+            placeholder: text,
 
-        fragment.appendChild(heading);
+            submitOnOutsideClick: true,
+            buttonsTemplate: (close: () => void, submit: () => void) => { return undefined; },
+            
+            prepareValue: (value: string) => value.trim().replace(/\s\s+/g, ' '),
+            onSubmit: (value: string) => this.eventEmitter.emit('change-column-name', value),
+            validation: (value: string) => {
+                if(value.length === 0)
+                    return [false, 'Column name can\'t be empty'];
+                
+                if(value.length > 40)
+                    return [false, 'Column name is too long'];
+
+                return [true, ''];
+            }
+        };
+        this.createComponent(headingContainer, EditableFieldComponent, options, 'heading-field');
+        
+        this._draggableArea = headingContainer;
+
+        fragment.appendChild(headingContainer);
     }
 
     private renderContent(fragment: DocumentFragment, cards: Card[]) {
@@ -56,6 +77,8 @@ export class ColumnView extends DropView<ColumnState> {
         const options: EditableFieldOptions = {
             title: '+ Add new card',
             placeholder: 'Enter new card\'s name',
+
+            prepareValue: (value: string) => value.trim().replace(/\s\s+/g, ' '),
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-card', value),
             validation: (value: string) => {
                 if(value.length === 0)

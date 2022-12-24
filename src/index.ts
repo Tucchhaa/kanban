@@ -9,8 +9,10 @@ refactor state
 убрать методы в state которые меняют состояние. пример DropState.updateItems
 drag-drop cards when column has scroll
 user-select cards
+get rid of state property in BaseView
 
 BUG: start edit column name -> click any card
+BUG: start edit column name -> start adding new card
 
 TODO:
 rename column

@@ -42,6 +42,8 @@ export class KanbanView extends DropView<KanbanState> {
         const options: EditableFieldOptions = {
             title: '+ Add new column',
             placeholder: 'Enter new column\'s name',
+            
+            prepareValue: (value: string) => value.trim().replace(/\s\s+/g, ' '),
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-column', value),
             validation: (value: string) => {
                 if(value.length === 0)

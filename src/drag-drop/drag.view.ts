@@ -1,11 +1,11 @@
-import { BaseState, BaseStateType } from "../base/state";
+import { BaseStateType } from "../base/state";
 import { BaseView } from "../base/view";
-import { processClasses } from "../helpers";
+import { concatClasses } from "../helpers";
 import { DragState } from "./drag.state";
 
 export abstract class DragView<TState extends BaseStateType> extends BaseView<TState> {
     constructor(state: TState, classes?: string[] | string) {
-        const _classes = ['draggable', ...processClasses(classes)];
+        const _classes = concatClasses('draggable', classes);
         super(state, _classes);
     }
 
