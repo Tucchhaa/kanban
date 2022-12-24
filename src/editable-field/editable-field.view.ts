@@ -24,7 +24,7 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
     private renderClosed(fragment: DocumentFragment) {
         const btn = this.createDOMElement('div', 'title');
 
-        btn.innerText = this.state.btnText;
+        btn.innerText = this.state.title;
         btn.addEventListener('click', () => this.eventEmitter.emit('open'));
 
         fragment.appendChild(btn);
@@ -64,12 +64,13 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
         input.setAttribute('contenteditable', 'true');
         input.setAttribute('role', 'textbox');
         
-        input.addEventListener('input', e => this.eventEmitter.emit('value-change', (e.target as HTMLInputElement).innerText));
+        input.addEventListener('input', () => this.eventEmitter.emit('value-change', input.innerText));
         input.addEventListener('keydown', (e: KeyboardEvent) => e.key === 'Enter' && this.eventEmitter.emit('enter-pressed'));
         input.addEventListener('focusin', () => this.eventEmitter.emit('focusin'));
         input.addEventListener('focusout', () => this.eventEmitter.emit('focusout'));
-        
-        input.value = this.state.value;
+
+        input.innerText = this.state.value;
+
         return input;
     }
 

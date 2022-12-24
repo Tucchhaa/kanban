@@ -40,7 +40,7 @@ export class KanbanView extends DropView<KanbanState> {
         const addColumnContainer = this.createDOMElement('div', ['add-column']);
 
         const options: EditableFieldOptions = {
-            btnText: '+ Add new column',
+            title: '+ Add new column',
             placeholder: 'Enter new column\'s name',
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-column', value),
             validation: (value: string) => {

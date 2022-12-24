@@ -1,4 +1,5 @@
 import { BaseController } from "../base/controller";
+import { setEndOfContenteditable } from "../helpers";
 import { EditableFieldState } from "./editable-field.state";
 import { EditableFieldView } from "./editable-field.view";
 
@@ -27,12 +28,19 @@ export class EditableFieldController extends BaseController {
     }
 
     private focusInput() {
-        this.view.input?.focus();
+        const input = this.view.input as HTMLInputElement|undefined;
+
+        if(input && this.state.isOpen) {
+            const end = input.innerText.length;
+
+            input.focus();
+            setEndOfContenteditable(input);
+        }
     }
 
     private toggleInput(isOpen: boolean) {
         isOpen ? this.setFocusState() : this.resetFocusState();
-        this.state.update({ isOpen, validationMsg: null, value: "" });
+        this.state.update({ isOpen, validationMsg: null, value: this.state.defaultValue });
     }
 
     private onDocumentClick(e: MouseEvent) {

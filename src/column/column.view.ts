@@ -54,7 +54,7 @@ export class ColumnView extends DropView<ColumnState> {
         const addCardContainer = this.createDOMElement('div', 'add-card');
 
         const options: EditableFieldOptions = {
-            btnText: '+ Add new card',
+            title: '+ Add new card',
             placeholder: 'Enter new card\'s name',
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-card', value),
             validation: (value: string) => {

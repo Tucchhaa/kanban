@@ -43,3 +43,13 @@ export const isDeepEqual = (object1: any, object2: any) => {
 export const generateID = (prefix: string = "") => {
     return prefix + `__id${Math.floor(Math.random() * Date.now())}`;
 }
+
+export const setEndOfContenteditable = (contentEditableElement: HTMLElement) => {
+    let range = document.createRange();//Create a range (a range is a like the selection but invisible)
+    range.selectNodeContents(contentEditableElement);//Select the entire contents of the element with the range
+    range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+    
+    let selection = window.getSelection()!;//get the selection object (allows you to change selection)
+    selection.removeAllRanges();//remove any selections already made
+    selection.addRange(range);//make the range you have just created the visible selection
+}
