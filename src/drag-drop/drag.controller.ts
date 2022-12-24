@@ -1,11 +1,16 @@
 import { BaseController } from "../base/controller";
+import { DragState } from "./drag.state";
 
-export class DragController<ItemType extends object> extends BaseController {
-    private _item: ItemType;
+export class DragController<TItem extends object> extends BaseController {
+    private state: DragState;
+
+    private _item: TItem;
     private _element: HTMLElement;
     
-    constructor(item: ItemType) {
+    constructor(item: TItem) {
         super();
+        
+        this.state = this.getRequiredState<DragState>(DragState.name);
 
         this._item = item;
         this._element = this.container;
@@ -37,6 +42,7 @@ export class DragController<ItemType extends object> extends BaseController {
 
     private dragStart(e: MouseEvent) {
         e.preventDefault();
+        this.state.updateByKey('isDragging', true, false);
 
         this.element.classList.add('state-dragging');
         this.element.style.cursor = 'grabbing';
@@ -57,6 +63,7 @@ export class DragController<ItemType extends object> extends BaseController {
     }
     
     private dragEnd(e: MouseEvent) {
+        this.state.updateByKey('isDragging', false, false);
         this.element.classList.remove('state-dragging');
 
         this.element.style.removeProperty('cursor');
