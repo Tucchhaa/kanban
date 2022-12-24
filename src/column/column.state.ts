@@ -7,23 +7,23 @@ export type ColumnOptions = {
 
 export class ColumnState extends BaseState<ColumnOptions> {
     public get column() {
-        return this.state.column!;
+        return this.options.column!;
     }
 
     public get columnCards() {
-        return this.state.column!.cards!;
+        return this.options.column!.cards!;
     }
 
-    constructor(state: ColumnOptions) {
-        const defaultState: ColumnOptions = {
+    constructor(options: ColumnOptions) {
+        const defaultOptions: ColumnOptions = {
             column: new Column('__empty-column__'),
         };
 
-        super(state, defaultState);
+        super(options, defaultOptions);
     }
 
     public updateCards(cards: Card[]) {
-        this.updateBy((state) => { state.column!.cards = cards });
+        this.updateBy((options) => { options.column!.cards = cards });
     }
 
     public addCard(card: Card) {

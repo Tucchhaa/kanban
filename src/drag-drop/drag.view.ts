@@ -3,10 +3,10 @@ import { BaseView } from "../base/view";
 import { concatClasses } from "../helpers";
 import { DragState } from "./drag.state";
 
-export abstract class DragView<TState extends BaseStateType> extends BaseView<TState> {
-    constructor(state: TState, classes?: string[] | string) {
+export class DragView<TState extends BaseStateType> extends BaseView<TState> {
+    constructor(classes?: string[] | string) {
         const _classes = concatClasses('draggable', classes);
-        super(state, _classes);
+        super(_classes);
     }
 
     protected _render(fragment: DocumentFragment): void {
@@ -28,8 +28,12 @@ export abstract class DragView<TState extends BaseStateType> extends BaseView<TS
         };
 
         const onMouseMove = (e: MouseEvent) => {
-            if(!dragState.disabled && !dragState.isDragging && isMouseDown && this.isThresholdPassed(initX, initY, e.clientX, e.clientY)) {
-                this.startDrag(e);
+            const isDragAllowed = !dragState.disabled && !dragState.isDragging;
+
+            if(isDragAllowed) {
+                if(isMouseDown && this.isThresholdPassed(initX, initY, e.clientX, e.clientY)) {
+                    this.startDrag(e);
+                }
             }
         }
 

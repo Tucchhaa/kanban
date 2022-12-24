@@ -4,31 +4,21 @@ import { BaseComponentType } from "./component";
 import { ComponentModule } from "./component-module";
 import { BaseStateType } from "./state";
 
-export type BaseViewType = BaseView<BaseStateType>;
-
 type ComponentClass = new(container: HTMLElement, options: object) => BaseComponentType;
 
-export abstract class BaseView<TState extends BaseStateType> extends ComponentModule {
-    protected state: TState;
-    
+export abstract class BaseView<TState extends BaseStateType = BaseStateType> extends ComponentModule<TState> {
     private components: Dictionary<BaseComponentType> = {};
+    private viewExtenders: BaseView[] = [];
 
     protected onClear: { (): void }[] = [];
 
-    constructor(state: TState, classes?: string[] | string) {
+    constructor(classes?: string[] | string) {
         super();
-        
-        this.state = state;
 
         this.container.classList.add(...processClasses(classes));
-
-        this.eventEmitter.on('render', () => {
-            this.clear();
-            this.render();
-        });
     }
 
-    protected abstract _render(fragment: DocumentFragment): void;
+    // PUBLIC
 
     public render() {
         this.container.innerHTML = "";
@@ -38,10 +28,36 @@ export abstract class BaseView<TState extends BaseStateType> extends ComponentMo
         
         this._render(fragment);
 
+        for(const viewExtender of this.viewExtenders)
+            viewExtender._render(fragment);
+
         this.container.appendChild(fragment);
 
         this.eventEmitter.emit('rendered');
     }
+
+    public extendView(viewExtender: BaseView) {
+        this.viewExtenders.push(viewExtender);
+    }
+
+    public clear(): void {
+        // internal level
+        this.clearInternalComponents();
+
+        // this level
+        for(const func of this.onClear)
+            func();
+
+        super.clear();
+        
+        // extender level
+        for(const viewExtender of this.viewExtenders)
+            viewExtender.clear();
+    }
+
+    // === PROTECTED METHODS
+
+    protected abstract _render(fragment: DocumentFragment): void;
 
     protected createDOMElement(tagName: string, classes?: string[] | string) {
         const element = document.createElement(tagName);
@@ -66,15 +82,6 @@ export abstract class BaseView<TState extends BaseStateType> extends ComponentMo
         this.components[key] = newComponent;
 
         return newComponent;
-    }
-
-    public clear(): void {
-        this.clearInternalComponents();
-
-        for(const func of this.onClear)
-            func();
-
-        super.clear();
     }
 
     private clearInternalComponents() {

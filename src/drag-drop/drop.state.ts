@@ -8,25 +8,25 @@ type DropOptions<ItemType extends object> = {
 
 export class DropState<TItem extends object> extends BaseState<DropOptions<TItem>> {
     public get direction() {
-        return this.state.direction!;
+        return this.options.direction!;
     }
 
     public get items() {
-        return this.state.items!;
+        return this.options.items!;
     }
     
     public isEqual() {
-        return this.state.isEqual!;
+        return this.options.isEqual!;
     }
 
-    constructor(state: DropOptions<TItem>) {
-        const defaultState: DropOptions<TItem> = {
+    constructor(options: DropOptions<TItem>) {
+        const defaultOptions: DropOptions<TItem> = {
             direction: 'horizontal',
             items: null,
             isEqual: (itemA: any, itemB: any) => itemA === itemB
         };
 
-        super(state, defaultState);
+        super(options, defaultOptions);
     }
 
     public updateItems(items: any[]) {

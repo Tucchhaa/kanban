@@ -1,16 +1,14 @@
 import { BaseView } from "../base/view";
 import { ColumnOptions } from "../column/column.state";
 import { ColumnComponent } from "../components/column.component";
-import { DraggableColumnComponent } from "../components/column.draggable.component";
 import { EditableFieldComponent } from "../components/editable-field.component";
-import { DropView } from "../drag-drop/drop.view";
 import { EditableFieldOptions } from "../editable-field/editable-field.state";
 import { Column } from "../types";
 import { KanbanState } from "./kanban.state";
 
-export class KanbanView extends DropView<KanbanState> {
-    constructor(state: KanbanState) {
-        super(state, ['kanban']);
+export class KanbanView extends BaseView<KanbanState> {
+    constructor() {
+        super(['kanban']);
     }
 
     protected _render(fragment: DocumentFragment): void {
@@ -27,8 +25,8 @@ export class KanbanView extends DropView<KanbanState> {
             const columnContainer = this.createDOMElement('div');
             const columnOptions: ColumnOptions = { column }
 
-            const columnComponent = this.createComponent(columnContainer, DraggableColumnComponent, columnOptions, `column${column.id}`);
-            columnComponent.eventEmitter.on('column-updated', (column: Column) => this.eventEmitter.emit('update-column', column));
+            const columnComponent = this.createComponent(columnContainer, ColumnComponent, columnOptions, `column${column.id}`);
+            columnComponent.eventEmitter.on('update-column', (column: Column) => this.eventEmitter.emit('update-column', column));
 
             setTimeout(() => this.eventEmitter.emit('process-drag', columnComponent));
 

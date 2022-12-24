@@ -6,12 +6,12 @@ import { BaseController } from "./controller";
 import { EventEmitter, IEventEmitter } from "./event-emitter";
 import { IClearable } from "./idisposable"; 
 
-export type BaseComponentType = BaseComponent<object, BaseState<object>, BaseView<BaseState<object>>>;
+export type BaseComponentType = BaseComponent<object, BaseState<object>, BaseView>;
 
 export class BaseComponent<
     TOptions extends object, 
     TState extends BaseState<TOptions>, 
-    TView extends BaseView<TState>
+    TView extends BaseView
 > implements IClearable {
     private _name: string;
     private _container: HTMLElement;
@@ -26,9 +26,9 @@ export class BaseComponent<
     constructor(
         name: string,
         stateType: new(options: TOptions) => TState, 
-        viewType: new(state: TState, container: HTMLElement) => TView, 
-        container: HTMLElement | null, options: TOptions | TState,
-        controllerType?: new(state: TState, view: TView) => BaseController
+        viewType: new(container: HTMLElement) => TView, 
+        container: HTMLElement | null, 
+        options: TOptions | TState
     ) {
         if(!container) {
             throw new Error(`${name}Component container is not defined`);
@@ -36,27 +36,41 @@ export class BaseComponent<
 
         this._name = name;
         this._container = container;
-
         this.eventEmitter = new EventEmitter();
         
-        this.beforeCreateComponentModules();
+        // === Create state
 
-        this._state = options instanceof BaseState ? options : new stateType(options);
+        options instanceof BaseState ?
+            this._state = options :
+            this._state = this.createComponentModule(() => new stateType(options));
+
         this.registerState(() => this._state);
 
-        this._view = new viewType(this._state, container);
+        // === Create view
 
-        if(controllerType)
-            this.registerController(() => new controllerType(this._state, this._view));
+        this._view = this.createComponentModule(() => new viewType(container));
+        this.eventEmitter.on('render', () => {
+            this.clear();
+            this.render();
+        });
+    }
 
-        this.afterCreateComponentModules();
+    // ===
+
+    protected extendView(viewExtenderFactory: () => BaseView) {
+        const viewExtender = this.createComponentModule(viewExtenderFactory);
+        this._view.extendView(viewExtender);
     }
 
     protected render() {
         this._view.render();
     }
 
-    // ===
+    public clear() {
+        this._view.clear();
+    }
+
+    // === GETTERS
 
     public get name() {
         return this._name;
@@ -71,9 +85,9 @@ export class BaseComponent<
         return this._state;
     }
 
-    // ===
+    // === CREATE COMPONENT MODULE
 
-    private beforeCreateComponentModules() {
+    private beforeCreateComponentModule() {
         const componentProps: ComponentProps = { 
             componentName: this._name,
             getContainer: () => this.container,
@@ -83,29 +97,38 @@ export class BaseComponent<
             getRequiredController: this.getRequiredController.bind(this),
 
             getState: this.getState.bind(this),
-            getRequiredState: this.getRequiredState.bind(this)
+            getRequiredState: this.getRequiredState.bind(this),
+
+            state: this.state,
+            view: this.view
         };
 
         ComponentModule.startCreatingComponent(componentProps);
     }
-    private afterCreateComponentModules() {
+    private afterCreateComponentModule() {
         ComponentModule.endCreatingComponent();
+    }
+
+    private createComponentModule(createFunc: () => any) {
+        this.beforeCreateComponentModule();
+        
+        const module = createFunc();
+
+        this.afterCreateComponentModule();
+    
+        return module;
     }
 
     // === Controller
 
     public registerController(controllerFactory: () => BaseController, name?: string) {
-        this.beforeCreateComponentModules();
-        
-        const controller = controllerFactory();
+        const controller = this.createComponentModule(controllerFactory) as BaseController;
         name = name ?? controller.constructor.name;
 
         if(this.controllers[name])
             throw new Error(`Controller with ${name} is already registered`);
 
         this.controllers[name] = controller;
-
-        this.afterCreateComponentModules();
     }
 
     public getController<T extends BaseController>(name: string) {
@@ -124,17 +147,13 @@ export class BaseComponent<
     // === State
 
     public registerState(stateFactory: () => BaseStateType, name?: string) {
-        this.beforeCreateComponentModules();
-        
-        const state = stateFactory();
+        const state = this.createComponentModule(stateFactory) as BaseStateType;
         name = name ?? state.constructor.name;
 
         if(this.states[name])
             throw new Error(`State with ${name} is already registered`);
 
         this.states[name] = state;
-
-        this.afterCreateComponentModules();
     }
 
     public getState<T extends BaseStateType>(name: string) {
@@ -145,16 +164,9 @@ export class BaseComponent<
         const state = this.states[name] as T;
 
         if(!state) {
-            console.log(this.states, this.container);
             throw new Error(`getRequiredState: state \'${name}\' is not registered`);
         }
 
         return state;
-    }
-
-    // ===
-
-    public clear() {
-        this._view.clear();
     }
 }

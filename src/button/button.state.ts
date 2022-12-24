@@ -8,19 +8,19 @@ export type ButtonOptions = {
 
 export class ButtonState extends BaseState<ButtonOptions> {
     get text() {
-        return this.state.text!;
+        return this.options.text!;
     }
 
     get onClick() {
-        return this.state.onClick!;
+        return this.options.onClick!;
     }
 
     constructor(state: ButtonOptions) {
-        const defaultState = {
+        const defaultOptions = {
             text: "button",
             onClick: noop
         };
         
-        super(state, defaultState);
+        super(state, defaultOptions);
     }
 }

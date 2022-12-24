@@ -2,6 +2,7 @@ import { BaseController } from "./controller";
 import { IEventEmitter } from "./event-emitter";
 import { IClearable } from "./idisposable";
 import { BaseStateType } from "./state";
+import { BaseView } from "./view";
 
 export type ComponentProps = { 
     componentName: string,
@@ -13,9 +14,15 @@ export type ComponentProps = {
 
     getState: <T extends BaseStateType>(name: string) => T | undefined,
     getRequiredState: <T extends BaseStateType>(name: string) => T,
+
+    state: BaseStateType,
+    view: BaseView
 };
 
-export class ComponentModule implements IClearable {
+export class ComponentModule<
+    TState extends BaseStateType = BaseStateType,
+    TView extends BaseView = BaseView
+> implements IClearable {
     protected componentName: string;
     protected getContainer: () => HTMLElement;
     private _eventEmitter: IEventEmitter;
@@ -26,6 +33,11 @@ export class ComponentModule implements IClearable {
     protected getState: <T extends BaseStateType>(name: string) => T | undefined;
     protected getRequiredState: <T extends BaseStateType>(name: string) => T;
 
+    private _state: TState;
+    private _view: TView;
+
+    // ===
+
     public get container() {
         return this.getContainer();
     }
@@ -33,6 +45,16 @@ export class ComponentModule implements IClearable {
     public get eventEmitter() {
         return this._eventEmitter;
     }
+
+    public get state() {
+        return this._state;
+    }
+
+    public get view() {
+        return this._view;
+    }
+
+    // ===
 
     constructor() {
         const props = ComponentModule.props[ComponentModule.props.length - 1];
@@ -44,13 +66,16 @@ export class ComponentModule implements IClearable {
         this.getController = props.getController;
         this.getRequiredController = props.getRequiredController;
 
-        this.getState= props.getState;
+        this.getState = props.getState;
         this.getRequiredState = props.getRequiredState;
+
+        this._state = (props.state as TState);
+        this._view = (props.view as TView);
     }
 
     public clear(): void { }
 
-    // ===
+    // === STATIC
 
     private static props: ComponentProps[] = [];
 

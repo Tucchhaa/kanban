@@ -2,19 +2,15 @@ import { Card } from "../types";
 import { CardComponent } from "../components/card.component";
 import { ColumnState } from "./column.state";
 import { EditableFieldComponent } from "../components/editable-field.component";
-import { DropView } from "../drag-drop/drop.view";
 import { EditableFieldOptions } from "../editable-field/editable-field.state";
 import { CardOptions } from "../card/card.state";
+import { BaseView } from "../base/view";
 
-export class ColumnView extends DropView<ColumnState> {
-    private _draggableArea?: HTMLElement;
+export class ColumnView extends BaseView<ColumnState> {
+    public headingContainer?: HTMLElement;
 
-    public get draggableArea() {
-        return this._draggableArea!;
-    }
-
-    constructor(state: ColumnState) {
-        super(state, 'kanban-column');
+    constructor() {
+        super('kanban-column');
     }
 
     protected _render(fragment: DocumentFragment): void {
@@ -51,7 +47,7 @@ export class ColumnView extends DropView<ColumnState> {
         };
         this.createComponent(headingContainer, EditableFieldComponent, options, 'heading-field');
         
-        this._draggableArea = headingContainer;
+        this.headingContainer = headingContainer;
 
         fragment.appendChild(headingContainer);
     }
@@ -64,7 +60,7 @@ export class ColumnView extends DropView<ColumnState> {
             const cardContainer = this.createDOMElement('div');
 
             const cardOptions: CardOptions = { card };
-            const cardCompoment = this.createComponent(cardContainer, CardComponent, cardOptions, `card${index}`);
+            const cardCompoment = this.createComponent(cardContainer, CardComponent, cardOptions, `card${card.id}`);
 
             setTimeout(() => this.eventEmitter.emit('process-drag', cardCompoment));
             

@@ -6,8 +6,8 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
     public input?: HTMLElement;
     public placeholder?: HTMLElement;
 
-    constructor(state: EditableFieldState) {
-        super(state, 'editable-field');
+    constructor() {
+        super('editable-field');
     }
 
     protected _render(fragment: DocumentFragment): void {
@@ -64,7 +64,7 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
         input.setAttribute('contenteditable', 'true');
         input.setAttribute('role', 'textbox');
         
-        input.addEventListener('input', () => this.eventEmitter.emit('value-change', input.innerText));
+        input.addEventListener('input', () => this.eventEmitter.emit('value-changed', input.innerText));
         input.addEventListener('keydown', (e: KeyboardEvent) => e.key === 'Enter' && this.eventEmitter.emit('enter-pressed'));
         input.addEventListener('focusin', () => this.eventEmitter.emit('focusin'));
         input.addEventListener('focusout', () => this.eventEmitter.emit('focusout'));

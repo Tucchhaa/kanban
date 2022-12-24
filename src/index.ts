@@ -8,7 +8,6 @@ reopen editable-field - нужно передавать старое состо�
 refactor state
 убрать методы в state которые меняют состояние. пример DropState.updateItems
 drag-drop cards when column has scroll
-get rid of state property in BaseView
 перекрытия событий в eventEmitter: решение -> добавить неймспейсы
 переименовать обработчики событий: drag -> onDrag, sharedDrag -> onSharedDrag
 shared-drop, drop -> Вместо хранения компонентов, лучше хранить контролеры

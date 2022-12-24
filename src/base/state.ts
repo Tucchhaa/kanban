@@ -5,12 +5,12 @@ export interface OptionsType {
     [id: string]: any;
 }
 
-interface IState<TOptions extends OptionsType> {
+export interface IState<TOptions extends OptionsType> {
     getOptions(): TOptions;
 
-    update(newState: TOptions, needRender: boolean): void;
+    update(newOptions: TOptions, needRender: boolean): void;
 
-    updateBy(func: (state: TOptions) => void, needRender: boolean): void;
+    updateBy(func: (options: TOptions) => void, needRender: boolean): void;
 
     updateByKey(key: string, value: any, needRender: boolean): void;
 }
@@ -18,49 +18,49 @@ interface IState<TOptions extends OptionsType> {
 export type BaseStateType = BaseState<OptionsType>;
 
 export class BaseState<TOptions extends OptionsType> extends ComponentModule {
-    protected state: TOptions;
+    protected options: TOptions;
 
-    constructor(state: TOptions, defaultState: TOptions) {
+    constructor(options: TOptions, defaultOptions: TOptions) {
         super();
 
-        this.state = this.updateRecusively(defaultState, state);
+        this.options = this.updateRecusively(defaultOptions, options);
     }
 
-    public update(newState: TOptions, needRender = true) {
-        this.state = this.updateRecusively(Object.assign({}, this.state), newState);
+    public update(newOptions: TOptions, needRender = true) {
+        this.options = this.updateRecusively(Object.assign({}, this.options), newOptions);
 
         if(needRender) {
             this.eventEmitter.emit('render');
         }
     }
 
-    private updateRecusively(state: TOptions, newState: TOptions) {
-        for(const key in newState) {
-            if(!this.checkKey(state, key) || newState[key] === undefined)
+    private updateRecusively(options: TOptions, newOptions: TOptions) {
+        for(const key in newOptions) {
+            if(!this.checkKey(options, key) || newOptions[key] === undefined)
                 continue;
             
-            if(isObject(state[key]) && isObject(newState[key]))
-                (state[key] as OptionsType) = this.updateRecusively(state[key], newState[key]);
+            if(isObject(options[key]) && isObject(newOptions[key]))
+                (options[key] as OptionsType) = this.updateRecusively(options[key], newOptions[key]);
             else 
-                state[key] = newState[key];
+                options[key] = newOptions[key];
         } 
 
-        return state;
+        return options;
     }
 
     public updateByKey(key: string, value: any, needRender = true) {
-        if(!this.checkKey(this.state, key))
+        if(!this.checkKey(this.options, key))
             return;
 
-        (this.state[key] as OptionsType) = value;
+        (this.options[key] as OptionsType) = value;
 
         if(needRender) {
             this.eventEmitter.emit('render');
         }
     }
 
-    public updateBy(func: (state: TOptions) => void, needRender = true) {
-        func(this.state);
+    public updateBy(func: (options: TOptions) => void, needRender = true) {
+        func(this.options);
         
         if(needRender) {
             this.eventEmitter.emit('render');
@@ -68,8 +68,8 @@ export class BaseState<TOptions extends OptionsType> extends ComponentModule {
     }
 
     public get(key: string): any {
-        if(this.checkKey(this.state, key)) {
-            return this.state[key];
+        if(this.checkKey(this.options, key)) {
+            return this.options[key];
         }
 
         return undefined;

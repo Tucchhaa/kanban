@@ -22,61 +22,61 @@ export type EditableFieldOptions = {
 
 export class EditableFieldState extends BaseState<EditableFieldOptions> {
     get title() {
-        return this.state.title!;
+        return this.options.title!;
     }
 
     get value() {
-        return this.state.value!;
+        return this.options.value!;
     }
 
     get defaultValue() {
-        return this.state.defaultValue!;
+        return this.options.defaultValue!;
     }
 
     get placeholder() {
-        return this.state.placeholder!;
+        return this.options.placeholder!;
     }
 
 
     get isOpen() {
-        return this.state.isOpen!;
+        return this.options.isOpen!;
     }
 
     get validationMsg() {
-        return (this.state.validationMsg as string | null);
+        return (this.options.validationMsg as string | null);
     }
 
     get submitOnOutsideClick() {
-        return this.state.submitOnOutsideClick!;
+        return this.options.submitOnOutsideClick!;
     }
 
     get buttonsTemplate() {
-        return this.state.buttonsTemplate;
+        return this.options.buttonsTemplate;
     }
 
 
     get prepareValue() {
-        return this.state.prepareValue!;
+        return this.options.prepareValue!;
     }
 
     get validation() {
-        return this.state.validation!;
+        return this.options.validation!;
     }
 
     get onOpened() {
-        return this.state.onOpened!;
+        return this.options.onOpened!;
     }
 
     get onClosed() {
-        return this.state.onClosed!;
+        return this.options.onClosed!;
     }
 
     get onSubmit() {
-        return this.state.onSubmit!;
+        return this.options.onSubmit!;
     }
 
-    constructor(state: EditableFieldOptions) {
-        const defaultState: EditableFieldOptions = {
+    constructor(options: EditableFieldOptions) {
+        const defaultOptions: EditableFieldOptions = {
             title: 'toggle',
             value: "",
             defaultValue: "",
@@ -95,6 +95,6 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
             onSubmit: noop
         };
 
-        super(state, defaultState);
+        super(options, defaultOptions);
     }
 }

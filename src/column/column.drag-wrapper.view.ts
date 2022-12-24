@@ -1,23 +1,19 @@
-import { ColumnComponent } from "../components/column.component";
 import { DragState } from "../drag-drop/drag.state";
 import { DragView } from "../drag-drop/drag.view";
-import { Column } from "../types";
 import { ColumnState } from "./column.state";
+import { ColumnView } from "./column.view";
 
 export class DraggableColumnView extends DragView<ColumnState> {
-    constructor(state: ColumnState) {
-        super(state);
+    private dragState: DragState;
+
+    constructor() {
+        super();
+
+        this.dragState = this.getRequiredState<DragState>(DragState.name);
     }
 
     protected _render(fragment: DocumentFragment): void {
-        const columnComponent = (this.createComponent(this.container, ColumnComponent, this.state) as ColumnComponent);
-        columnComponent.eventEmitter.on('column-updated', (column: Column) => this.eventEmitter.emit('column-updated', column));
-        columnComponent.eventEmitter.on('disable-drag', () => this.eventEmitter.emit('disable-drag'));
-        columnComponent.eventEmitter.on('enable-drag', () => this.eventEmitter.emit('enable-drag'));
-
-
-        const dragState = this.getRequiredState<DragState>(DragState.name);
-        dragState.updateByKey('draggableArea', columnComponent.view.draggableArea, false);
+        this.dragState.updateByKey('draggableArea', (this.view as ColumnView).headingContainer, false);
 
         super._render(fragment);
     }

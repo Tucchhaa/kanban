@@ -8,24 +8,24 @@ type DragOptions = {
 
 export class DragState extends BaseState<DragOptions> {
     public get isDragging() {
-        return this.state.isDragging!;
+        return this.options.isDragging!;
     }
 
     public get draggableArea() {
-        return this.state.draggableArea!;
+        return this.options.draggableArea!;
     }
 
     public get disabled() {
-        return this.state.disabled!;
+        return this.options.disabled!;
     }
 
-    constructor(state: DragOptions) {
-        const defaultState: DragOptions = {
+    constructor(options: DragOptions) {
+        const defaultOptions: DragOptions = {
             isDragging: false,
             draggableArea: undefined,
             disabled: false
         };
 
-        super(state, defaultState);
+        super(options, defaultOptions);
     }
 }
