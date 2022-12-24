@@ -3,42 +3,35 @@ import { Card } from "../types";
 import { ColumnState } from "./column.state";
 import { ColumnView } from "./column.view";
 
-export class ColumnController extends BaseController {
-    private state: ColumnState;
-    private view: ColumnView;
-    
-    constructor(state: ColumnState, view: ColumnView) {
+export class ColumnController extends BaseController<ColumnState, ColumnView> {
+    constructor() {
         super();
-
-        this.state = state;
-        this.view = view;
         
         this.eventEmitter
-            .on('change-column-name', (newName: string) => this.changeColumnName(newName))
-            .on('create-new-card', (cardName: string) => this.createNewCard(cardName))
-            .on('update-items-order', (cards: Card[]) => this.updateCardsOrder(cards));
+            .on('change-column-name', this.onChangeColumnName.bind(this))
+            .on('create-new-card', this.onCreateNewCard.bind(this))
+            .on('update-items-order', this.onUpdateCardsOrder.bind(this));
     }
 
-    private changeColumnName(newName: string) {
+    private onChangeColumnName(newName: string) {
         this.state.updateBy(state => {
             state.column!.name = newName;
         }, true);
 
-        this.eventEmitter.emit('column-updated', this.state.column);
+        this.eventEmitter.emit('update-column', this.state.column);
     }
 
-    private createNewCard(cardName: string) {
+    private onCreateNewCard(cardName: string) {
         this.state.addCard(new Card(cardName));
 
-        this.eventEmitter.emit('column-updated', this.state.column);
-        this.eventEmitter.emit('items-updated', this.state.columnCards);
+        this.eventEmitter.emit('update-items', this.state.columnCards);
+        this.eventEmitter.emit('update-column', this.state.column);
     }
 
-    private updateCardsOrder(cards: Card[]) {
-        this.eventEmitter.emit('items-updated', this.state.columnCards);
-
+    private onUpdateCardsOrder(cards: Card[]) {
         this.state.updateCards(cards);
         
-        this.eventEmitter.emit('column-updated', this.state.column);
+        this.eventEmitter.emit('update-items', this.state.columnCards);
+        this.eventEmitter.emit('update-column', this.state.column);
     }
 }

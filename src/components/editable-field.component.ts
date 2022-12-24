@@ -5,8 +5,10 @@ import { EditableFieldView } from "../editable-field/editable-field.view";
 
 export class EditableFieldComponent extends BaseComponent<EditableFieldOptions, EditableFieldState, EditableFieldView> {
     constructor(container: HTMLElement | null, options: EditableFieldOptions) {
-        super('EditableField', EditableFieldState, EditableFieldView, container, options, EditableFieldController);
+        super('EditableField', EditableFieldState, EditableFieldView, container, options);
         
+        this.registerController(() => new EditableFieldController());
+
         super.render();
     }
 }

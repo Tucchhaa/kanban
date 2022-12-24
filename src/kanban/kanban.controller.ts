@@ -3,30 +3,24 @@ import { Column } from "../types";
 import { KanbanState } from "./kanban.state";
 import { KanbanView } from "./kanban.view";
 
-export class KanbanController extends BaseController {
-    private state: KanbanState;
-    private view: KanbanView;
-    
-    constructor(state: KanbanState, view: KanbanView) {
+export class KanbanController extends BaseController<KanbanState, KanbanView> {
+    constructor() {
         super();
-
-        this.state = state;
-        this.view = view;
         
         this.eventEmitter
-            .on('create-new-column', (columnName: string) => this.createNewColumn(columnName))
-            .on('update-column', (column: Column) => this.updateColumn(column))
-            .on('update-items-order', (columns: Column[]) => this.updateColumnsOrder(columns));
+            .on('create-new-column', this.onCreateNewColumn.bind(this))
+            .on('update-column', this.onUpdateColumn.bind(this))
+            .on('update-items-order', this.onUpdateColumnsOrder.bind(this));
     }
 
-    private createNewColumn(columnName: string) {
+    private onCreateNewColumn(columnName: string) {
         const column = new Column(columnName);
 
         this.state.createColumn(column);
-        this.eventEmitter.emit('items-updated', this.state.columns);
+        this.eventEmitter.emit('update-items', this.state.columns);
     }
 
-    private updateColumn(column: Column) {
+    private onUpdateColumn(column: Column) {
         const isUpdated = this.state.updateColumn(column);
 
         if(!isUpdated) {
@@ -34,8 +28,8 @@ export class KanbanController extends BaseController {
         }
     }
 
-    private updateColumnsOrder(columns: Column[]) {
+    private onUpdateColumnsOrder(columns: Column[]) {
         this.state.updateColumns(columns);
-        this.eventEmitter.emit('items-updated', this.state.columns);
+        this.eventEmitter.emit('update-items', this.state.columns);
     }
 }

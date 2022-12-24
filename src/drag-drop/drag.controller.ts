@@ -2,7 +2,7 @@ import { BaseController } from "../base/controller";
 import { DragState } from "./drag.state";
 
 export class DragController<TItem extends object> extends BaseController {
-    private state: DragState;
+    private dragState: DragState;
 
     private _item: TItem;
     private _element: HTMLElement;
@@ -10,18 +10,18 @@ export class DragController<TItem extends object> extends BaseController {
     constructor(item: TItem) {
         super();
         
-        this.state = this.getRequiredState<DragState>(DragState.name);
+        this.dragState = this.getRequiredState<DragState>(DragState.name);
 
         this._item = item;
         this._element = this.container;
         
         this.eventEmitter
-            .on('drag-start', (e: MouseEvent) => this.dragStart(e))
-            .on('drag', (e: MouseEvent) => this.drag(e))
-            .on('drag-end', (e: MouseEvent) => this.dragEnd(e))
+            .on('drag-start', this.onDragStart.bind(this))
+            .on('drag', this.onDrag.bind(this))
+            .on('drag-end', this.dragEnd.bind(this))
 
-            .on('disable-drag', () => this.disableDrag())
-            .on('enable-drag', () => this.enableDrag());
+            .on('disable-drag', this.onDisableDrag.bind(this))
+            .on('enable-drag', this.onEnableDrag.bind(this));
     }
 
     private _sizes: { width: number, height: number } = { width: 50, height: 50 };
@@ -43,9 +43,9 @@ export class DragController<TItem extends object> extends BaseController {
 
     // ===
 
-    private dragStart(e: MouseEvent) {
+    private onDragStart(e: MouseEvent) {
         e.preventDefault();
-        this.state.updateByKey('isDragging', true, false);
+        this.dragState.updateByKey('isDragging', true, false);
 
         this.element.classList.add('state-dragging');
         this.element.style.cursor = 'grabbing';
@@ -57,16 +57,16 @@ export class DragController<TItem extends object> extends BaseController {
         this._element.style.width = this._sizes.width + 'px';
         this._element.style.height = this._sizes.height + 'px';
 
-        this.drag(e);
+        this.onDrag(e);
     }
 
-    private drag(e: MouseEvent) {
+    private onDrag(e: MouseEvent) {
         this._element.style.top = (e.clientY - this.offset.y) + 'px';
         this._element.style.left = (e.clientX - this.offset.x) + 'px';
     }
     
     private dragEnd(e: MouseEvent) {
-        this.state.updateByKey('isDragging', false, false);
+        this.dragState.updateByKey('isDragging', false, false);
         this.element.classList.remove('state-dragging');
 
         this.element.style.removeProperty('cursor');
@@ -108,11 +108,11 @@ export class DragController<TItem extends object> extends BaseController {
     }
 
     // ===
-    private disableDrag() {
-        this.state.updateByKey('disabled', true, false);
+    private onDisableDrag() {
+        this.dragState.updateByKey('disabled', true, false);
     }
 
-    private enableDrag() {
-        this.state.updateByKey('disabled', false, false);
+    private onEnableDrag() {
+        this.dragState.updateByKey('disabled', false, false);
     }
 }

@@ -7,14 +7,14 @@ export type CardOptions = {
 
 export class CardState extends BaseState<CardOptions> {
     public get card() {
-        return this.state.card!;
+        return this.options.card!;
     }
 
-    constructor(state: CardOptions) {
-        const defaultState = {
+    constructor(options: CardOptions) {
+        const defaultOptions = {
             card: new Card("__empty-card__")
         }
         
-        super(state, defaultState);
+        super(options, defaultOptions);
     }
 }

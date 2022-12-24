@@ -7,30 +7,27 @@ export type KanbanOptions = {
 
 export class KanbanState extends BaseState<KanbanOptions> {
     public get columns() {
-        return this.state.columns!.slice(); 
+        return this.options.columns!.slice(); 
     }
 
     // ===
     
-    constructor(state: KanbanOptions) {
-        const defaultState = {
+    constructor(options: KanbanOptions) {
+        const defaultOptions = {
             columns: []
         };
 
-        super(state, defaultState);
-
-        (window as any).columns = () => this.columns;
+        super(options, defaultOptions);
     }
 
     public createColumn(column: Column) {
-        console.log(this.columns, column);
         this.updateByKey('columns', [...this.columns, column]);
     }
 
     public updateColumn(updated: Column) {
         let isUpdated = false;
 
-        this.updateBy(state => {
+        this.updateBy(options => {
             for(const column of this.columns) {
                 if(column.id === updated.id) {
                     Object.assign(column, updated);
@@ -44,6 +41,6 @@ export class KanbanState extends BaseState<KanbanOptions> {
     }
     
     public updateColumns(columns: Column[]) {
-        this.updateBy((state) => { state.columns = columns });
+        this.updateBy((options) => { options.columns = columns });
     }
 }

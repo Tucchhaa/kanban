@@ -3,27 +3,21 @@ import { setEndOfContenteditable } from "../helpers";
 import { EditableFieldState } from "./editable-field.state";
 import { EditableFieldView } from "./editable-field.view";
 
-export class EditableFieldController extends BaseController {
-    private state: EditableFieldState;
-    private view: EditableFieldView;
-    
-    constructor(state: EditableFieldState, view: EditableFieldView) {
+export class EditableFieldController extends BaseController<EditableFieldState, EditableFieldView> {
+    constructor() {
         super();
-
-        this.state = state;
-        this.view = view;
         
         this.eventEmitter
-            .on('open', () => this.toggleInput(true))
-            .on('close', () => this.toggleInput(false))
+            .on('open', this.toggleInput.bind(this, true))
+            .on('close', this.toggleInput.bind(this, false))
 
-            .on('document-click', (e: MouseEvent) => this.onDocumentClick(e))
-            .on('focusin', () => this.setFocusState())
-            .on('focusout', () => this.resetFocusState())
+            .on('document-click', this.onDocumentClick.bind(this))
+            .on('focusin', this.onFocusIn.bind(this))
+            .on('focusout', this.onFocusOut.bind(this))
         
-            .on('submit', () => this.submit())
-            .on('enter-pressed', () => this.onEnterPressed())
-            .on('value-change', (value: string) => this.updateValue(value))
+            .on('submit', this.onSubmit.bind(this))
+            .on('enter-pressed', this.onEnterPressed.bind(this))
+            .on('value-changed', this.onValueChanged.bind(this));
     }
 
     private focusInput() {
@@ -42,11 +36,11 @@ export class EditableFieldController extends BaseController {
         
         if(isOpen) {
             this.focusInput();
-            this.setFocusState();
+            this.onFocusIn();
             this.state.onOpened();
         }
         else {
-            this.resetFocusState();
+            this.onFocusOut();
             this.state.onClosed();
         }
     }
@@ -56,21 +50,21 @@ export class EditableFieldController extends BaseController {
         
         if(!isInnerClick) {
             if(this.state.submitOnOutsideClick)
-                this.submit();
+                this.onSubmit();
             else
                 this.toggleInput(false);
         }
     }
 
-    private setFocusState() {
+    private onFocusIn() {
         this.container.classList.add('state-focused');
     }
 
-    private resetFocusState() {
+    private onFocusOut() {
         this.container.classList.remove('state-focused');
     }
 
-    private submit() {
+    private onSubmit() {
         const value = this.state.prepareValue(this.state.value);
         const [result, msg] = this.state.validation(value);
 
@@ -84,10 +78,10 @@ export class EditableFieldController extends BaseController {
     }
 
     private onEnterPressed() {
-        this.submit();
+        this.onSubmit();
     }
 
-    private updateValue(value: string) {
+    private onValueChanged(value: string) {
         this.state.updateByKey('value', value, false);
 
         this.view.placeholder!.style.display = value.length ? 'none' : 'block';

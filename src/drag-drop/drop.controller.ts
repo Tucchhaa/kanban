@@ -6,7 +6,7 @@ import { DragController } from "./drag.controller";
 import { DropState } from "./drop.state";
 
 export class DropController<TItem extends object> extends BaseController {
-    private state: DropState<TItem>;
+    private dropState: DropState<TItem>;
     
     private draggingDirection: 'horizontal' | 'vertical';
     private drags: BaseComponentType[] = [];
@@ -18,26 +18,26 @@ export class DropController<TItem extends object> extends BaseController {
     constructor() {
         super();
 
-        this.state = this.getRequiredState<DropState<TItem>>(DropState.name);
-        this.draggingDirection = this.state.direction;
-        this.isItemsEqual = this.state.isEqual();
+        this.dropState = this.getRequiredState<DropState<TItem>>(DropState.name);
+        this.draggingDirection = this.dropState.direction;
+        this.isItemsEqual = this.dropState.isEqual();
         
         this.eventEmitter
-            .on('process-drag', (drag: BaseComponentType) => this.processDraggable(drag))
-            .on('items-updated', (items: any) => this.onUpdateItems(items));
+            .on('process-drag', this.onProcessDrag.bind(this))
+            .on('update-items', this.onUpdateItems.bind(this));
     }
 
-    public processDraggable(drag: BaseComponentType) {
+    public onProcessDrag(drag: BaseComponentType) {
         this.drags.push(drag);
         
         const dragController = drag.getRequiredController<DragController<TItem>>(DragController.name);
         
-        drag.eventEmitter.on('drag-start', (e: MouseEvent) => this.dragStart(e, dragController));
-        drag.eventEmitter.on('drag', (e: MouseEvent) => this.drag(e, dragController));
-        drag.eventEmitter.on('drag-end', (e: MouseEvent) => this.dragEnd(e, dragController))
+        drag.eventEmitter.on('drag-start', (e: MouseEvent) => this.onDragStart(e, dragController));
+        drag.eventEmitter.on('drag', (e: MouseEvent) => this.onDrag(e, dragController));
+        drag.eventEmitter.on('drag-end', (e: MouseEvent) => this.onDragEnd(e, dragController))
     }
 
-    private dragStart(e: MouseEvent, dragController: DragController<TItem>) {
+    private onDragStart(e: MouseEvent, dragController: DragController<TItem>) {
         this.showShadow(dragController.element)
 
         this.shadowIndex = this.getIndex(dragController.item);
@@ -45,8 +45,8 @@ export class DropController<TItem extends object> extends BaseController {
     }
 
     private getIndex(item: any): number {
-        for(let index=0; index < this.state.items.length; index++) {
-            const itemB = this.state.items[index];
+        for(let index=0; index < this.dropState.items.length; index++) {
+            const itemB = this.dropState.items[index];
 
             if(this.isItemsEqual(item, itemB)) {
                 return index;
@@ -56,7 +56,7 @@ export class DropController<TItem extends object> extends BaseController {
         return -1;
     }
 
-    private drag(e: MouseEvent, dragController: DragController<TItem>) {
+    private onDrag(e: MouseEvent, dragController: DragController<TItem>) {
         const currentDragElement = dragController.element;
 
         this.mouseDirection.calculateMouseDirection(e);
@@ -82,13 +82,13 @@ export class DropController<TItem extends object> extends BaseController {
         }
     }
 
-    private dragEnd(e: MouseEvent, dragController: DragController<TItem>) {
+    private onDragEnd(e: MouseEvent, dragController: DragController<TItem>) {
         this.hideShadow();
         this.updateItemsOrder(dragController);
     }
 
     private updateItemsOrder(dragController: DragController<TItem>) {
-        const items = this.state.items;
+        const items = this.dropState.items;
         const currentItem = dragController.item;
         const newOrder: any[] = [];
         const insertBeforeIndex = this.shadowIndex;
@@ -114,7 +114,7 @@ export class DropController<TItem extends object> extends BaseController {
 
     private onUpdateItems(items: any) {
         this.shadowIndex = -1;
-        this.state.updateItems(items);
+        this.dropState.updateItems(items);
         this.drags = [];
     }
 
