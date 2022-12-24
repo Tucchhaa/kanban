@@ -28,7 +28,7 @@ export abstract class DragView<TState extends BaseStateType> extends BaseView<TS
         };
 
         const onMouseMove = (e: MouseEvent) => {
-            if(!dragState.isDragging && isMouseDown && this.isThresholdPassed(initX, initY, e.clientX, e.clientY)) {
+            if(!dragState.disabled && !dragState.isDragging && isMouseDown && this.isThresholdPassed(initX, initY, e.clientX, e.clientY)) {
                 this.startDrag(e);
             }
         }

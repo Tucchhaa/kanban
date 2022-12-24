@@ -14,7 +14,9 @@ export type EditableFieldOptions = {
     buttonsTemplate?: (close: () => void, submit: () => void) => HTMLElement | undefined,
     
     prepareValue?: (value: string) => string,
-    onSubmit?: (value: string) => any;
+    onSubmit?: (value: string) => void;
+    onOpened?: () => void;
+    onClosed?: () => void;
     validation?: (value: string) => [boolean, string];
 }
 
@@ -61,6 +63,14 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
         return this.state.validation!;
     }
 
+    get onOpened() {
+        return this.state.onOpened!;
+    }
+
+    get onClosed() {
+        return this.state.onClosed!;
+    }
+
     get onSubmit() {
         return this.state.onSubmit!;
     }
@@ -79,8 +89,10 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
             buttonsTemplate: undefined,
 
             prepareValue: value => value,
-            onSubmit: noop,
-            validation: () => [true, ""]
+            validation: () => [true, ""],
+            onOpened: noop,
+            onClosed: noop,
+            onSubmit: noop
         };
 
         super(state, defaultState);

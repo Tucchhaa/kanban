@@ -35,7 +35,6 @@ export class ColumnView extends DropView<ColumnState> {
             buttonsTemplate: (close: () => void, submit: () => void) => { return undefined; },
             
             prepareValue: (value: string) => value.trim().replace(/\s\s+/g, ' '),
-            onSubmit: (value: string) => this.eventEmitter.emit('change-column-name', value),
             validation: (value: string) => {
                 if(value.length === 0)
                     return [false, 'Column name can\'t be empty'];
@@ -44,7 +43,11 @@ export class ColumnView extends DropView<ColumnState> {
                     return [false, 'Column name is too long'];
 
                 return [true, ''];
-            }
+            },
+            
+            onSubmit: (value: string) => this.eventEmitter.emit('change-column-name', value),
+            onOpened: () => this.eventEmitter.emit('disable-drag'),
+            onClosed: () => this.eventEmitter.emit('enable-drag')
         };
         this.createComponent(headingContainer, EditableFieldComponent, options, 'heading-field');
         

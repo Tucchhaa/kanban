@@ -14,7 +14,6 @@ export class EditableFieldController extends BaseController {
         this.view = view;
         
         this.eventEmitter
-            .on('rendered', () => this.focusInput())
             .on('open', () => this.toggleInput(true))
             .on('close', () => this.toggleInput(false))
 
@@ -39,8 +38,17 @@ export class EditableFieldController extends BaseController {
     }
 
     private toggleInput(isOpen: boolean) {
-        isOpen ? this.setFocusState() : this.resetFocusState();
         this.state.update({ isOpen, validationMsg: null, value: this.state.defaultValue });
+        
+        if(isOpen) {
+            this.focusInput();
+            this.setFocusState();
+            this.state.onOpened();
+        }
+        else {
+            this.resetFocusState();
+            this.state.onClosed();
+        }
     }
 
     private onDocumentClick(e: MouseEvent) {

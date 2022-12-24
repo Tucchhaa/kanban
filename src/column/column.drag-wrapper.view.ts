@@ -12,6 +12,9 @@ export class DraggableColumnView extends DragView<ColumnState> {
     protected _render(fragment: DocumentFragment): void {
         const columnComponent = (this.createComponent(this.container, ColumnComponent, this.state) as ColumnComponent);
         columnComponent.eventEmitter.on('column-updated', (column: Column) => this.eventEmitter.emit('column-updated', column));
+        columnComponent.eventEmitter.on('disable-drag', () => this.eventEmitter.emit('disable-drag'));
+        columnComponent.eventEmitter.on('enable-drag', () => this.eventEmitter.emit('enable-drag'));
+
 
         const dragState = this.getRequiredState<DragState>(DragState.name);
         dragState.updateByKey('draggableArea', columnComponent.view.draggableArea, false);

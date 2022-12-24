@@ -18,7 +18,10 @@ export class DragController<TItem extends object> extends BaseController {
         this.eventEmitter
             .on('drag-start', (e: MouseEvent) => this.dragStart(e))
             .on('drag', (e: MouseEvent) => this.drag(e))
-            .on('drag-end', (e: MouseEvent) => this.dragEnd(e));
+            .on('drag-end', (e: MouseEvent) => this.dragEnd(e))
+
+            .on('disable-drag', () => this.disableDrag())
+            .on('enable-drag', () => this.enableDrag());
     }
 
     private _sizes: { width: number, height: number } = { width: 50, height: 50 };
@@ -102,5 +105,14 @@ export class DragController<TItem extends object> extends BaseController {
             x: e.clientX - element.offsetLeft,
             y: e.clientY - element.offsetTop
         };
+    }
+
+    // ===
+    private disableDrag() {
+        this.state.updateByKey('disabled', true, false);
+    }
+
+    private enableDrag() {
+        this.state.updateByKey('disabled', false, false);
     }
 }

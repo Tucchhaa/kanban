@@ -3,6 +3,7 @@ import { BaseState } from "../base/state";
 type DragOptions = {
     isDragging?: boolean;
     draggableArea?: HTMLElement;
+    disabled?: boolean;
 }
 
 export class DragState extends BaseState<DragOptions> {
@@ -14,10 +15,15 @@ export class DragState extends BaseState<DragOptions> {
         return this.state.draggableArea!;
     }
 
+    public get disabled() {
+        return this.state.disabled!;
+    }
+
     constructor(state: DragOptions) {
         const defaultState: DragOptions = {
             isDragging: false,
-            draggableArea: undefined
+            draggableArea: undefined,
+            disabled: false
         };
 
         super(state, defaultState);
