@@ -31,8 +31,8 @@ export abstract class BaseView<TState extends BaseStateType> extends ComponentMo
     protected abstract _render(fragment: DocumentFragment): void;
 
     public render() {
-        // console.log('render', this.componentName);
         this.container.innerHTML = "";
+        this.onClear = [];
 
         const fragment = document.createDocumentFragment();
         

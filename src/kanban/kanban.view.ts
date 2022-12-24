@@ -30,7 +30,7 @@ export class KanbanView extends DropView<KanbanState> {
             const columnComponent = this.createComponent(columnContainer, DraggableColumnComponent, columnOptions, `column${column.id}`);
             columnComponent.eventEmitter.on('column-updated', (column: Column) => this.eventEmitter.emit('update-column', column));
 
-            setTimeout(() => this.eventEmitter.emit('draggable-rendered', columnComponent));
+            setTimeout(() => this.eventEmitter.emit('process-drag', columnComponent));
 
             fragment.appendChild(columnContainer);
         }
@@ -40,8 +40,10 @@ export class KanbanView extends DropView<KanbanState> {
         const addColumnContainer = this.createDOMElement('div', ['add-column']);
 
         const options: EditableFieldOptions = {
-            btnText: '+ Add new column',
+            title: '+ Add new column',
             placeholder: 'Enter new column\'s name',
+            
+            prepareValue: (value: string) => value.trim().replace(/\s\s+/g, ' '),
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-column', value),
             validation: (value: string) => {
                 if(value.length === 0)

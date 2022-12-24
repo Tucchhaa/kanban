@@ -1,5 +1,6 @@
 import { BaseComponentType } from "../base/component";
 import { BaseController } from "../base/controller";
+import { isMouseInsideElement } from "../helpers";
 import { MouseDirection } from "../utils/mouse-direction";
 import { DragController } from "./drag.controller";
 import { DropState } from "./drop.state";
@@ -22,7 +23,7 @@ export class DropController<TItem extends object> extends BaseController {
         this.isItemsEqual = this.state.isEqual();
         
         this.eventEmitter
-            .on('draggable-rendered', (drag: BaseComponentType) => this.processDraggable(drag))
+            .on('process-drag', (drag: BaseComponentType) => this.processDraggable(drag))
             .on('items-updated', (items: any) => this.onUpdateItems(items));
     }
 
@@ -63,14 +64,8 @@ export class DropController<TItem extends object> extends BaseController {
         for(let index=0; index < this.drags.length; index++) {
             const drag = this.drags[index];
             const dragElement = drag.container; 
-
-            const position = dragElement.getBoundingClientRect();
         
-            if(
-                dragElement !== currentDragElement &&
-                e.clientX >= position.x && e.clientX <= position.x + position.width &&
-                e.clientY >= position.y && e.clientY <= position.y + position.height
-            ) {
+            if(dragElement !== currentDragElement && isMouseInsideElement(e, dragElement)) {
                 const isInsertBefore = this.isInsertBefore();
                 
                 if(isInsertBefore) {

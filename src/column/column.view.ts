@@ -24,12 +24,36 @@ export class ColumnView extends DropView<ColumnState> {
     }
 
     private renderHeading(fragment: DocumentFragment, text: string) {
-        const heading = this.createDOMElement('div', 'heading');
-        this._draggableArea = heading;
+        const headingContainer = this.createDOMElement('div', 'heading');
 
-        heading.innerText = text;
+        const options: EditableFieldOptions = {
+            title: text,
+            defaultValue: text,
+            placeholder: text,
 
-        fragment.appendChild(heading);
+            submitOnOutsideClick: true,
+            buttonsTemplate: (close: () => void, submit: () => void) => { return undefined; },
+            
+            prepareValue: (value: string) => value.trim().replace(/\s\s+/g, ' '),
+            validation: (value: string) => {
+                if(value.length === 0)
+                    return [false, 'Column name can\'t be empty'];
+                
+                if(value.length > 40)
+                    return [false, 'Column name is too long'];
+
+                return [true, ''];
+            },
+            
+            onSubmit: (value: string) => this.eventEmitter.emit('change-column-name', value),
+            onOpened: () => this.eventEmitter.emit('disable-drag'),
+            onClosed: () => this.eventEmitter.emit('enable-drag')
+        };
+        this.createComponent(headingContainer, EditableFieldComponent, options, 'heading-field');
+        
+        this._draggableArea = headingContainer;
+
+        fragment.appendChild(headingContainer);
     }
 
     private renderContent(fragment: DocumentFragment, cards: Card[]) {
@@ -42,7 +66,7 @@ export class ColumnView extends DropView<ColumnState> {
             const cardOptions: CardOptions = { card };
             const cardCompoment = this.createComponent(cardContainer, CardComponent, cardOptions, `card${index}`);
 
-            setTimeout(() => this.eventEmitter.emit('draggable-rendered', cardCompoment));
+            setTimeout(() => this.eventEmitter.emit('process-drag', cardCompoment));
             
             content.appendChild(cardContainer);
         }
@@ -54,14 +78,16 @@ export class ColumnView extends DropView<ColumnState> {
         const addCardContainer = this.createDOMElement('div', 'add-card');
 
         const options: EditableFieldOptions = {
-            btnText: '+ Add new card',
+            title: '+ Add new card',
             placeholder: 'Enter new card\'s name',
+
+            prepareValue: (value: string) => value.trim().replace(/\s\s+/g, ' '),
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-card', value),
             validation: (value: string) => {
                 if(value.length === 0)
                     return [false, 'Card name can\'t be empty'];
                 
-                if(value.length > 40)
+                if(value.length > 120)
                     return [false, 'Card name is too long'];
 
                 return [true, ''];

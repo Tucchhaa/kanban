@@ -8,11 +8,21 @@ reopen editable-field - нужно передавать старое состо�
 refactor state
 убрать методы в state которые меняют состояние. пример DropState.updateItems
 drag-drop cards when column has scroll
+get rid of state property in BaseView
+перекрытия событий в eventEmitter: решение -> добавить неймспейсы
+переименовать обработчики событий: drag -> onDrag, sharedDrag -> onSharedDrag
+shared-drop, drop -> Вместо хранения компонентов, лучше хранить контролеры
+
+BUG: start edit column name -> click any card
+BUG: start edit column name -> start adding new card
+BUG: start edit column name -> drag any card -> drag column
+
+OPTIMIZATION: dragging: instead of iterating all cards on drag event, it is possible to add event listener on each card
 
 TODO:
-rename column
 rename card
 drag and drop cards between columns
+local storage
 */
 
 window.addEventListener("load", () => {    
@@ -30,7 +40,10 @@ window.addEventListener("load", () => {
         }, {
             name: 'Done',
             id: 1,
-            cards: [{ id: 18, name: 'card 4' }, { id: 19, name: 'card 5' }, { id: 20, name: 'card 6' }]
+            cards: [
+                { id: 18, name: 'card 4' }, { id: 19, name: 'card 5' }, { id: 20, name: 'card 6' },
+                { id: 21, name: 'card 6 jsnda aksdn lsadm aas as lorem aksldm asdkl asld []wqekr saodj s wek nasda lskdan sdm lasjd kalns' }
+            ]
         }, {
             name: 'Waiting',
             id: 2,

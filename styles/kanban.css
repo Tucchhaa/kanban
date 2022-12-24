@@ -20,8 +20,7 @@
 }
 
 .kanban > .add-column, 
-.kanban-column > .add-card,
-.kanban-column > .card {
+.kanban-column {
     -webkit-user-select: none;  
     -moz-user-select: none;
     -ms-user-select: none;

@@ -18,9 +18,12 @@ export class KanbanState extends BaseState<KanbanOptions> {
         };
 
         super(state, defaultState);
+
+        (window as any).columns = () => this.columns;
     }
 
     public createColumn(column: Column) {
+        console.log(this.columns, column);
         this.updateByKey('columns', [...this.columns, column]);
     }
 

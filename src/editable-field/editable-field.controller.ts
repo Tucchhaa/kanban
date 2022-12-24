@@ -1,4 +1,5 @@
 import { BaseController } from "../base/controller";
+import { setEndOfContenteditable } from "../helpers";
 import { EditableFieldState } from "./editable-field.state";
 import { EditableFieldView } from "./editable-field.view";
 
@@ -13,11 +14,10 @@ export class EditableFieldController extends BaseController {
         this.view = view;
         
         this.eventEmitter
-            .on('rendered', () => this.focusInput())
             .on('open', () => this.toggleInput(true))
             .on('close', () => this.toggleInput(false))
 
-            .on('document-mousedown', (e: MouseEvent) => this.onDocumentClick(e))
+            .on('document-click', (e: MouseEvent) => this.onDocumentClick(e))
             .on('focusin', () => this.setFocusState())
             .on('focusout', () => this.resetFocusState())
         
@@ -27,19 +27,38 @@ export class EditableFieldController extends BaseController {
     }
 
     private focusInput() {
-        this.view.input?.focus();
+        const input = this.view.input as HTMLInputElement|undefined;
+
+        if(input && this.state.isOpen) {
+            const end = input.innerText.length;
+
+            input.focus();
+            setEndOfContenteditable(input);
+        }
     }
 
     private toggleInput(isOpen: boolean) {
-        isOpen ? this.setFocusState() : this.resetFocusState();
-        this.state.update({ isOpen, validationMsg: null, value: "" });
+        this.state.update({ isOpen, validationMsg: null, value: this.state.defaultValue });
+        
+        if(isOpen) {
+            this.focusInput();
+            this.setFocusState();
+            this.state.onOpened();
+        }
+        else {
+            this.resetFocusState();
+            this.state.onClosed();
+        }
     }
 
     private onDocumentClick(e: MouseEvent) {
         const isInnerClick = e.target === this.container || this.container.contains(e.target as Node);
         
         if(!isInnerClick) {
-            this.toggleInput(false);
+            if(this.state.submitOnOutsideClick)
+                this.submit();
+            else
+                this.toggleInput(false);
         }
     }
 

@@ -1,22 +1,62 @@
-import { BaseState, BaseStateType } from "../base/state";
+import { BaseStateType } from "../base/state";
 import { BaseView } from "../base/view";
-import { processClasses } from "../helpers";
+import { concatClasses } from "../helpers";
 import { DragState } from "./drag.state";
 
 export abstract class DragView<TState extends BaseStateType> extends BaseView<TState> {
     constructor(state: TState, classes?: string[] | string) {
-        const _classes = ['draggable', ...processClasses(classes)];
+        const _classes = concatClasses('draggable', classes);
         super(state, _classes);
     }
 
     protected _render(fragment: DocumentFragment): void {
-        const dragStart = (e: MouseEvent) => {
-            this.eventEmitter.emit('drag-start', e);
-            
-            document.addEventListener('mousemove', drag);
-            document.addEventListener('mouseup', dragEnd);
+        const dragState = this.getRequiredState<DragState>(DragState.name);
+
+        // ===
+
+        let isMouseDown: boolean;
+        let initX: number, initY: number;
+
+        const setIsMouseDownFalse = () => {
+            isMouseDown = false;
+        }
+
+        const onMouseDown = (e: MouseEvent) => {
+            initX = e.clientX;
+            initY = e.clientY;
+            isMouseDown = true;
         };
 
+        const onMouseMove = (e: MouseEvent) => {
+            if(!dragState.disabled && !dragState.isDragging && isMouseDown && this.isThresholdPassed(initX, initY, e.clientX, e.clientY)) {
+                this.startDrag(e);
+            }
+        }
+
+        // ===
+        const { draggableArea } = dragState;
+        draggableArea.addEventListener('mousedown', onMouseDown);
+        draggableArea.addEventListener('mousemove', onMouseMove);
+
+        draggableArea.addEventListener('click', setIsMouseDownFalse);
+        draggableArea.addEventListener('mouseup', setIsMouseDownFalse);
+        draggableArea.addEventListener('mouseout', setIsMouseDownFalse);
+        
+        this.onClear.push(() => {
+            draggableArea.removeEventListener('mousedown', onMouseDown);
+            draggableArea.removeEventListener('mousemove', onMouseMove);
+
+            draggableArea.removeEventListener('click', setIsMouseDownFalse);
+            draggableArea.removeEventListener('mouseup', setIsMouseDownFalse);
+            draggableArea.removeEventListener('mouseout', setIsMouseDownFalse);
+        });
+    }
+
+    private isThresholdPassed(initX: number, initY: number, lastX: number, lastY: number) {
+        return Math.abs(initX - lastX) >= 2 || Math.abs(initY - lastY) >= 2;
+    }
+
+    private startDrag(e: MouseEvent) {
         const drag = (e: MouseEvent) => this.eventEmitter.emit('drag', e);
 
         const dragEnd = (e: MouseEvent) => {
@@ -24,17 +64,17 @@ export abstract class DragView<TState extends BaseStateType> extends BaseView<TS
             unsubscribeDocumentListeners();
         };
 
-        // ===
+        this.eventEmitter.emit('drag-start', e);
+        
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
 
-        const { draggableArea } = this.getRequiredState<DragState>(DragState.name);
-        draggableArea.addEventListener('mousedown', dragStart)
+        // ===
 
         const unsubscribeDocumentListeners = () => {
             document.removeEventListener('mousemove', drag);
             document.removeEventListener('mouseup', dragEnd);
         }
-
         this.onClear.push(unsubscribeDocumentListeners);
-        this.onClear.push(() => draggableArea.removeEventListener('mousedown', dragStart));
     }
 }

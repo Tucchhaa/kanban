@@ -24,7 +24,7 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
     private renderClosed(fragment: DocumentFragment) {
         const btn = this.createDOMElement('div', 'title');
 
-        btn.innerText = this.state.btnText;
+        btn.innerText = this.state.title;
         btn.addEventListener('click', () => this.eventEmitter.emit('open'));
 
         fragment.appendChild(btn);
@@ -64,12 +64,13 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
         input.setAttribute('contenteditable', 'true');
         input.setAttribute('role', 'textbox');
         
-        input.addEventListener('input', e => this.eventEmitter.emit('value-change', (e.target as HTMLInputElement).innerText));
+        input.addEventListener('input', () => this.eventEmitter.emit('value-change', input.innerText));
         input.addEventListener('keydown', (e: KeyboardEvent) => e.key === 'Enter' && this.eventEmitter.emit('enter-pressed'));
         input.addEventListener('focusin', () => this.eventEmitter.emit('focusin'));
         input.addEventListener('focusout', () => this.eventEmitter.emit('focusout'));
-        
-        input.value = this.state.value;
+
+        input.innerText = this.state.value;
+
         return input;
     }
 
@@ -82,28 +83,40 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
     }
 
     private renderButtons(fragment: DocumentFragment) {
-        const buttons = this.createDOMElement('div', 'buttons');
-        
-        const submitBtn = this.createDOMElement('span');
-        this.createComponent(submitBtn, ButtonComponent, {
-            text: 'submit', 
-            onClick: () => this.eventEmitter.emit('submit')
-        }, 'submit-btn');
+        const submitAction = () => this.eventEmitter.emit('submit');
+        const closeAction = () => this.eventEmitter.emit('close');
 
-        const cancelBtn = this.createDOMElement('span');
-        this.createComponent(cancelBtn, ButtonComponent, {
-            text: 'cancel', 
-            onClick: () => this.eventEmitter.emit('close')
-        }, 'cancel-btn');
-        
-        buttons.append(submitBtn, cancelBtn);
+        if(this.state.buttonsTemplate) {
+            const buttons = this.state.buttonsTemplate(submitAction, closeAction);
 
-        fragment.appendChild(buttons);
+            buttons && fragment.appendChild(buttons);
+        }
+        else {
+            const buttons = this.createDOMElement('div', 'buttons');
+        
+            const submitBtn = this.createDOMElement('span');
+            this.createComponent(submitBtn, ButtonComponent, {
+                text: 'submit', 
+                onClick: submitAction
+            }, 'submit-btn');
+
+            const cancelBtn = this.createDOMElement('span');
+            this.createComponent(cancelBtn, ButtonComponent, {
+                text: 'cancel', 
+                onClick: closeAction
+            }, 'cancel-btn');
+            
+            buttons.append(submitBtn, cancelBtn);
+
+            fragment.appendChild(buttons);
+        }
     }
 
     private setDocumentMouseDownListener() {
-        const onDocumentClick = (e: MouseEvent) => this.eventEmitter.emit('document-mousedown', e);
+        const onDocumentClick = (e: MouseEvent) => this.eventEmitter.emit('document-click', e);
         document.addEventListener('mousedown', onDocumentClick);
-        this.onClear.push(() => document.removeEventListener('mousedown', onDocumentClick));
+        this.onClear.push(() => {
+            document.removeEventListener('mousedown', onDocumentClick)
+        });
     }
 }

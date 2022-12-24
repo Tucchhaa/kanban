@@ -1,11 +1,16 @@
 import { BaseController } from "../base/controller";
+import { DragState } from "./drag.state";
 
-export class DragController<ItemType extends object> extends BaseController {
-    private _item: ItemType;
+export class DragController<TItem extends object> extends BaseController {
+    private state: DragState;
+
+    private _item: TItem;
     private _element: HTMLElement;
     
-    constructor(item: ItemType) {
+    constructor(item: TItem) {
         super();
+        
+        this.state = this.getRequiredState<DragState>(DragState.name);
 
         this._item = item;
         this._element = this.container;
@@ -13,7 +18,10 @@ export class DragController<ItemType extends object> extends BaseController {
         this.eventEmitter
             .on('drag-start', (e: MouseEvent) => this.dragStart(e))
             .on('drag', (e: MouseEvent) => this.drag(e))
-            .on('drag-end', (e: MouseEvent) => this.dragEnd(e));
+            .on('drag-end', (e: MouseEvent) => this.dragEnd(e))
+
+            .on('disable-drag', () => this.disableDrag())
+            .on('enable-drag', () => this.enableDrag());
     }
 
     private _sizes: { width: number, height: number } = { width: 50, height: 50 };
@@ -37,6 +45,7 @@ export class DragController<ItemType extends object> extends BaseController {
 
     private dragStart(e: MouseEvent) {
         e.preventDefault();
+        this.state.updateByKey('isDragging', true, false);
 
         this.element.classList.add('state-dragging');
         this.element.style.cursor = 'grabbing';
@@ -57,6 +66,7 @@ export class DragController<ItemType extends object> extends BaseController {
     }
     
     private dragEnd(e: MouseEvent) {
+        this.state.updateByKey('isDragging', false, false);
         this.element.classList.remove('state-dragging');
 
         this.element.style.removeProperty('cursor');
@@ -95,5 +105,14 @@ export class DragController<ItemType extends object> extends BaseController {
             x: e.clientX - element.offsetLeft,
             y: e.clientY - element.offsetTop
         };
+    }
+
+    // ===
+    private disableDrag() {
+        this.state.updateByKey('disabled', true, false);
+    }
+
+    private enableDrag() {
+        this.state.updateByKey('disabled', false, false);
     }
 }
