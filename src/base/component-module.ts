@@ -18,7 +18,7 @@ export type ComponentProps = {
 export class ComponentModule implements IClearable {
     protected componentName: string;
     protected getContainer: () => HTMLElement;
-    protected eventEmitter: IEventEmitter;
+    private _eventEmitter: IEventEmitter;
 
     protected getController: <T extends BaseController>(name: string) => T | undefined;
     protected getRequiredController: <T extends BaseController>(name: string) => T;
@@ -26,8 +26,12 @@ export class ComponentModule implements IClearable {
     protected getState: <T extends BaseStateType>(name: string) => T | undefined;
     protected getRequiredState: <T extends BaseStateType>(name: string) => T;
 
-    protected get container() {
+    public get container() {
         return this.getContainer();
+    }
+
+    public get eventEmitter() {
+        return this._eventEmitter;
     }
 
     constructor() {
@@ -35,7 +39,7 @@ export class ComponentModule implements IClearable {
 
         this.componentName = props.componentName;
         this.getContainer = props.getContainer;
-        this.eventEmitter = props.eventEmitter;
+        this._eventEmitter = props.eventEmitter;
 
         this.getController = props.getController;
         this.getRequiredController = props.getRequiredController;

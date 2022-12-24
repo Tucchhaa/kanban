@@ -53,3 +53,12 @@ export const setEndOfContenteditable = (contentEditableElement: HTMLElement) => 
     selection.removeAllRanges();//remove any selections already made
     selection.addRange(range);//make the range you have just created the visible selection
 }
+
+export const isMouseInsideElement = (e: MouseEvent, element: HTMLElement) => {
+    const position = element.getBoundingClientRect();
+
+    return (
+        e.clientX >= position.x && e.clientX <= position.x + position.width &&
+        e.clientY >= position.y && e.clientY <= position.y + position.height
+    );
+}
