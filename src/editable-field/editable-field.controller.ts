@@ -47,7 +47,10 @@ export class EditableFieldController extends BaseController {
         const isInnerClick = e.target === this.container || this.container.contains(e.target as Node);
         
         if(!isInnerClick) {
-            this.toggleInput(false);
+            if(this.state.submitOnOutsideClick)
+                this.submit();
+            else
+                this.toggleInput(false);
         }
     }
 
