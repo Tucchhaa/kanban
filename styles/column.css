@@ -1,6 +1,5 @@
 .kanban-column {
     min-height: 50px;
-    padding: 5px 0 0;
     max-height: 100%; 
     margin-right: 10px;
 
@@ -12,14 +11,6 @@
 
 .kanban-column.state-dragging {
     transform: rotate(2deg);
-}
-
-.kanban-column > .heading {
-    padding: 5px 11px 4px 11px;
-    font-size: 17px;
-    font-weight: bold;
-    color: #1d2934;
-    cursor: grab;
 }
 
 .kanban-column > .content {

@@ -13,6 +13,7 @@ get rid of state property in BaseView
 
 BUG: start edit column name -> click any card
 BUG: start edit column name -> start adding new card
+BUG: cursor doesn't change on column drag
 
 TODO:
 rename column
