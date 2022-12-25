@@ -4,9 +4,13 @@ import { IClearable } from "./idisposable";
 export interface IEventEmitter {
     on(event: string, listener: CallableFunction): IEventEmitter;
 
+    once(event: string, listener: CallableFunction): IEventEmitter;
+
     onAny(listener: CallableFunction): IEventEmitter;
 
     onMany(events: string[], listener: CallableFunction): IEventEmitter;
+
+    unsubscribe(event: string, listener: CallableFunction): IEventEmitter;
 
     emit(event: string, ...param: any): void;
 }
@@ -16,10 +20,12 @@ export interface IEventEmitter {
 export class EventEmitter implements IEventEmitter, IClearable {
     private events: Dictionary<CallableFunction[]>;
     private onAnyListeners: CallableFunction[];
+    private onceListeners: Dictionary<CallableFunction[]>;
 
     constructor() {
         this.events = {};
         this.onAnyListeners = [];
+        this.onceListeners = {};
     }
     
     public on(event: string, listener: CallableFunction): EventEmitter {
@@ -27,6 +33,21 @@ export class EventEmitter implements IEventEmitter, IClearable {
             this.events[event] = [];
 
         this.events[event].push(listener);
+
+        return this;
+    }
+
+    public once(event: string, listener: CallableFunction): EventEmitter {
+        if(!this.events[event])
+            this.events[event] = [];
+
+        this.events[event].push(listener);
+
+        // ===
+        if(!this.onceListeners[event])
+            this.onceListeners[event] = [];
+        
+        this.onceListeners[event].push(listener)
 
         return this;
     }
@@ -50,6 +71,12 @@ export class EventEmitter implements IEventEmitter, IClearable {
         return this;
     }
 
+    public unsubscribe(event: string, listener: CallableFunction): IEventEmitter {
+        this.events[event] = this.events[event].filter(_listener => _listener !== listener);
+        
+        return this;
+    }
+
     public emit(event: string, ...param: any) {
         for(const listener of this.onAnyListeners) {
             listener(event, ...param);
@@ -57,6 +84,11 @@ export class EventEmitter implements IEventEmitter, IClearable {
         
         for(const listener of (this.events[event] ?? [])) {
             listener(...param);
+        }
+
+        // delete once listeners
+        for(const onceListener of (this.onceListeners[event] ?? [])) {
+            this.events[event] = this.events[event].filter(listener => listener !== onceListener);
         }
     }
 

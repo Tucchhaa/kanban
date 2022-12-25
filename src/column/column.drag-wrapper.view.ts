@@ -13,8 +13,6 @@ export class DraggableColumnView extends DragView<ColumnState> {
     }
 
     protected _render(fragment: DocumentFragment): void {
-        this.dragState.updateByKey('draggableArea', (this.view as ColumnView).headingContainer, false);
-
-        super._render(fragment);
+        super._render(fragment, (this.view as ColumnView).headingContainer);
     }
 }

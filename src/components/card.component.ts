@@ -13,9 +13,7 @@ export class CardComponent extends BaseComponent<CardOptions, CardState, CardVie
         
         this.registerController(() => new CardController());
 
-        this.registerState(() => new DragState({
-            draggableArea: this.container
-        }));
+        this.registerState(() => new DragState());
         this.extendView(() => new DragView());
         this.registerController(() => new DragController<Card>(this.state.card));
         

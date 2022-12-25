@@ -19,7 +19,7 @@ export class BaseComponent<
     private _state: TState;
     private _view: TView;
     private states: Dictionary<object | undefined> = {};
-    private controllers: Dictionary<object | undefined> = {};
+    private controllers: Dictionary<BaseController | undefined> = {};
 
     public eventEmitter: IEventEmitter;
 
@@ -68,6 +68,12 @@ export class BaseComponent<
 
     public clear() {
         this._view.clear();
+
+        for(const controllerName in this.controllers!) {
+            const controller = this.controllers[controllerName];
+
+            controller?.clear();
+        }
     }
 
     // === GETTERS
