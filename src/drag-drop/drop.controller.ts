@@ -13,21 +13,28 @@ export class DropController<TItem extends object> extends BaseController {
 
     private drags: DragController<TItem>[] = [];
     private items: TItem[] = [];
+    private dragsContainer?: HTMLElement;
 
     private shadowElement: HTMLElement = document.createElement('div');
     private shadowIndex: number = -1;
 
+    private isAbleToDrop: (e: MouseEvent, dropElement: HTMLElement) => boolean;
     private isItemsEqual: (itemA: TItem, itemB: TItem) => boolean;
 
-    constructor() {
+    // columnName: string = (this.container.querySelector('.title') as HTMLElement).innerText;
+
+    constructor(isAbleToDrop?: (e: MouseEvent, dropElement: HTMLElement) => boolean) {
         super();
 
         this.dropState = this.getRequiredState<DropState<TItem>>(DropState.name);
         this.draggingDirection = this.dropState.direction;
+
+        this.isAbleToDrop = isAbleToDrop ?? isMouseInsideElement;
         this.isItemsEqual = this.dropState.isEqual();
         
         this.eventEmitter
             .on('process-drag', this.onProcessDrag.bind(this))
+            .on('drags-container-rendered', (dragsContainer: HTMLElement) => this.dragsContainer = dragsContainer);
     }
 
     public onProcessDrag(dragComponent: BaseComponentType | DragController<TItem>) {
@@ -40,9 +47,19 @@ export class DropController<TItem extends object> extends BaseController {
 
         // ===
 
-        const onDragStart = (e: MouseEvent) => this.startDrag(e, dragController);
-        const onDrag = (e: MouseEvent) => this.drag(e, dragController);
-        const onDragEnd = (e: MouseEvent) =>this.endDrag(e, dragController);
+        const onDragStart = (e: MouseEvent) => {
+            this.eventEmitter.emit('shared-drag-start', e, this, dragController);
+            this.startDrag(e, dragController);
+        };
+
+        const onDrag = (e: MouseEvent) => {
+            this.eventEmitter.emit('shared-drag', e, this, dragController);
+            this.drag(e, dragController);
+        };
+        const onDragEnd = (e: MouseEvent) => {
+            this.eventEmitter.emit('shared-drag-end', e, this, dragController);
+            this.endDrag(e, dragController);
+        }
 
         dragController.eventEmitter
             .on('drag-start', onDragStart)
@@ -62,8 +79,7 @@ export class DropController<TItem extends object> extends BaseController {
 
     // === DRAG EVENTS
     public startDrag(e: MouseEvent, dragController: DragController<TItem>) {
-        this.eventEmitter.emit('shared-drag-start', e, this, dragController);
-        this.showShadow(dragController.element)
+        this.showShadow(dragController.element);
 
         this.shadowIndex = this.getItemIndex(dragController.item);
         this.mouseDirection.setMousePosition(e);
@@ -72,34 +88,59 @@ export class DropController<TItem extends object> extends BaseController {
     }
 
     private drag(e: MouseEvent, dragController: DragController<TItem>) {
-        this.eventEmitter.emit('shared-drag', e, this, dragController);
-        const currentDragElement = dragController.element;
-
         this.mouseDirection.calculateMouseDirection(e);
 
-        for(let index=0; index < this.drags.length; index++) {
-            const drag = this.drags[index];
-            const dragElement = drag.container; 
-        
-            if(dragElement !== currentDragElement && isMouseInsideElement(e, dragElement)) {
-                const isInsertBefore = this.isInsertBefore();
-                
-                if(isInsertBefore) {
-                    dragElement.before(this.shadowElement);
-                    this.shadowIndex = index;
-                }
-                else {
-                    dragElement.after(this.shadowElement);
-                    this.shadowIndex = index + 1; 
-                }
+        const direction = this.dropState.direction;
+        const isInsertBefore = this.isInsertBefore();
+        const dropPosition = this.dragsContainer!.getBoundingClientRect();
+        const currentDragElement = dragController.element;
 
-                break;
+        // Shadow above or left
+        if(
+            (direction === 'vertical' && e.clientY <= dropPosition.y) || (direction === 'horizontal' && e.clientX <= dropPosition.x)
+        ) {
+            this.shadowIndex = 0;
+
+            this.dragsContainer?.children.length ?
+                this.dragsContainer!.firstChild?.before(this.shadowElement) :
+                this.dragsContainer!.appendChild(this.shadowElement);
+        }
+        // Shadow below
+        else if(
+            (direction === 'vertical' && e.clientY >= dropPosition.y + dropPosition.height) || 
+            (direction === 'horizontal' && e.clientX >= dropPosition.x + dropPosition.width)
+        ) {
+            this.shadowIndex = this.drags.length;
+
+            this.dragsContainer?.children.length ?
+                this.dragsContainer!.lastChild?.after(this.shadowElement) :
+                this.dragsContainer!.appendChild(this.shadowElement);
+        }
+        // Shadow inside
+        else  {
+            for(let index=0; index < this.drags.length; index++) {
+                const drag = this.drags[index];
+                const dragElement = drag.container; 
+            
+                if(dragElement !== currentDragElement) {
+                    if(this.isAbleToDrop(e, dragElement)) {
+                        if(isInsertBefore) {
+                            dragElement.before(this.shadowElement);
+                            this.shadowIndex = index;
+                        }
+                        else {
+                            dragElement.after(this.shadowElement);
+                            this.shadowIndex = index + 1; 
+                        }
+
+                        break;
+                    }
+                }
             }
         }
     }
 
     private endDrag(e: MouseEvent, dragController: DragController<TItem>) {
-        this.eventEmitter.emit('shared-drag-end', e, this, dragController);
         this.hideShadow();
         this.updateItemsOrder(dragController);
     }
@@ -135,15 +176,28 @@ export class DropController<TItem extends object> extends BaseController {
     }
 
     // === SHARED DROP
-    public onDragToSharedDrop(dragController: DragController<TItem>) {
+    public onSharedDropDragStart(e: MouseEvent, dragController: DragController<TItem>) {
+        this.onProcessDrag(dragController);
+        
+        this.startDrag(e, dragController);
+    }
+
+    public onDragStartToSharedDrop(dragController: DragController<TItem>) {
+        this.removeDrag(dragController);
         this.hideShadow();
+
         dragController.eventEmitter.emit('unsubscribe-drag-listeners');
     }
 
     public onDragEndToSharedDrop(dragController: DragController<TItem>) {
-        this.items = this.items.filter(item => !this.isItemsEqual(item, dragController.item));
+        this.removeDrag(dragController);
 
         this.eventEmitter.emit('update-items-order', this.items);
+    }
+
+    private removeDrag(dragController: DragController<TItem>) {
+        this.drags = this.drags.filter(drag => drag !== dragController);
+        this.items = this.items.filter(item => !this.isItemsEqual(item, dragController.item));
     }
 
     // === PRIVATE METHODS

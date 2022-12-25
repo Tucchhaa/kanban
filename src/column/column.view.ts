@@ -7,7 +7,8 @@ import { CardOptions } from "../card/card.state";
 import { BaseView } from "../base/view";
 
 export class ColumnView extends BaseView<ColumnState> {
-    public headingContainer?: HTMLElement;
+    public draggableAreaElement?: HTMLElement;
+    public dragsContainer?: HTMLElement;
 
     constructor() {
         super('kanban-column');
@@ -47,7 +48,7 @@ export class ColumnView extends BaseView<ColumnState> {
         };
         this.createComponent(headingContainer, EditableFieldComponent, options, 'heading-field');
         
-        this.headingContainer = headingContainer;
+        this.draggableAreaElement = headingContainer;
 
         fragment.appendChild(headingContainer);
     }
@@ -67,6 +68,7 @@ export class ColumnView extends BaseView<ColumnState> {
             content.appendChild(cardContainer);
         }
 
+        this.dragsContainer = content;
         fragment.appendChild(content);
     }
 
