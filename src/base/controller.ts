@@ -6,5 +6,5 @@ export class BaseController<
     TState extends BaseStateType = BaseStateType,
     TView extends BaseView = BaseView
 > extends ComponentModule<TState, TView> {
-
+    public clear(): void {}
 }

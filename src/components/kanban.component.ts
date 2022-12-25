@@ -19,7 +19,6 @@ export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, K
 
         // Drop
         this.registerState(() => new DropState<Column>({
-            items: this.state.columns,
             isEqual: (cardA, cardB) => cardA.id === cardB.id
         }))
         this.extendView(() => new DropView());

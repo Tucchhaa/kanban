@@ -2,72 +2,68 @@ import { BaseComponentType } from "../base/component";
 import { BaseController } from "../base/controller";
 import { DropController } from "./drop.controller";
 import { DragController } from "./drag.controller";
-import { DropState } from "./drop.state";
 import { isMouseInsideElement } from "../helpers";
 
 export class SharedDropController<TItem extends object> extends BaseController {
-    private drops: BaseComponentType[];
+    private drops: DropController<TItem>[];
 
-    private currentDrop?: BaseComponentType;
+    private isDragging: boolean;
+    private originDrop?: DropController<TItem>;
+    private currentDrop?: DropController<TItem>;
 
     constructor() {
         super();
 
         this.drops = [];
 
+        this.isDragging = false;
+
         this.eventEmitter.on('process-shared-drop', (dropComponent: BaseComponentType) => this.processDrop(dropComponent));
     }
 
     private processDrop(dropComponent: BaseComponentType) {
-        dropComponent.eventEmitter
-            .on(
-                'shared-drag', 
-                (e: MouseEvent, originDrop: BaseComponentType, dragController: DragController<TItem>) => this.onDrag(e, originDrop, dragController)
-            )
-            .on(
-                'shared-drag-end',
-                (e: MouseEvent, originDrop: BaseComponentType, dragController: DragController<TItem>) => this.onDragEnd(e, originDrop, dragController)
-            );
-        
-        this.drops.push(dropComponent);
+        const dropController = dropComponent.getRequiredController<DropController<TItem>>(DropController.name);
+
+        dropController.eventEmitter
+            .on('shared-drag-start', this.onDragStart.bind(this))
+            .on('shared-drag', this.onDrag.bind(this))
+            .on('shared-drag-end', this.onDragEnd.bind(this));
+
+        this.drops.push(dropController);
     }
 
-    private onDrag(e: MouseEvent, originDrop: BaseComponentType, dragController: DragController<TItem>) {
-        for(const drop of this.drops) {
+    private onDragStart(e: MouseEvent, fromDrop: DropController<TItem>, dragController: DragController<TItem>) {
+        if(!this.isDragging) {
+            this.isDragging = true;
+            this.originDrop = fromDrop;
+            this.currentDrop = fromDrop;
+        }
+    }
 
-            if(drop !== originDrop && isMouseInsideElement(e, drop.container)) {
-                console.log('drag-start')
-                const fromDropController = originDrop.getRequiredController<DropController<TItem>>(DropController.name);
-                const fromDropState = originDrop.getRequiredState<DropState<TItem>>(DropState.name);
+    private onDrag(e: MouseEvent, fromDrop: DropController<TItem>, dragController: DragController<TItem>) {
+        for(const toDrop of this.drops) {
 
-                const toDropController = drop.getRequiredController<DropController<TItem>>(DropController.name);
-                const toDropState = drop.getRequiredState<DropState<TItem>>(DropState.name);
+            if(toDrop !== fromDrop && isMouseInsideElement(e, toDrop.container)) {
 
-                if(this.currentDrop === drop) {
-                    drop.eventEmitter.emit('drag-start', e, dragController);
-                    this.currentDrop = drop;
+                if(toDrop !== this.currentDrop) {
+                    this.currentDrop?.onDragToSharedDrop(dragController);
+
+                    toDrop.onProcessDrag(dragController);
+                    toDrop.startDrag(e, dragController);
+                    
+                    this.currentDrop = toDrop;
                 }
-
-                toDropController.eventEmitter.emit('drag', e, dragController);
 
                 continue;
             }
         }
     }
 
-    private onDragEnd(e: MouseEvent, originDrop: BaseComponentType, dragController: DragController<TItem>) {
+    private onDragEnd(e: MouseEvent, toDrop: DropController<TItem>, dragController: DragController<TItem>) {
+        this.isDragging = false;
 
+        if(toDrop !== this.originDrop) {
+            this.originDrop?.onDragEndToSharedDrop(dragController);
+        }
     }
 }
-
-/*
-слушать у каждого дропа драгСтарт, драг и драгэнд
-
-если во время драга, окажется что курсор находится внутри дропа, то
-перемещать айтем из одного дропа в другой таким образом:
-
-мы не меняем состояние и не рендерим компоненты, но мы меняем
-айтемсы у дропов.
-
-
-*/

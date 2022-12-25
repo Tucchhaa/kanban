@@ -19,14 +19,13 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
         // DROP
         this.registerState(() => new DropState<Card>({
             direction: 'vertical',
-            items: this.state.columnCards,
             isEqual: (cardA, cardB) => cardA.id === cardB.id
         }))
         this.extendView(() => new DropView());
         this.registerController(() => new DropController<Card>());
 
         // DRAG
-        this.registerState(() => new DragState({}));
+        this.registerState(() => new DragState());
         this.extendView(() => new DraggableColumnView());
         this.registerController(() => new DragController<Column>(this.state.column));
 

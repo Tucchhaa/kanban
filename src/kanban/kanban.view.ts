@@ -29,6 +29,7 @@ export class KanbanView extends BaseView<KanbanState> {
             columnComponent.eventEmitter.on('update-column', (column: Column) => this.eventEmitter.emit('update-column', column));
 
             setTimeout(() => this.eventEmitter.emit('process-drag', columnComponent));
+            setTimeout(() => this.eventEmitter.emit('process-shared-drop', columnComponent));
 
             fragment.appendChild(columnContainer);
         }

@@ -9,7 +9,7 @@ export class DragView<TState extends BaseStateType> extends BaseView<TState> {
         super(_classes);
     }
 
-    protected _render(fragment: DocumentFragment): void {
+    protected _render(fragment: DocumentFragment, draggableArea: HTMLElement | undefined): void {
         const dragState = this.getRequiredState<DragState>(DragState.name);
 
         // ===
@@ -38,7 +38,8 @@ export class DragView<TState extends BaseStateType> extends BaseView<TState> {
         }
 
         // ===
-        const { draggableArea } = dragState;
+        draggableArea = draggableArea ?? this.container;
+
         draggableArea.addEventListener('mousedown', onMouseDown);
         draggableArea.addEventListener('mousemove', onMouseMove);
 
@@ -47,12 +48,12 @@ export class DragView<TState extends BaseStateType> extends BaseView<TState> {
         draggableArea.addEventListener('mouseout', setIsMouseDownFalse);
         
         this.onClear.push(() => {
-            draggableArea.removeEventListener('mousedown', onMouseDown);
-            draggableArea.removeEventListener('mousemove', onMouseMove);
+            draggableArea!.removeEventListener('mousedown', onMouseDown);
+            draggableArea!.removeEventListener('mousemove', onMouseMove);
 
-            draggableArea.removeEventListener('click', setIsMouseDownFalse);
-            draggableArea.removeEventListener('mouseup', setIsMouseDownFalse);
-            draggableArea.removeEventListener('mouseout', setIsMouseDownFalse);
+            draggableArea!.removeEventListener('click', setIsMouseDownFalse);
+            draggableArea!.removeEventListener('mouseup', setIsMouseDownFalse);
+            draggableArea!.removeEventListener('mouseout', setIsMouseDownFalse);
         });
     }
 

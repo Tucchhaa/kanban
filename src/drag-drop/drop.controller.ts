@@ -1,4 +1,4 @@
-import { BaseComponentType } from "../base/component";
+import { BaseComponent, BaseComponentType } from "../base/component";
 import { BaseController } from "../base/controller";
 import { isMouseInsideElement } from "../helpers";
 import { MouseDirection } from "../utils/mouse-direction";
@@ -9,11 +9,15 @@ export class DropController<TItem extends object> extends BaseController {
     private dropState: DropState<TItem>;
     
     private draggingDirection: 'horizontal' | 'vertical';
-    private drags: BaseComponentType[] = [];
-    private shadowElement: HTMLElement = document.createElement('div');
     private mouseDirection: MouseDirection = new MouseDirection();
+
+    private drags: DragController<TItem>[] = [];
+    private items: TItem[] = [];
+
+    private shadowElement: HTMLElement = document.createElement('div');
     private shadowIndex: number = -1;
-    private isItemsEqual: (itemA: any, itemB: any) => boolean;
+
+    private isItemsEqual: (itemA: TItem, itemB: TItem) => boolean;
 
     constructor() {
         super();
@@ -24,39 +28,51 @@ export class DropController<TItem extends object> extends BaseController {
         
         this.eventEmitter
             .on('process-drag', this.onProcessDrag.bind(this))
-            .on('update-items', this.onUpdateItems.bind(this));
     }
 
-    public onProcessDrag(drag: BaseComponentType) {
-        this.drags.push(drag);
+    public onProcessDrag(dragComponent: BaseComponentType | DragController<TItem>) {
+        const dragController = 
+            dragComponent instanceof BaseComponent ?
+            dragComponent.getRequiredController<DragController<TItem>>(DragController.name) : dragComponent;
         
-        const dragController = drag.getRequiredController<DragController<TItem>>(DragController.name);
-        
-        drag.eventEmitter.on('drag-start', (e: MouseEvent) => this.onDragStart(e, dragController));
-        drag.eventEmitter.on('drag', (e: MouseEvent) => this.onDrag(e, dragController));
-        drag.eventEmitter.on('drag-end', (e: MouseEvent) => this.onDragEnd(e, dragController))
+        this.drags.push(dragController);
+        this.items.push(dragController.item);
+
+        // ===
+
+        const onDragStart = (e: MouseEvent) => this.startDrag(e, dragController);
+        const onDrag = (e: MouseEvent) => this.drag(e, dragController);
+        const onDragEnd = (e: MouseEvent) =>this.endDrag(e, dragController);
+
+        dragController.eventEmitter
+            .on('drag-start', onDragStart)
+            .on('drag', onDrag)
+            .on('drag-end', onDragEnd);
+
+        // ===
+
+        dragController.eventEmitter.once('unsubscribe-drag-listeners', () => {
+            dragController.eventEmitter            
+                .unsubscribe('drag-start', onDragStart)
+                .unsubscribe('drag', onDrag)
+                .unsubscribe('drag-end', onDragEnd)
+        });
     }
 
-    private onDragStart(e: MouseEvent, dragController: DragController<TItem>) {
+
+    // === DRAG EVENTS
+    public startDrag(e: MouseEvent, dragController: DragController<TItem>) {
+        this.eventEmitter.emit('shared-drag-start', e, this, dragController);
         this.showShadow(dragController.element)
 
-        this.shadowIndex = this.getIndex(dragController.item);
+        this.shadowIndex = this.getItemIndex(dragController.item);
         this.mouseDirection.setMousePosition(e);
+
+        this.drag(e, dragController);
     }
 
-    private getIndex(item: any): number {
-        for(let index=0; index < this.dropState.items.length; index++) {
-            const itemB = this.dropState.items[index];
-
-            if(this.isItemsEqual(item, itemB)) {
-                return index;
-            }
-        }
-
-        return -1;
-    }
-
-    private onDrag(e: MouseEvent, dragController: DragController<TItem>) {
+    private drag(e: MouseEvent, dragController: DragController<TItem>) {
+        this.eventEmitter.emit('shared-drag', e, this, dragController);
         const currentDragElement = dragController.element;
 
         this.mouseDirection.calculateMouseDirection(e);
@@ -82,19 +98,19 @@ export class DropController<TItem extends object> extends BaseController {
         }
     }
 
-    private onDragEnd(e: MouseEvent, dragController: DragController<TItem>) {
+    private endDrag(e: MouseEvent, dragController: DragController<TItem>) {
+        this.eventEmitter.emit('shared-drag-end', e, this, dragController);
         this.hideShadow();
         this.updateItemsOrder(dragController);
     }
 
     private updateItemsOrder(dragController: DragController<TItem>) {
-        const items = this.dropState.items;
         const currentItem = dragController.item;
-        const newOrder: any[] = [];
+        const newOrder: TItem[] = [];
         const insertBeforeIndex = this.shadowIndex;
 
-        for(let index=0; index < items.length; index++) {
-            const item = items[index];
+        for(let index=0; index < this.items.length; index++) {
+            const item = this.items[index];
 
             if(index === insertBeforeIndex)
                 newOrder.push(currentItem);
@@ -106,16 +122,41 @@ export class DropController<TItem extends object> extends BaseController {
             newOrder.push(item);
         }
 
-        if(insertBeforeIndex === items.length)
+        if(insertBeforeIndex === this.items.length)
             newOrder.push(currentItem);
 
         this.eventEmitter.emit('update-items-order', newOrder);
     }
 
-    private onUpdateItems(items: any) {
+    public clear() {
         this.shadowIndex = -1;
-        this.dropState.updateItems(items);
+        this.items = [];
         this.drags = [];
+    }
+
+    // === SHARED DROP
+    public onDragToSharedDrop(dragController: DragController<TItem>) {
+        this.hideShadow();
+        dragController.eventEmitter.emit('unsubscribe-drag-listeners');
+    }
+
+    public onDragEndToSharedDrop(dragController: DragController<TItem>) {
+        this.items = this.items.filter(item => !this.isItemsEqual(item, dragController.item));
+
+        this.eventEmitter.emit('update-items-order', this.items);
+    }
+
+    // === PRIVATE METHODS
+    private getItemIndex(item: TItem): number {
+        for(let index=0; index < this.items.length; index++) {
+            const itemB = this.items[index];
+
+            if(this.isItemsEqual(item, itemB)) {
+                return index;
+            }
+        }
+
+        return -1;
     }
 
     private showShadow(element: HTMLElement) {
