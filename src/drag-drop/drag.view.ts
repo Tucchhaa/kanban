@@ -9,7 +9,7 @@ export class DragView<TState extends BaseStateType> extends BaseView<TState> {
         super(_classes);
     }
 
-    protected _render(fragment: DocumentFragment, draggableArea: HTMLElement | undefined): void {
+    protected _render(fragment: DocumentFragment): void {
         const dragState = this.getRequiredState<DragState>(DragState.name);
 
         // ===
@@ -38,7 +38,7 @@ export class DragView<TState extends BaseStateType> extends BaseView<TState> {
         }
 
         // ===
-        draggableArea = draggableArea ?? this.container;
+        let draggableArea = (this.view as any).draggableAreaElement ?? this.container;
 
         draggableArea.addEventListener('mousedown', onMouseDown);
         draggableArea.addEventListener('mousemove', onMouseMove);

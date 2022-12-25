@@ -4,19 +4,23 @@ import { DropController } from "./drop.controller";
 import { DragController } from "./drag.controller";
 import { isMouseInsideElement } from "../helpers";
 
-export class SharedDropController<TItem extends object> extends BaseController {
+export class SharedDropManagerController<TItem extends object> extends BaseController {
     private drops: DropController<TItem>[];
 
     private isDragging: boolean;
     private originDrop?: DropController<TItem>;
     private currentDrop?: DropController<TItem>;
 
-    constructor() {
+    private isAbleToDrop: (e: MouseEvent, dropElement: HTMLElement) => boolean;
+
+    constructor(isAbleToDrop?: (e: MouseEvent, dropElement: HTMLElement) => boolean) {
         super();
 
         this.drops = [];
 
         this.isDragging = false;
+
+        this.isAbleToDrop = isAbleToDrop ?? isMouseInsideElement;
 
         this.eventEmitter.on('process-shared-drop', (dropComponent: BaseComponentType) => this.processDrop(dropComponent));
     }
@@ -42,19 +46,17 @@ export class SharedDropController<TItem extends object> extends BaseController {
 
     private onDrag(e: MouseEvent, fromDrop: DropController<TItem>, dragController: DragController<TItem>) {
         for(const toDrop of this.drops) {
+            // what if toDrop === originDrop?
+            if(toDrop !== this.currentDrop  && this.isAbleToDrop(e, toDrop.container)) {
+                this.currentDrop?.onDragStartToSharedDrop(dragController);
 
-            if(toDrop !== fromDrop && isMouseInsideElement(e, toDrop.container)) {
-
-                if(toDrop !== this.currentDrop) {
-                    this.currentDrop?.onDragToSharedDrop(dragController);
-
-                    toDrop.onProcessDrag(dragController);
-                    toDrop.startDrag(e, dragController);
-                    
-                    this.currentDrop = toDrop;
-                }
-
-                continue;
+                // toDrop.onProcessDrag(dragController);
+                // toDrop.startDrag(e, dragController);
+                toDrop.onSharedDropDragStart(e, dragController);
+                
+                this.currentDrop = toDrop;
+                
+                break;
             }
         }
     }
