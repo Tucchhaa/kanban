@@ -3,13 +3,14 @@ import { BaseController } from "../base/controller";
 import { DropController } from "./drop.controller";
 import { DragController } from "./drag.controller";
 import { isMouseInsideElement } from "../helpers";
+import { SharedDropController } from "./shared-drop.controller";
 
 export class SharedDropManagerController<TItem extends object> extends BaseController {
-    private drops: DropController<TItem>[];
+    private drops: SharedDropController<TItem>[];
 
     private isDragging: boolean;
-    private originDrop?: DropController<TItem>;
-    private currentDrop?: DropController<TItem>;
+    private originDrop?: SharedDropController<TItem>;
+    private currentDrop?: SharedDropController<TItem>;
 
     private isAbleToDrop: (e: MouseEvent, dropElement: HTMLElement) => boolean;
 
@@ -26,7 +27,7 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
     }
 
     private processDrop(dropComponent: BaseComponentType) {
-        const dropController = dropComponent.getRequiredController<DropController<TItem>>(DropController.name);
+        const dropController = dropComponent.getRequiredController<SharedDropController<TItem>>(SharedDropController.name);
 
         dropController.eventEmitter
             .on('shared-drag-start', this.onDragStart.bind(this))
@@ -36,7 +37,7 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
         this.drops.push(dropController);
     }
 
-    private onDragStart(e: MouseEvent, fromDrop: DropController<TItem>, dragController: DragController<TItem>) {
+    private onDragStart(e: MouseEvent, fromDrop: SharedDropController<TItem>, dragController: DragController<TItem>) {
         if(!this.isDragging) {
             this.isDragging = true;
             this.originDrop = fromDrop;
@@ -44,14 +45,11 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
         }
     }
 
-    private onDrag(e: MouseEvent, fromDrop: DropController<TItem>, dragController: DragController<TItem>) {
+    private onDrag(e: MouseEvent, fromDrop: SharedDropController<TItem>, dragController: DragController<TItem>) {
         for(const toDrop of this.drops) {
-            // what if toDrop === originDrop?
             if(toDrop !== this.currentDrop  && this.isAbleToDrop(e, toDrop.container)) {
                 this.currentDrop?.onDragStartToSharedDrop(dragController);
 
-                // toDrop.onProcessDrag(dragController);
-                // toDrop.startDrag(e, dragController);
                 toDrop.onSharedDropDragStart(e, dragController);
                 
                 this.currentDrop = toDrop;
@@ -61,7 +59,7 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
         }
     }
 
-    private onDragEnd(e: MouseEvent, toDrop: DropController<TItem>, dragController: DragController<TItem>) {
+    private onDragEnd(e: MouseEvent, toDrop: SharedDropController<TItem>, dragController: DragController<TItem>) {
         this.isDragging = false;
 
         if(toDrop !== this.originDrop) {

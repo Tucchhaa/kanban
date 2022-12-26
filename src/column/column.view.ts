@@ -62,6 +62,7 @@ export class ColumnView extends BaseView<ColumnState> {
             const cardOptions: CardOptions = { card };
             const cardCompoment = this.createComponent(cardContainer, CardComponent, cardOptions, `card${card.id}`);
 
+            setTimeout(() => this.eventEmitter.emit('process-shared-drag', cardCompoment));
             setTimeout(() => this.eventEmitter.emit('process-drag', cardCompoment));
             
             content.appendChild(cardContainer);
