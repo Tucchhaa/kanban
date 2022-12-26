@@ -16,7 +16,7 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
     private onChangeColumnName(newName: string) {
         this.state.updateBy(state => {
             state.column!.name = newName;
-        }, true);
+        }, false);
 
         this.eventEmitter.emit('update-column', this.state.column);
     }

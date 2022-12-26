@@ -24,9 +24,8 @@ export class ColumnView extends BaseView<ColumnState> {
         const headingContainer = this.createDOMElement('div', 'heading');
 
         const options: EditableFieldOptions = {
-            title: text,
-            defaultValue: text,
-            placeholder: text,
+            value: text,
+            showValue: true,
 
             submitOnOutsideClick: true,
             buttonsTemplate: (close: () => void, submit: () => void) => { return undefined; },
@@ -63,6 +62,7 @@ export class ColumnView extends BaseView<ColumnState> {
             const cardOptions: CardOptions = { card };
             const cardCompoment = this.createComponent(cardContainer, CardComponent, cardOptions, `card${card.id}`);
 
+            setTimeout(() => this.eventEmitter.emit('process-shared-drag', cardCompoment));
             setTimeout(() => this.eventEmitter.emit('process-drag', cardCompoment));
             
             content.appendChild(cardContainer);

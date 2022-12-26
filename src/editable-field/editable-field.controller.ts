@@ -1,5 +1,5 @@
 import { BaseController } from "../base/controller";
-import { setEndOfContenteditable } from "../helpers";
+import { focusEndOfContenteditable } from "../helpers";
 import { EditableFieldState } from "./editable-field.state";
 import { EditableFieldView } from "./editable-field.view";
 
@@ -27,12 +27,17 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
             const end = input.innerText.length;
 
             input.focus();
-            setEndOfContenteditable(input);
+            focusEndOfContenteditable(input);
         }
     }
 
     private toggleInput(isOpen: boolean) {
-        this.state.update({ isOpen, validationMsg: null, value: this.state.defaultValue });
+        const { value, placeholder, showValue } = this.state;
+
+        this.state.update({ 
+            isOpen, validationMsg: null, value,
+            placeholder: showValue ? value : placeholder
+        });
         
         if(isOpen) {
             this.focusInput();

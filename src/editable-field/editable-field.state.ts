@@ -4,7 +4,8 @@ import { noop } from "../helpers";
 export type EditableFieldOptions = {
     title?: string;
     value?: string;
-    defaultValue?: string;
+    // if true, editable field show value instead of title. In helps to 
+    showValue?: boolean;
     placeholder?: string;
 
     isOpen?: boolean;
@@ -29,8 +30,8 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
         return this.options.value!;
     }
 
-    get defaultValue() {
-        return this.options.defaultValue!;
+    get showValue() {
+        return this.options.showValue!;
     }
 
     get placeholder() {
@@ -79,7 +80,7 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
         const defaultOptions: EditableFieldOptions = {
             title: 'toggle',
             value: "",
-            defaultValue: "",
+            showValue: false,
             placeholder: "",
 
             isOpen: false,

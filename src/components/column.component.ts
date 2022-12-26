@@ -9,6 +9,7 @@ import { DragState } from "../drag-drop/drag.state";
 import { DragController } from "../drag-drop/drag.controller";
 import { DropView } from "../drag-drop/drop.view";
 import { DragView } from "../drag-drop/drag.view";
+import { SharedDropController } from "../drag-drop/shared-drop.controller";
 
 export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, ColumnView> {
     constructor(container: HTMLElement | null, columnOptions: ColumnOptions | ColumnState) {
@@ -33,6 +34,7 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
         }))
         this.extendView(() => new DropView());
         this.registerController(() => new DropController<Card>(isAbleToDrop));
+        this.registerController(() => new SharedDropController<Card>());
 
         // DRAG
         this.registerState(() => new DragState());

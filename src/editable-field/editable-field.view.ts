@@ -24,7 +24,7 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
     private renderClosed(fragment: DocumentFragment) {
         const btn = this.createDOMElement('div', 'title');
 
-        btn.innerText = this.state.title;
+        btn.innerText = this.state.showValue ? this.state.value : this.state.title;
         btn.addEventListener('click', () => this.eventEmitter.emit('open'));
 
         fragment.appendChild(btn);
