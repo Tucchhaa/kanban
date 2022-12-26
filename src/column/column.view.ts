@@ -24,9 +24,8 @@ export class ColumnView extends BaseView<ColumnState> {
         const headingContainer = this.createDOMElement('div', 'heading');
 
         const options: EditableFieldOptions = {
-            title: text,
-            defaultValue: text,
-            placeholder: text,
+            value: text,
+            showValue: true,
 
             submitOnOutsideClick: true,
             buttonsTemplate: (close: () => void, submit: () => void) => { return undefined; },

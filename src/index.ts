@@ -10,10 +10,6 @@ drag-drop cards when column has scroll
 перекрытия событий в eventEmitter: решение -> добавить неймспейсы
 shared-drop, drop -> Вместо хранения компонентов, лучше хранить контролеры
 
-BUG: start edit column name -> click any card
-BUG: start edit column name -> start adding new card
-BUG: start edit column name -> drag any card -> no dragging
-
 OPTIMIZATION: dragging: instead of iterating all cards on drag event, it is possible to add event listener on each card
 
 REFACTORING: разделить дроп контроллер на две части
