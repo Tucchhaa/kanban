@@ -31,7 +31,7 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
             template && btn.appendChild(template);
         }
         else {
-            btn.innerText = this.state.title;
+            btn.innerText = this.state.title ? this.state.title : this.state.value;
             btn.addEventListener('click', open);
         }
 

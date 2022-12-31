@@ -29,14 +29,6 @@ export class ColumnView extends BaseView<ColumnState> {
 
             submitOnOutsideClick: true,
 
-            titleTemplate: (open: () => void) => {
-                const title = this.createDOMElement('div');
-                
-                title.innerText = this.state.column.name;
-                title.addEventListener('click', open);
-                
-                return title;
-            },
             buttonsTemplate: (close: () => void, submit: () => void) => { return undefined; },
             
             prepareValue: (value: string) => value.trim().replace(/\s\s+/g, ' '),

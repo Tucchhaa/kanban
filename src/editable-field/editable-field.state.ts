@@ -79,7 +79,7 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
 
     constructor(options: EditableFieldOptions) {
         const defaultOptions: EditableFieldOptions = {
-            title: 'toggle',
+            title: "",
             value: "",
             placeholder: "",
 
