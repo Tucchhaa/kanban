@@ -24,14 +24,14 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
     private onCreateNewCard(cardName: string) {
         this.state.addCard(new Card(cardName));
 
-        this.eventEmitter.emit('update-items', this.state.columnCards);
+        this.eventEmitter.emit('update-items', this.state.column.cards);
         this.eventEmitter.emit('update-column', this.state.column);
     }
 
     private onUpdateCardsOrder(cards: Card[]) {
         this.state.updateCards(cards);
         
-        this.eventEmitter.emit('update-items', this.state.columnCards);
+        this.eventEmitter.emit('update-items', this.state.column.cards);
         this.eventEmitter.emit('update-column', this.state.column);
     }
 }

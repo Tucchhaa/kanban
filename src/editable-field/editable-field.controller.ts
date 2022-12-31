@@ -27,21 +27,22 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
             const end = input.innerText.length;
 
             input.focus();
+            this.onFocusIn();
             focusEndOfContenteditable(input);
         }
     }
 
     private toggleInput(isOpen: boolean) {
-        const { value, placeholder, showValue } = this.state;
+        const { value, placeholder } = this.state;
 
         this.state.update({ 
             isOpen, validationMsg: null, value,
-            placeholder: showValue ? value : placeholder
+            placeholder: placeholder
         });
         
         if(isOpen) {
             this.focusInput();
-            this.onFocusIn();
+            this.updatePlaceholder();
             this.state.onOpened();
         }
         else {
@@ -74,8 +75,8 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
         const [result, msg] = this.state.validation(value);
 
         if(result) {
-            this.toggleInput(false);
             this.state.onSubmit(value);
+            this.toggleInput(false);
         }
         else {
             this.state.updateByKey('validationMsg', msg);
@@ -89,6 +90,10 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
     private onValueChanged(value: string) {
         this.state.updateByKey('value', value, false);
 
-        this.view.placeholder!.style.display = value.length ? 'none' : 'block';
+        this.updatePlaceholder();
+    }
+
+    private updatePlaceholder() {
+        this.view.placeholder!.style.display = this.state.value.length ? 'none' : 'block';
     }
 }

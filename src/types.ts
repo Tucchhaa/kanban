@@ -5,9 +5,9 @@ export interface Dictionary<TValue> {
 }
 
 export class Column {
-    name?: string;
-    id?: number | string;
-    cards?: Card[];
+    name: string;
+    id: number | string;
+    cards: Card[];
 
     constructor(name: string) {
         this.name = name;
@@ -17,8 +17,8 @@ export class Column {
 }
 
 export class Card {
-    id?: number | string;
-    name?: string;
+    id: number | string;
+    name: string;
 
     constructor(name: string) {
         this.id = generateID(Card.name);

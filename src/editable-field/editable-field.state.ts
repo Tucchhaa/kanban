@@ -5,13 +5,14 @@ export type EditableFieldOptions = {
     title?: string;
     value?: string;
     // if true, editable field show value instead of title. In helps to 
-    showValue?: boolean;
     placeholder?: string;
 
     isOpen?: boolean;
     validationMsg?: string | null;
 
     submitOnOutsideClick?: boolean;
+
+    titleTemplate?: (open: () => void) => HTMLElement | undefined;
     buttonsTemplate?: (close: () => void, submit: () => void) => HTMLElement | undefined,
     
     prepareValue?: (value: string) => string,
@@ -30,10 +31,6 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
         return this.options.value!;
     }
 
-    get showValue() {
-        return this.options.showValue!;
-    }
-
     get placeholder() {
         return this.options.placeholder!;
     }
@@ -49,6 +46,10 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
 
     get submitOnOutsideClick() {
         return this.options.submitOnOutsideClick!;
+    }
+
+    get titleTemplate() {
+        return this.options.titleTemplate;
     }
 
     get buttonsTemplate() {
@@ -80,13 +81,14 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
         const defaultOptions: EditableFieldOptions = {
             title: 'toggle',
             value: "",
-            showValue: false,
             placeholder: "",
 
             isOpen: false,
             validationMsg: null,
             
             submitOnOutsideClick: false,
+
+            titleTemplate: undefined,
             buttonsTemplate: undefined,
 
             prepareValue: value => value,
