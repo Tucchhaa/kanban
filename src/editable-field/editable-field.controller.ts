@@ -4,12 +4,12 @@ import { EditableFieldState } from "./editable-field.state";
 import { EditableFieldView } from "./editable-field.view";
 
 export class EditableFieldController extends BaseController<EditableFieldState, EditableFieldView> {
-    private lastSaveValue: string;
+    private lastSavedValue: string;
 
     constructor() {
         super();
         
-        this.lastSaveValue = this.state.value;
+        this.lastSavedValue = this.state.value;
 
         this.eventEmitter
             .on('open', this.toggleInput.bind(this, true))
@@ -28,8 +28,6 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
         const input = this.view.input as HTMLInputElement|undefined;
 
         if(input && this.state.isOpen) {
-            const end = input.innerText.length;
-
             input.focus();
             this.onFocus();
             focusEndOfContenteditable(input);
@@ -37,11 +35,8 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
     }
 
     private toggleInput(isOpen: boolean) {
-        const { value, placeholder } = this.state;
-
         this.state.update({ 
-            isOpen, validationMsg: null, value,
-            placeholder: placeholder
+            isOpen, validationMsg: null, value: this.lastSavedValue
         });
         
         if(isOpen) {
@@ -50,10 +45,7 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
             this.state.onOpened();
         }
         else {
-            if(this.state.resetValueOnClosed)
-                this.state.updateByKey('value', '', false)
-            else
-                this.state.updateByKey('value', this.lastSaveValue, false);
+            this.state.resetValueOnClosed && this.state.updateByKey('value', '', false);
 
             this.onBlur();
             this.state.onClosed();
@@ -64,11 +56,11 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
         const isInnerClick = e.target === this.container || this.container.contains(e.target as Node);
 
         if(!isInnerClick) {
-            if(this.state.submitOnOutsideClick) {
+            if(this.state.submitOnOutsideClick)
                 this.onSubmit(e);
-            }
-            else
-                this.toggleInput(false);
+            
+            // else 
+            this.toggleInput(false);
         }
     }
 
@@ -85,7 +77,7 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
         const [result, msg] = this.state.validation(value);
 
         if(result) {
-            this.lastSaveValue = value;
+            this.lastSavedValue = value;
             this.state.updateByKey('value', value, false);
             this.state.onSubmit(value);
             this.toggleInput(false);
