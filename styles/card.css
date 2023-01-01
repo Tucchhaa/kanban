@@ -17,12 +17,17 @@
 }
 
 /* Card toolbar */
+.kanban-column .card:hover .toolbar {
+    opacity: 1;
+}
+
 .kanban-column .card .toolbar {
     padding: 7px 0 5px;
     text-align: right;
+    opacity: 0;
 }
 
-.kanban-column .card .toolbar button.change-name {
+.kanban-column .card .toolbar button {
     outline: none;
     border: none;
     background-color: transparent;
@@ -32,7 +37,7 @@
     border-radius: 3px;
 }
 
-.kanban-column .card .toolbar button.change-name:hover {
+.kanban-column .card .toolbar button:hover {
     color: #494848;
     background-color: #cccaca;
 }

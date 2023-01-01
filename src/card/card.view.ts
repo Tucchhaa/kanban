@@ -7,7 +7,8 @@ import { cardNameValidation } from "../utils/validation";
 import { CardState } from "./card.state";
 
 type ToolbarHandlers = {
-    changeNameClickHandler: (e: MouseEvent) => void
+    changeNameHandler: (e: MouseEvent) => void,
+    deleteHandler: (e: MouseEvent) => void
 };
 
 export class CardView extends BaseView<CardState> {
@@ -29,7 +30,8 @@ export class CardView extends BaseView<CardState> {
                 title.innerText = this.state.card.name;
 
                 const toolbar = this.createToolbar({
-                    changeNameClickHandler: open
+                    changeNameHandler: open,
+                    deleteHandler: () => {}
                 });
 
                 fragment.append(title, toolbar);
@@ -51,7 +53,7 @@ export class CardView extends BaseView<CardState> {
                 this.eventEmitter.emit('disable-drag');
             },
             onClosed: () => {
-                this.container.style.cursor = 'auto';
+                this.container.style.removeProperty('cursor');
                 this.eventEmitter.emit('enable-drag');
             }
         };
@@ -61,13 +63,16 @@ export class CardView extends BaseView<CardState> {
     }
 
     private createToolbar(handlers: ToolbarHandlers) {
-        const toolbar = this.createDOMElement('div', 'toolbar');
-
         const changeNameBtn = this.createDOMElement('button', 'change-name');
         changeNameBtn.appendChild(Icon.pencil);
-        changeNameBtn.addEventListener('click', handlers.changeNameClickHandler);
+        changeNameBtn.addEventListener('click', handlers.changeNameHandler);
 
-        toolbar.append(changeNameBtn);
+        const deleteBtn = this.createDOMElement('button', 'delete-card');
+        deleteBtn.appendChild(Icon.delete);
+        deleteBtn.addEventListener('click', handlers.deleteHandler);
+
+        const toolbar = this.createDOMElement('div', 'toolbar');
+        toolbar.append(changeNameBtn, deleteBtn);
 
         return toolbar;
     }

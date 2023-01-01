@@ -20,4 +20,8 @@ export class Icon {
     static get cross() {
         return createIcon('times');
     }
+
+    static get delete() {
+        return createIcon('trash');
+    }
 }
