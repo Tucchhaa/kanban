@@ -4,9 +4,13 @@ import { EditableFieldState } from "./editable-field.state";
 import { EditableFieldView } from "./editable-field.view";
 
 export class EditableFieldController extends BaseController<EditableFieldState, EditableFieldView> {
+    private lastSaveValue: string;
+
     constructor() {
         super();
         
+        this.lastSaveValue = this.state.value;
+
         this.eventEmitter
             .on('open', this.toggleInput.bind(this, true))
             .on('close', this.toggleInput.bind(this, false))
@@ -46,7 +50,11 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
             this.state.onOpened();
         }
         else {
-            this.state.resetValueOnClosed && this.state.updateByKey('value', '', false);
+            if(this.state.resetValueOnClosed)
+                this.state.updateByKey('value', '', false)
+            else
+                this.state.updateByKey('value', this.lastSaveValue, false);
+
             this.onBlur();
             this.state.onClosed();
         }
@@ -77,6 +85,7 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
         const [result, msg] = this.state.validation(value);
 
         if(result) {
+            this.lastSaveValue = value;
             this.state.updateByKey('value', value, false);
             this.state.onSubmit(value);
             this.toggleInput(false);
