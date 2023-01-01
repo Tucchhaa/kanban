@@ -1,5 +1,6 @@
 import { BaseState } from "../base/state";
 import { noop } from "../helpers";
+import { Icon } from "../utils/icons";
 
 export type EditableFieldOptions = {
     title?: string;
@@ -11,9 +12,13 @@ export type EditableFieldOptions = {
     validationMsg?: string | null;
 
     submitOnOutsideClick?: boolean;
+    resetValueOnClosed?: boolean;
 
-    titleTemplate?: (open: () => void) => HTMLElement | undefined;
-    buttonsTemplate?: (close: () => void, submit: () => void) => HTMLElement | undefined,
+    titleTemplate?: (open: () => void) => Node | undefined;
+    buttonsTemplate?: (close: () => void, submit: () => void) => Node | undefined,
+
+    submitBtnContent?: string;
+    cancelBtnContent?: string;
     
     prepareValue?: (value: string) => string,
     onSubmit?: (value: string) => void;
@@ -35,6 +40,7 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
         return this.options.placeholder!;
     }
 
+    // ===
 
     get isOpen() {
         return this.options.isOpen!;
@@ -48,6 +54,12 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
         return this.options.submitOnOutsideClick!;
     }
 
+    get resetValueOnClosed() {
+        return this.options.resetValueOnClosed!;
+    }
+
+    // ===
+
     get titleTemplate() {
         return this.options.titleTemplate;
     }
@@ -56,6 +68,15 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
         return this.options.buttonsTemplate;
     }
 
+    get submitBtnContent() {
+        return this.options.submitBtnContent!;
+    }
+
+    get cancelBtnContent() {
+        return this.options.cancelBtnContent!;
+    }
+
+    // ===
 
     get prepareValue() {
         return this.options.prepareValue!;
@@ -87,9 +108,12 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
             validationMsg: null,
             
             submitOnOutsideClick: false,
+            resetValueOnClosed: true,
 
             titleTemplate: undefined,
             buttonsTemplate: undefined,
+            submitBtnContent: 'submit',
+            cancelBtnContent: 'cancel',
 
             prepareValue: value => value,
             validation: () => [true, ""],

@@ -1,7 +1,6 @@
 import { BaseComponent, BaseComponentType } from "../base/component";
 import { BaseController } from "../base/controller";
-import { isMouseInsideElement } from "../helpers";
-import { MouseDirection } from "../utils/mouse-direction";
+import { mouse } from "../utils/mouse-direction";
 import { DragController } from "./drag.controller";
 import { DropState } from "./drop.state";
 
@@ -9,36 +8,34 @@ export class DropController<TItem extends object> extends BaseController {
     private dropState: DropState<TItem>;
     
     private draggingDirection: 'horizontal' | 'vertical';
-    private mouseDirection: MouseDirection = new MouseDirection();
 
-    private drags: DragController<TItem>[] = [];
-    private items: TItem[] = [];
+    public drags: DragController<TItem>[] = [];
     private dragsContainer?: HTMLElement;
 
     private shadowElement: HTMLElement = document.createElement('div');
     private shadowIndex: number = -1;
 
-    private isAbleToDrop: (e: MouseEvent, dropElement: HTMLElement) => boolean;
+    private isAbleToDrop: (dropElement: HTMLElement) => boolean;
     public isItemsEqual: (itemA: TItem, itemB: TItem) => boolean;
 
-    // columnName: string = (this.container.querySelector('.title') as HTMLElement).innerText;
+    public columnName: string = "";
 
-    constructor(isAbleToDrop?: (e: MouseEvent, dropElement: HTMLElement) => boolean) {
+    constructor(isAbleToDrop?: (dropElement: HTMLElement) => boolean) {
         super();
 
         this.dropState = this.getRequiredState<DropState<TItem>>(DropState.name);
         this.draggingDirection = this.dropState.direction;
 
-        this.isAbleToDrop = isAbleToDrop ?? isMouseInsideElement;
+        this.isAbleToDrop = isAbleToDrop ?? mouse.isInsideElement.bind(mouse);
         this.isItemsEqual = this.dropState.isEqual();
         
+        setTimeout(() => {
+            this.columnName = (this.container.querySelector('.title') as HTMLElement).innerText;
+        })
+
         this.eventEmitter
             .on('process-drag', this.onProcessDrag.bind(this))
             .on('drags-container-rendered', (dragsContainer: HTMLElement) => this.dragsContainer = dragsContainer);
-    }
-
-    public getItems() {
-        return this.items;
     }
 
     // ===
@@ -49,7 +46,6 @@ export class DropController<TItem extends object> extends BaseController {
             dragComponent.getRequiredController<DragController<TItem>>(DragController.name) : dragComponent;
         
         this.drags.push(dragController);
-        this.items.push(dragController.item);
 
         // ===
 
@@ -75,17 +71,13 @@ export class DropController<TItem extends object> extends BaseController {
 
     // === DRAG EVENTS
     public startDrag(e: MouseEvent, dragController: DragController<TItem>) {
-        this.showShadow(dragController.element);
-
         this.shadowIndex = this.getItemIndex(dragController.item);
-        this.mouseDirection.setMousePosition(e);
 
+        this.showShadow(dragController.element);
         this.drag(e, dragController);
     }
 
     private drag(e: MouseEvent, dragController: DragController<TItem>) {
-        this.mouseDirection.calculateMouseDirection(e);
-
         const direction = this.dropState.direction;
         const isInsertBefore = this.isInsertBefore();
         const dropPosition = this.dragsContainer!.getBoundingClientRect();
@@ -93,7 +85,8 @@ export class DropController<TItem extends object> extends BaseController {
 
         // Shadow above or left
         if(
-            (direction === 'vertical' && e.clientY <= dropPosition.y) || (direction === 'horizontal' && e.clientX <= dropPosition.x)
+            (direction === 'vertical' && e.clientY <= dropPosition.y) || 
+            (direction === 'horizontal' && e.clientX <= dropPosition.x)
         ) {
             this.shadowIndex = 0;
 
@@ -101,7 +94,7 @@ export class DropController<TItem extends object> extends BaseController {
                 this.dragsContainer!.firstChild?.before(this.shadowElement) :
                 this.dragsContainer!.appendChild(this.shadowElement);
         }
-        // Shadow below
+        // Shadow below or right
         else if(
             (direction === 'vertical' && e.clientY >= dropPosition.y + dropPosition.height) || 
             (direction === 'horizontal' && e.clientX >= dropPosition.x + dropPosition.width)
@@ -119,7 +112,7 @@ export class DropController<TItem extends object> extends BaseController {
                 const dragElement = drag.container; 
             
                 if(dragElement !== currentDragElement) {
-                    if(this.isAbleToDrop(e, dragElement)) {
+                    if(this.isAbleToDrop(dragElement)) {
                         if(isInsertBefore) {
                             dragElement.before(this.shadowElement);
                             this.shadowIndex = index;
@@ -146,8 +139,8 @@ export class DropController<TItem extends object> extends BaseController {
         const newOrder: TItem[] = [];
         const insertBeforeIndex = this.shadowIndex;
 
-        for(let index=0; index < this.items.length; index++) {
-            const item = this.items[index];
+        for(let index=0; index < this.drags.length; index++) {
+            const item = this.drags[index].item;
 
             if(index === insertBeforeIndex)
                 newOrder.push(currentItem);
@@ -159,7 +152,7 @@ export class DropController<TItem extends object> extends BaseController {
             newOrder.push(item);
         }
 
-        if(insertBeforeIndex === this.items.length)
+        if(insertBeforeIndex === this.drags.length)
             newOrder.push(currentItem);
 
         this.eventEmitter.emit('update-items-order', newOrder);
@@ -167,20 +160,18 @@ export class DropController<TItem extends object> extends BaseController {
 
     public clear() {
         this.shadowIndex = -1;
-        this.items = [];
         this.drags = [];
     }
 
     // === SHARED DROP
     public removeDrag(dragController: DragController<TItem>) {
         this.drags = this.drags.filter(drag => drag !== dragController);
-        this.items = this.items.filter(item => !this.isItemsEqual(item, dragController.item));
     }
 
     // === PRIVATE METHODS
     private getItemIndex(item: TItem): number {
-        for(let index=0; index < this.items.length; index++) {
-            const itemB = this.items[index];
+        for(let index=0; index < this.drags.length; index++) {
+            const itemB = this.drags[index].item;
 
             if(this.isItemsEqual(item, itemB)) {
                 return index;
@@ -205,6 +196,6 @@ export class DropController<TItem extends object> extends BaseController {
     }
 
     private isInsertBefore() {
-        return this.draggingDirection === 'vertical' ? this.mouseDirection.vertical === 'up' : this.mouseDirection.horizontal === 'left'
+        return this.draggingDirection === 'vertical' ? mouse.vertical === 'up' : mouse.horizontal === 'left'
     }
 }

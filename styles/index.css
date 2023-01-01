@@ -8,3 +8,11 @@ body {
     overflow-x: auto;
     overflow-y: hidden;
 }
+
+/* Cancel buttons with cross */
+.add-column .buttons .cancel,
+.kanban-column .card .editable-field .buttons .cancel,
+.add-card .buttons .cancel {
+    padding: 7px 10px;
+    color: #1a1a1a;
+}

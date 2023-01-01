@@ -10,6 +10,7 @@ import { DragController } from "../drag-drop/drag.controller";
 import { DropView } from "../drag-drop/drop.view";
 import { DragView } from "../drag-drop/drag.view";
 import { SharedDropController } from "../drag-drop/shared-drop.controller";
+import { mouse } from "../utils/mouse-direction";
 
 export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, ColumnView> {
     constructor(container: HTMLElement | null, columnOptions: ColumnOptions | ColumnState) {
@@ -18,14 +19,15 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
         this.registerController(() => new ColumnController());
 
         // DROP
-        const isAbleToDrop = (e: MouseEvent, dragElement: HTMLElement) => {
+        const isAbleToDrop = (dragElement: HTMLElement) => {
+            const mousePosition = mouse.getPosition();
             const position = dragElement.getBoundingClientRect();
 
             const styles = getComputedStyle(dragElement);
             const marginLeft = parseInt(styles.marginLeft);
             const marginRight = parseInt(styles.marginRight);
 
-            return e.clientY >= position.y - marginLeft && e.clientY <= position.y + position.height + marginRight;
+            return mousePosition.y >= position.y - marginLeft && mousePosition.y <= position.y + position.height + marginRight;
         }
 
         this.registerState(() => new DropState<Card>({

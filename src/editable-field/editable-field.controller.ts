@@ -12,8 +12,8 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
             .on('close', this.toggleInput.bind(this, false))
 
             .on('document-click', this.onDocumentClick.bind(this))
-            .on('focusin', this.onFocusIn.bind(this))
-            .on('focusout', this.onFocusOut.bind(this))
+            .on('focus', this.onFocus.bind(this))
+            .on('blur', this.onBlur.bind(this))
         
             .on('submit', this.onSubmit.bind(this))
             .on('enter-pressed', this.onEnterPressed.bind(this))
@@ -27,7 +27,7 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
             const end = input.innerText.length;
 
             input.focus();
-            this.onFocusIn();
+            this.onFocus();
             focusEndOfContenteditable(input);
         }
     }
@@ -46,35 +46,38 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
             this.state.onOpened();
         }
         else {
-            this.onFocusOut();
+            this.state.resetValueOnClosed && this.state.updateByKey('value', '', false);
+            this.onBlur();
             this.state.onClosed();
         }
     }
 
     private onDocumentClick(e: MouseEvent) {
         const isInnerClick = e.target === this.container || this.container.contains(e.target as Node);
-        
+
         if(!isInnerClick) {
-            if(this.state.submitOnOutsideClick)
-                this.onSubmit();
+            if(this.state.submitOnOutsideClick) {
+                this.onSubmit(e);
+            }
             else
                 this.toggleInput(false);
         }
     }
 
-    private onFocusIn() {
+    private onFocus() {
         this.container.classList.add('state-focused');
     }
 
-    private onFocusOut() {
+    private onBlur() {
         this.container.classList.remove('state-focused');
     }
 
-    private onSubmit() {
+    private onSubmit(e?: MouseEvent) {
         const value = this.state.prepareValue(this.state.value);
         const [result, msg] = this.state.validation(value);
 
         if(result) {
+            this.state.updateByKey('value', value, false);
             this.state.onSubmit(value);
             this.toggleInput(false);
         }

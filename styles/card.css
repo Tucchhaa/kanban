@@ -1,7 +1,6 @@
 .kanban-column .card {
     background-color: #ecf0f1;
     margin: 5px 7px;
-    padding: 7px 8px 10px 8px;
     cursor: grab;
     border-radius: 3px;
     box-shadow: 0px 1.5px 0px rgb(189, 195, 199);
@@ -15,4 +14,50 @@
 .kanban-column .shadow {
     border-radius: 3px;
     background-color: lightgrey;
+}
+
+/* Card toolbar */
+.kanban-column .card .toolbar {
+    padding: 7px 0 5px;
+    text-align: right;
+}
+
+.kanban-column .card .toolbar button.change-name {
+    outline: none;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    color: #696969;
+    padding: 5px 7px;
+    border-radius: 3px;
+}
+
+.kanban-column .card .toolbar button.change-name:hover {
+    color: #494848;
+    background-color: #cccaca;
+}
+
+/* Car name Input */
+.kanban-column .card .editable-field {
+    padding: 7px 8px 0px 8px;
+}
+
+.kanban-column .card .editable-field.state-opened {
+    padding: 4px 4px 8px 4px;
+}
+
+.kanban-column .card .editable-field .input-wrapper {
+    border-radius: 3px;
+    background-color: #fbfbfb;
+    border: 2px solid #05558b;
+    padding: 1px 2px;
+}
+
+.kanban-column .card .editable-field.state-focused .input-wrapper {
+    border: 2px solid #1581c9;
+}
+
+.kanban-column .card .editable-field .validation-msg {
+    font-size: 14px;
+    padding: 1px 3px;
 }

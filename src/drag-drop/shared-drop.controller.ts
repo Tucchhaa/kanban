@@ -12,7 +12,11 @@ export class SharedDropController<TItem extends object> extends BaseController {
         this.dropController = this.getRequiredController<DropController<TItem>>(DropController.name);
     
         this.eventEmitter.on('process-shared-drag', this.onProcessSharedDrag.bind(this));
-    }   
+    }
+
+    public get columnName() {
+        return this.dropController.columnName;
+    }
 
     public onProcessSharedDrag(dragComponent: BaseComponentType | DragController<TItem>) {
         const dragController = 
@@ -38,23 +42,23 @@ export class SharedDropController<TItem extends object> extends BaseController {
         });
     }
 
-    public onSharedDropDragStart(e: MouseEvent, dragController: DragController<TItem>) {
+    public onSharedDragStart(e: MouseEvent, dragController: DragController<TItem>) {
         this.onProcessSharedDrag(dragController);
         this.dropController.onProcessDrag(dragController);
-        
+
         this.dropController.startDrag(e, dragController);
     }
 
-    public onDragStartToSharedDrop(dragController: DragController<TItem>) {
+    public onDragStartToShared(dragController: DragController<TItem>) {
+        dragController.eventEmitter.emit('unsubscribe-drag-listeners');
+
         this.dropController.removeDrag(dragController);
         this.dropController.hideShadow();
-
-        dragController.eventEmitter.emit('unsubscribe-drag-listeners');
     }
 
-    public onDragEndToSharedDrop(dragController: DragController<TItem>) {
+    public onDragEndToShared(dragController: DragController<TItem>) {
         this.dropController.removeDrag(dragController);
 
-        this.eventEmitter.emit('update-items-order', this.dropController.getItems());
+        this.eventEmitter.emit('update-items-order', this.dropController.drags.map(drag => drag.item));
     }
 }

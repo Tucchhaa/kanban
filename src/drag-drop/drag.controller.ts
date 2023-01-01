@@ -1,4 +1,5 @@
 import { BaseController } from "../base/controller";
+import { mouse } from "../utils/mouse-direction";
 import { DragState } from "./drag.state";
 
 export class DragController<TItem extends object> extends BaseController {
@@ -45,6 +46,7 @@ export class DragController<TItem extends object> extends BaseController {
 
     private onDragStart(e: MouseEvent) {
         e.preventDefault();
+        mouse.setPosition(e);
         this.dragState.updateByKey('isDragging', true, false);
 
         this.element.classList.add('state-dragging');
@@ -61,6 +63,7 @@ export class DragController<TItem extends object> extends BaseController {
     }
 
     private onDrag(e: MouseEvent) {
+        mouse.setPosition(e);
         this._element.style.top = (e.clientY - this.offset.y) + 'px';
         this._element.style.left = (e.clientX - this.offset.x) + 'px';
     }

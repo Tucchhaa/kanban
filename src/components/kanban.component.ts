@@ -7,6 +7,7 @@ import { Column } from "../types";
 import { DropController } from "../drag-drop/drop.controller";
 import { SharedDropManagerController } from "../drag-drop/shared-drop.manager.controller";
 import { DropView } from "../drag-drop/drop.view";
+import { mouse } from "../utils/mouse-direction";
 
 export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, KanbanView> {
     constructor(container: HTMLElement | null, options: KanbanOptions) {
@@ -15,10 +16,11 @@ export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, K
         this.registerController(() => new KanbanController());
 
         // Shared drop
-        const isAbleToDrop = (e: MouseEvent, dropElement: HTMLElement) => {
+        const isAbleToDrop = (dropElement: HTMLElement) => {
+            const mousePosition = mouse.getPosition();
             const position = dropElement.getBoundingClientRect();
 
-            return e.clientX >= position.x && e.clientX <= position.x + position.width;
+            return mousePosition.x >= position.x && mousePosition.x <= position.x + position.width;
         }
         this.registerController(() => new SharedDropManagerController(isAbleToDrop));
 

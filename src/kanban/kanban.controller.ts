@@ -17,7 +17,6 @@ export class KanbanController extends BaseController<KanbanState, KanbanView> {
         const column = new Column(columnName);
 
         this.state.createColumn(column);
-        this.eventEmitter.emit('update-items', this.state.columns);
     }
 
     private onUpdateColumn(column: Column) {
@@ -30,6 +29,5 @@ export class KanbanController extends BaseController<KanbanState, KanbanView> {
 
     private onUpdateColumnsOrder(columns: Column[]) {
         this.state.updateColumns(columns);
-        this.eventEmitter.emit('update-items', this.state.columns);
     }
 }

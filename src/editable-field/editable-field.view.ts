@@ -74,8 +74,8 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
         
         input.addEventListener('input', () => this.eventEmitter.emit('value-changed', input.innerText));
         input.addEventListener('keydown', (e: KeyboardEvent) => e.key === 'Enter' && this.eventEmitter.emit('enter-pressed'));
-        input.addEventListener('focusin', () => this.eventEmitter.emit('focusin'));
-        input.addEventListener('focusout', () => this.eventEmitter.emit('focusout'));
+        input.addEventListener('focus', () => this.eventEmitter.emit('focus'));
+        input.addEventListener('blur', (e: FocusEvent) => this.eventEmitter.emit('blur', e));
 
         input.innerText = this.state.value;
 
@@ -104,13 +104,15 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
         
             const submitBtn = this.createDOMElement('span');
             this.createComponent(submitBtn, ButtonComponent, {
-                text: 'submit', 
+                className: 'submit',
+                text: this.state.submitBtnContent, 
                 onClick: submitAction
             }, 'submit-btn');
 
             const cancelBtn = this.createDOMElement('span');
             this.createComponent(cancelBtn, ButtonComponent, {
-                text: 'cancel', 
+                className: 'cancel',
+                text: this.state.cancelBtnContent, 
                 onClick: closeAction
             }, 'cancel-btn');
             

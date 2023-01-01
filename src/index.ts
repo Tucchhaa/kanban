@@ -14,10 +14,18 @@ OPTIMIZATION: dragging: instead of iterating all cards on drag event, it is poss
 
 REFACTORING: разделить дроп контроллер на две части
 
+BUG:
+1) start drag
+2) move card to another column
+3) move card to its original position
+4) drag end
+=> Card is placed at the end
+
 TODO:
 rename card
 scroll drop
 local storage
+delete card
 */
 
 window.addEventListener("load", () => {    
@@ -44,8 +52,8 @@ window.addEventListener("load", () => {
             id: 2,
             cards: [
                 { id: 9, name: 'card 1' }, { id: 10, name: 'card 2' }, { id: 11, name: 'card 3' },
-                { id: 12, name: 'card 1' }, { id: 13, name: 'card 2' }, { id: 14, name: 'card 3' },
-                { id: 15, name: 'card 1' }, { id: 16, name: 'card 2' }, { id: 17, name: 'card 3' }
+                { id: 12, name: 'card 4' }, { id: 13, name: 'card 5' }, { id: 14, name: 'card 6' },
+                { id: 15, name: 'card 7' }, { id: 16, name: 'card 8' }, { id: 17, name: 'card 9' }
             ]
         }]
     }
