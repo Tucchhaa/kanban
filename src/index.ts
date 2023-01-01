@@ -6,9 +6,7 @@ Known issues:
 reopen editable-field - нужно передавать старое состояние при ререндере
 refactor state
 убрать методы в state которые меняют состояние. пример DropState.updateItems
-drag-drop cards when column has scroll
 перекрытия событий в eventEmitter: решение -> добавить неймспейсы
-shared-drop, drop -> Вместо хранения компонентов, лучше хранить контролеры
 
 OPTIMIZATION: dragging: instead of iterating all cards on drag event, it is possible to add event listener on each card
 
@@ -22,10 +20,11 @@ BUG:
 => Card is placed at the end
 
 TODO:
-rename card
 scroll drop
 local storage
 delete card
+scroll to down when adding card
+save scroll position on renders
 */
 
 window.addEventListener("load", () => {    
@@ -44,7 +43,7 @@ window.addEventListener("load", () => {
             name: 'Done',
             id: 1,
             cards: [
-                { id: 18, name: 'card 4' }, { id: 19, name: 'card 5' }, { id: 20, name: 'card 6' },
+                { id: 18, name: 'card 4' }, { id: 19, name: 'card 5' },
                 { id: 21, name: 'card 6 jsnda aksdn lsadm aas as lorem aksldm asdkl asld []wqekr saodj s wek nasda lskdan sdm lasjd kalns' }
             ]
         }, {
@@ -53,7 +52,8 @@ window.addEventListener("load", () => {
             cards: [
                 { id: 9, name: 'card 1' }, { id: 10, name: 'card 2' }, { id: 11, name: 'card 3' },
                 { id: 12, name: 'card 4' }, { id: 13, name: 'card 5' }, { id: 14, name: 'card 6' },
-                { id: 15, name: 'card 7' }, { id: 16, name: 'card 8' }, { id: 17, name: 'card 9' }
+                { id: 15, name: 'card 7' }, { id: 16, name: 'card 8' }, { id: 17, name: 'card 9' },
+                { id: 20, name: 'card 6' },
             ]
         }]
     }
