@@ -1,4 +1,4 @@
-import { isArray, isObject } from "../helpers";
+import { clone, isArray, isDeepEqual, isObject } from "../helpers";
 import { ComponentModule } from "./component-module";
 
 export interface OptionsType {
@@ -23,8 +23,7 @@ export interface IState<TOptions extends OptionsType> {
     updateByKey(key: string, value: any): void;
 }
 
-
-export class NewState<TOptions extends OptionsType> extends ComponentModule implements IState<TOptions> {
+export class BaseState<TOptions extends OptionsType> extends ComponentModule implements IState<TOptions> {
     protected options: TOptions;
 
     private changes: StateChange[] = [];
@@ -32,8 +31,8 @@ export class NewState<TOptions extends OptionsType> extends ComponentModule impl
     constructor(defaultOptions: TOptions, options: TOptions) {
         super();
 
-        this.options = defaultOptions;
-        this.updateRecursively(defaultOptions, options);
+        this.options = clone(Object.assign({}, defaultOptions, options));
+
         this.changes = [];
     }
 
@@ -43,7 +42,6 @@ export class NewState<TOptions extends OptionsType> extends ComponentModule impl
 
     public update(updatedOptions: TOptions) {
         this.changes = [];
-
         this.updateRecursively(this.options, updatedOptions);
 
         this.callStateChanged(this.changes);
@@ -61,39 +59,49 @@ export class NewState<TOptions extends OptionsType> extends ComponentModule impl
     }
 
     public updateBy(func: (options: TOptions) => void): void {
-        throw new Error('not implemented');
+        const updatedOptions = clone(this.options);
+
+        func(updatedOptions);
+        
+        this.update(updatedOptions);
     }
 
     // ===
 
     private callStateChanged(changes: StateChange[]) {
-
+        console.log(changes);
     }
 
     private updateRecursively(options: TOptions, updatedOptions: TOptions, path: string = "") {
         if(isArray(options)) {
-            this.changes.push({
-                name: path,
-                previousValue: options.map((item: any) => Object.assign({}, item)),
-                value: updatedOptions.map((item: any) => Object.assign({}, item))
-            });
+            if(!isDeepEqual(options, updatedOptions)) {
+                const newValue = clone(updatedOptions);
 
-            options = updatedOptions;
+                this.changes.push({
+                    name: path,
+                    previousValue: clone(options),
+                    value: newValue
+                });
+    
+                options.splice(0, options.length, ...newValue);
+            }
         }
         else if(isObject(options)) {
             for(const key in updatedOptions) {
                 if(!options.hasOwnProperty(key))
                     throw new Error(`No such property: '${key}' in ${this.constructor.name}`);
     
-                const fullName = `${path}.${key}`;
+                const currentValue = options[key];
                 const newValue = updatedOptions[key];
+                const fullName = path ? `${path}.${key}` : key;
 
-                if(isObject(options[key]))
-                    this.updateRecursively(options[key], updatedOptions[key], fullName);
-                else {
+                if(isObject(currentValue))
+                    this.updateRecursively(currentValue, newValue, fullName);
+
+                else if(currentValue !== newValue) {
                     this.changes.push({
                         name: fullName,
-                        previousValue: options[key],
+                        previousValue: currentValue,
                         value: newValue
                     });
 
@@ -109,77 +117,5 @@ export class NewState<TOptions extends OptionsType> extends ComponentModule impl
         return path.length === 0 ?
             { [key]: value } :
             { [key]: this.createUpdatedOptionsByPath(path, value) };
-    }
-}
-
-export class BaseState<TOptions extends OptionsType> extends ComponentModule implements IState<TOptions> {
-    protected options: TOptions;
-
-    constructor(options: TOptions, defaultOptions: TOptions) {
-        super();
-
-        this.options = this.updateRecusively(defaultOptions, options);
-    }
-
-    public getOptions(): TOptions {
-        return this.options;
-    }
-
-    public update(newOptions: TOptions, needRender = true) {
-        this.options = this.updateRecusively(Object.assign({}, this.options), newOptions);
-
-        if(needRender) {
-            this.eventEmitter.emit('render');
-        }
-    }
-
-    private updateRecusively(options: TOptions, newOptions: TOptions) {
-        for(const key in newOptions) {
-            if(!this.checkKey(options, key) || newOptions[key] === undefined)
-                continue;
-            
-            if(isObject(options[key]) && isObject(newOptions[key]))
-                (options[key] as OptionsType) = this.updateRecusively(options[key], newOptions[key]);
-            else 
-                options[key] = newOptions[key];
-        } 
-
-        return options;
-    }
-
-    public updateByKey(key: string, value: any, needRender = true) {
-        if(!this.checkKey(this.options, key))
-            return;
-
-        (this.options[key] as OptionsType) = value;
-
-        if(needRender) {
-            this.eventEmitter.emit('render');
-        }
-    }
-
-    public updateBy(func: (options: TOptions) => void, needRender = true) {
-        func(this.options);
-        
-        if(needRender) {
-            this.eventEmitter.emit('render');
-        }
-    }
-
-    public get(key: string): any {
-        if(this.checkKey(this.options, key)) {
-            return this.options[key];
-        }
-
-        return undefined;
-    }
-
-    private checkKey(object: TOptions, key: string) {
-        if(Array.isArray(object) || object.hasOwnProperty(key)) {
-            return true;
-        }
-
-        console.error(`No such property: '${key}' in ${this.constructor.name}`);
-        return false;
     }
 }

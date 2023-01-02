@@ -47,7 +47,7 @@ export class DragController<TItem extends object> extends BaseController {
     private onDragStart(e: MouseEvent) {
         e.preventDefault();
         mouse.setPosition(e);
-        this.dragState.updateByKey('isDragging', true, false);
+        this.dragState.updateByKey('isDragging', true);
 
         this.element.classList.add('state-dragging');
         this.element.style.cursor = 'grabbing';
@@ -70,7 +70,7 @@ export class DragController<TItem extends object> extends BaseController {
     }
     
     private dragEnd(e: MouseEvent) {
-        this.dragState.updateByKey('isDragging', false, false);
+        this.dragState.updateByKey('isDragging', false);
         this.element.classList.remove('state-dragging');
 
         this.element.style.removeProperty('cursor');
@@ -115,10 +115,10 @@ export class DragController<TItem extends object> extends BaseController {
 
     // ===
     private onDisableDrag() {
-        this.dragState.updateByKey('disabled', true, false);
+        this.dragState.updateByKey('disabled', true);
     }
 
     private onEnableDrag() {
-        this.dragState.updateByKey('disabled', false, false);
+        this.dragState.updateByKey('disabled', false);
     }
 }

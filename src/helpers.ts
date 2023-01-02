@@ -16,26 +16,65 @@ export const isObject = (object: any) => object !== null && typeof(object) === '
 
 export const isArray = (object: any) => Array.isArray(object);
 
-export const isDeepEqual = (object1: any, object2: any) => {
-    const objKeys1 = Object.keys(object1);
-    const objKeys2 = Object.keys(object2);
+export const isDeepEqual = (a: any, b: any) => {
+    // const objKeys1 = Object.keys(object1);
+    // const objKeys2 = Object.keys(object2);
 
-    if (objKeys1.length !== objKeys2.length) return false;
+    // if (objKeys1.length !== objKeys2.length) return false;
 
-    for (let key of objKeys1) {
-        const value1 = object1[key];
-        const value2 = object2[key];
+    // for (let key of objKeys1) {
+    //     const value1 = object1[key];
+    //     const value2 = object2[key];
 
-        const isObjects = isObject(value1) && isObject(value2);
+    //     const isObjects = isObject(value1) && isObject(value2);
 
-        if (
-            (isObjects && !isDeepEqual(value1, value2)) ||
-            (!isObjects && value1 !== value2)
-        )
-            return false;
+    //     if (
+    //         (isObjects && !isDeepEqual(value1, value2)) ||
+    //         (!isObjects && value1 !== value2)
+    //     )
+    //         return false;
 
+    // }
+    // return true;
+
+    if(typeof(a) !== typeof(b) || isArray(a) !== isArray(b))
+        return false;
+
+    else if(isObject(a)) {
+        const keys1 = Object.keys(a);
+        const keys2 = Object.keys(b);
+
+        if (keys1.length !== keys2.length) return false;
+
+        for (let key of keys1) {
+            const value1 = a[key];
+            const value2 = b[key];
+
+            if (!isDeepEqual(value1, value2))
+                return false;
+
+        }
+        return true;
     }
-    return true;
+    
+    return a !== b;
+};
+
+export const clone = (value: any) => {
+    if(isArray(value)) {
+        return value.map((item: any) => clone(item));
+    }
+    else if(isObject(value)) {
+        const result = {};
+
+        for(const key in value)
+            (result as any)[key] = clone(value[key]);
+
+        return result;
+    }
+    else {
+        return value;
+    }
 };
 
 export const generateID = (prefix: string = "") => {

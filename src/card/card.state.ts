@@ -1,11 +1,11 @@
-import { BaseState, NewState } from "../base/state";
+import { BaseState } from "../base/state";
 import { Card } from "../types";
 
 export type CardOptions = {
     card?: Card;
 }
 
-export class CardState extends NewState<CardOptions> {
+export class CardState extends BaseState<CardOptions> {
     public get card() {
         return this.options.card!;
     }

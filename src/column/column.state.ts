@@ -15,14 +15,21 @@ export class ColumnState extends BaseState<ColumnOptions> {
             column: new Column('__empty-column__'),
         };
 
-        super(options, defaultOptions);
+        super(defaultOptions, options);
+    }
+
+    public updateCard(id: number | string, card: Card) {
+        this.updateBy(options => {
+            const cardIndex = options.column!.cards.findIndex((card) => id === card.id);
+            options.column!.cards[cardIndex] = card;
+        });
     }
 
     public updateCards(cards: Card[]) {
         this.updateBy((options) => { options.column!.cards = cards });
     }
 
-    public addCard(card: Card) {
+    public createCard(card: Card) {
         const updatedCards = [...this.column.cards, card];
 
         this.updateCards(updatedCards);

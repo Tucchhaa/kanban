@@ -17,30 +17,21 @@ export class KanbanState extends BaseState<KanbanOptions> {
             columns: []
         };
 
-        super(options, defaultOptions);
+        super(defaultOptions, options);
     }
 
     public createColumn(column: Column) {
-        this.updateByKey('columns', [...this.columns, column]);
+        this.updateColumns([...this.columns, column]);
     }
 
-    public updateColumn(updated: Column) {
-        let isUpdated = false;
-
+    public updateColumn(id: number | string, column: Column) {
         this.updateBy(options => {
-            for(const column of this.columns) {
-                if(column.id === updated.id) {
-                    Object.assign(column, updated);
-                    isUpdated = true;
-                    break;
-                }
-            }
-        }, false);
-
-        return isUpdated;
+            const columnIndex = options.columns!.findIndex((column) => id === column.id);
+            options.columns![columnIndex] = column;
+        });
     }
     
     public updateColumns(columns: Column[]) {
-        this.updateBy((options) => { options.columns = columns });
+        this.updateByKey('columns', columns);
     }
 }

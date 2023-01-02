@@ -27,6 +27,6 @@ export class ButtonState extends BaseState<ButtonOptions> {
             onClick: noop
         };
         
-        super(state, defaultOptions);
+        super(defaultOptions, state);
     }
 }

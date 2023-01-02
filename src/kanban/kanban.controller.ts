@@ -17,17 +17,15 @@ export class KanbanController extends BaseController<KanbanState, KanbanView> {
         const column = new Column(columnName);
 
         this.state.createColumn(column);
+        this.eventEmitter.emit('render');
     }
 
     private onUpdateColumn(column: Column) {
-        const isUpdated = this.state.updateColumn(column);
-
-        if(!isUpdated) {
-            throw new Error(`${this.componentName} can not update column with id: ${column.id}, because it does not exist`);
-        }
+        this.state.updateColumn(column.id, column);
     }
 
     private onUpdateColumnsOrder(columns: Column[]) {
         this.state.updateColumns(columns);
+        this.eventEmitter.emit('render');
     }
 }

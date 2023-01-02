@@ -1,4 +1,4 @@
-import { BaseState, BaseStateType, IState } from "../base/state";
+import { BaseStateType, IState } from "../base/state";
 import { BaseView } from "../base/view";
 import { Dictionary } from "../types";
 import { ComponentModule, ComponentProps } from "./component-module";

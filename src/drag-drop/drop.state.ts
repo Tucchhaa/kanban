@@ -20,6 +20,6 @@ export class DropState<TItem extends object> extends BaseState<DropOptions<TItem
             isEqual: (itemA: TItem, itemB: TItem) => itemA === itemB
         };
 
-        super(options, defaultOptions);
+        super(defaultOptions, options);
     }
 }

@@ -38,6 +38,7 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
         this.state.update({ 
             isOpen, validationMsg: null, value: this.lastSavedValue
         });
+        this.eventEmitter.emit('render');
         
         if(isOpen) {
             this.focusInput();
@@ -45,7 +46,7 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
             this.state.onOpened();
         }
         else {
-            this.state.resetValueOnClosed && this.state.updateByKey('value', '', false);
+            this.state.resetValueOnClosed && this.state.updateByKey('value', '');
 
             this.onBlur();
             this.state.onClosed();
@@ -78,12 +79,13 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
 
         if(result) {
             this.lastSavedValue = value;
-            this.state.updateByKey('value', value, false);
+            this.state.updateByKey('value', value);
             this.state.onSubmit(value);
             this.toggleInput(false);
         }
         else {
             this.state.updateByKey('validationMsg', msg);
+            this.eventEmitter.emit('render');
         }
     }
 
@@ -92,7 +94,7 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
     }
 
     private onValueChanged(value: string) {
-        this.state.updateByKey('value', value, false);
+        this.state.updateByKey('value', value);
 
         this.updatePlaceholder();
     }

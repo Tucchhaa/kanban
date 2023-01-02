@@ -1,6 +1,5 @@
 import { BaseState } from "../base/state";
 import { noop } from "../helpers";
-import { Icon } from "../utils/icons";
 
 export type EditableFieldOptions = {
     title?: string;
@@ -122,6 +121,6 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
             onSubmit: noop
         };
 
-        super(options, defaultOptions);
+        super(defaultOptions, options);
     }
 }
