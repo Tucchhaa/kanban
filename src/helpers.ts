@@ -14,6 +14,8 @@ export const concatClasses = (classes1?: string[] | string, classes2?: string[] 
 
 export const isObject = (object: any) => object !== null && typeof(object) === 'object';
 
+export const isArray = (object: any) => Array.isArray(object);
+
 export const isDeepEqual = (object1: any, object2: any) => {
     const objKeys1 = Object.keys(object1);
     const objKeys2 = Object.keys(object2);
