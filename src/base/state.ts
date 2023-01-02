@@ -5,8 +5,6 @@ export interface OptionsType {
     [id: string]: any;
 }
 
-export type BaseStateType = IState<OptionsType>;
-
 export type StateChange = {
     name: string;
     previousValue: any;
@@ -23,17 +21,23 @@ export interface IState<TOptions extends OptionsType> {
     updateByKey(key: string, value: any): void;
 }
 
+export type BaseStateType = IState<OptionsType>;
+
 export class BaseState<TOptions extends OptionsType> extends ComponentModule implements IState<TOptions> {
     protected options: TOptions;
 
-    private changes: StateChange[] = [];
+    private changes: StateChange[];
 
-    constructor(defaultOptions: TOptions, options: TOptions) {
+    private subscribedControllers: any[];
+
+    constructor(defaultOptions: TOptions, options: TOptions, subscribedControllers: any[] = []) {
         super();
 
         this.options = clone(Object.assign({}, defaultOptions, options));
 
         this.changes = [];
+
+        this.subscribedControllers = subscribedControllers;
     }
 
     public getOptions(): TOptions {
@@ -69,7 +73,11 @@ export class BaseState<TOptions extends OptionsType> extends ComponentModule imp
     // ===
 
     private callStateChanged(changes: StateChange[]) {
-        console.log(changes);
+        for(const change of changes) {
+            for(const controller of this.subscribedControllers) {
+                this.getRequiredController(controller.name).stateChanged(change);
+            }
+        }
     }
 
     private updateRecursively(options: TOptions, updatedOptions: TOptions, path: string = "") {

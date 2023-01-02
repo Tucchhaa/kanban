@@ -17,26 +17,6 @@ export const isObject = (object: any) => object !== null && typeof(object) === '
 export const isArray = (object: any) => Array.isArray(object);
 
 export const isDeepEqual = (a: any, b: any) => {
-    // const objKeys1 = Object.keys(object1);
-    // const objKeys2 = Object.keys(object2);
-
-    // if (objKeys1.length !== objKeys2.length) return false;
-
-    // for (let key of objKeys1) {
-    //     const value1 = object1[key];
-    //     const value2 = object2[key];
-
-    //     const isObjects = isObject(value1) && isObject(value2);
-
-    //     if (
-    //         (isObjects && !isDeepEqual(value1, value2)) ||
-    //         (!isObjects && value1 !== value2)
-    //     )
-    //         return false;
-
-    // }
-    // return true;
-
     if(typeof(a) !== typeof(b) || isArray(a) !== isArray(b))
         return false;
 
@@ -57,7 +37,7 @@ export const isDeepEqual = (a: any, b: any) => {
         return true;
     }
     
-    return a !== b;
+    return a === b;
 };
 
 export const clone = (value: any) => {
@@ -82,13 +62,13 @@ export const generateID = (prefix: string = "") => {
 }
 
 export const focusEndOfContenteditable = (contentEditableElement: HTMLElement) => {
-    let range = document.createRange();//Create a range (a range is a like the selection but invisible)
-    range.selectNodeContents(contentEditableElement);//Select the entire contents of the element with the range
-    range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+    let range = document.createRange();
+    range.selectNodeContents(contentEditableElement);
+    range.collapse(false);
     
-    let selection = window.getSelection()!;//get the selection object (allows you to change selection)
-    selection.removeAllRanges();//remove any selections already made
-    selection.addRange(range);//make the range you have just created the visible selection
+    let selection = window.getSelection()!;
+    selection.removeAllRanges();
+    selection.addRange(range);
 }
 
 export const trim = (value: string) => value.trim().replace(/\s\s+/g, ' ');

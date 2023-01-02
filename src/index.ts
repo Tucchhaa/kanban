@@ -4,13 +4,10 @@ import { KanbanOptions } from "./kanban/kanban.state";
 /*
 Known issues:
 reopen editable-field - нужно передавать старое состояние при ререндере
-refactor state
 убрать методы в state которые меняют состояние. пример DropState.updateItems
 перекрытия событий в eventEmitter: решение -> добавить неймспейсы
 
 OPTIMIZATION: dragging: instead of iterating all cards on drag event, it is possible to add event listener on each card
-
-REFACTORING: разделить дроп контроллер на две части
 
 BUG:
 1) start drag

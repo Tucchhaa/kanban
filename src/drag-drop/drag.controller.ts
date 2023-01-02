@@ -1,4 +1,5 @@
 import { BaseController } from "../base/controller";
+import { StateChange } from "../base/state";
 import { mouse } from "../utils/mouse-direction";
 import { DragState } from "./drag.state";
 
@@ -27,7 +28,7 @@ export class DragController<TItem extends object> extends BaseController {
 
     private _sizes: { width: number, height: number } = { width: 50, height: 50 };
     private mouseOffset: { x: number, y: number } = { x: 50, y: 50 };
-    
+
     // ===
 
     public get item() {
@@ -40,6 +41,19 @@ export class DragController<TItem extends object> extends BaseController {
 
     public get sizes() {
         return this._sizes;
+    }
+
+    // ===
+
+    public stateChanged(change: StateChange): void {
+        switch(change.name) {
+            case "isDragging":
+            case "disabled":
+                break;
+            
+            default:
+                this.render();
+        }
     }
 
     // ===

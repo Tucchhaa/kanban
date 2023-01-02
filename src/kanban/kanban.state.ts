@@ -1,5 +1,6 @@
 import { BaseState } from "../base/state";
 import { Column } from "../types";
+import { KanbanController } from "./kanban.controller";
 
 export type KanbanOptions = {
     columns?: Column[];
@@ -17,7 +18,7 @@ export class KanbanState extends BaseState<KanbanOptions> {
             columns: []
         };
 
-        super(defaultOptions, options);
+        super(defaultOptions, options, [KanbanController]);
     }
 
     public createColumn(column: Column) {

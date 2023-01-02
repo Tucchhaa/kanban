@@ -1,4 +1,5 @@
 import { BaseState } from "../base/state";
+import { DragController } from "./drag.controller";
 
 type DragOptions = {
     isDragging?: boolean;
@@ -20,6 +21,6 @@ export class DragState extends BaseState<DragOptions> {
             disabled: false
         };
 
-        super(options, defaultOptions);
+        super(options, defaultOptions, [DragController]);
     }
 }

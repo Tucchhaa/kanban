@@ -1,4 +1,6 @@
 import { BaseController } from "../base/controller";
+import { StateChange } from "../base/state";
+import { isDeepEqual } from "../helpers";
 import { Card } from "../types";
 import { ColumnState } from "./column.state";
 import { ColumnView } from "./column.view";
@@ -14,29 +16,41 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
             .on('update-items-order', this.onUpdateCardsOrder.bind(this));
     }
 
+    public stateChanged(change: StateChange): void {
+        switch(change.name) {
+            case 'column.name':
+                break;
+
+            case 'column.cards':
+                const previousOrder = change.previousValue.map((card: Card) => card.id);
+                const currentOrder = change.value.map((card: Card) => card.id);
+
+                const isOrderChanged = !isDeepEqual(previousOrder, currentOrder); 
+
+                if(isOrderChanged)
+                    this.render();
+
+                break;
+
+            default:
+                this.render();
+        }
+        this.eventEmitter.emit('update-column', this.state.column);
+    }
+
     private onChangeColumnName(newName: string) {
         this.state.updateByKey('column.name', newName);
-
-        this.eventEmitter.emit('update-column', this.state.column);
     }
 
     private onCreateNewCard(cardName: string) {
         this.state.createCard(new Card(cardName));
-        this.eventEmitter.emit('render');
-
-        this.eventEmitter.emit('update-column', this.state.column);
     }
 
     private onUpdateCard(card: Card) {
         this.state.updateCard(card.id, card);
-
-        this.eventEmitter.emit('update-column', this.state.column);
     }
 
     private onUpdateCardsOrder(cards: Card[]) {
         this.state.updateCards(cards);
-        this.eventEmitter.emit('render');
-        
-        this.eventEmitter.emit('update-column', this.state.column);
     }
 }
