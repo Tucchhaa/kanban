@@ -9,6 +9,7 @@ export type StateChange = {
     name: string;
     previousValue: any;
     value: any;
+    state: BaseStateType;
 }
 
 export interface IState<TOptions extends OptionsType> {
@@ -88,7 +89,8 @@ export class BaseState<TOptions extends OptionsType> extends ComponentModule imp
                 this.changes.push({
                     name: path,
                     previousValue: clone(options),
-                    value: newValue
+                    value: newValue,
+                    state: this
                 });
     
                 options.splice(0, options.length, ...newValue);
@@ -110,7 +112,8 @@ export class BaseState<TOptions extends OptionsType> extends ComponentModule imp
                     this.changes.push({
                         name: fullName,
                         previousValue: currentValue,
-                        value: newValue
+                        value: newValue,
+                        state: this
                     });
 
                     options[key] = newValue;
