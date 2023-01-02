@@ -3,12 +3,17 @@ import { noop } from "../helpers";
 
 export type ButtonOptions = {
     text?: string;
+    className?: string;
     onClick?: (event: MouseEvent) => any;
 }
 
 export class ButtonState extends BaseState<ButtonOptions> {
     get text() {
         return this.options.text!;
+    }
+
+    get className() {
+        return this.options.className!;
     }
 
     get onClick() {
@@ -18,6 +23,7 @@ export class ButtonState extends BaseState<ButtonOptions> {
     constructor(state: ButtonOptions) {
         const defaultOptions = {
             text: "button",
+            className: "",
             onClick: noop
         };
         

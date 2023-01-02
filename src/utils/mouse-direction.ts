@@ -1,4 +1,4 @@
-export class MouseDirection { 
+export class Mouse { 
     private _horizontal?: 'left' | 'right';
     public get horizontal() {
         return this._horizontal!;
@@ -12,18 +12,34 @@ export class MouseDirection {
     private oldX: number = 0;
     private oldY: number = 0;
 
-    public setMousePosition(e: MouseEvent) {
+    public setPosition(e: MouseEvent) {
+        this.calculateDirection(e);
+
         this.oldX = e.clientX;
         this.oldY = e.clientY; 
     }
 
-    public calculateMouseDirection(e: MouseEvent) {
+    public getPosition() {
+        return {x: this.oldX, y: this.oldY };
+    }
+
+    public calculateDirection(e: MouseEvent) {
         if(this.oldX !== e.clientX)
             this._horizontal = this.oldX > e.clientX ? 'left' : 'right';
 
         if(this.oldY !== e.clientY)
             this._vertical = this.oldY > e.clientY ? 'up' : 'down';
+    }
 
-        this.setMousePosition(e);
+    public isInsideElement(element: HTMLElement) {
+        const mousePosition = this.getPosition();
+        const elementPosition = element instanceof DOMRect ? element : element.getBoundingClientRect();
+    
+        return (
+            mousePosition.x >= elementPosition.x  && mousePosition.x <= elementPosition.x + elementPosition.width &&
+            mousePosition.y >= elementPosition.y  && mousePosition.y <= elementPosition.y + elementPosition.height 
+        );
     }
 }; 
+
+export const mouse = new Mouse();

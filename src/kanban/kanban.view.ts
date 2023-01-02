@@ -3,7 +3,10 @@ import { ColumnOptions } from "../column/column.state";
 import { ColumnComponent } from "../components/column.component";
 import { EditableFieldComponent } from "../components/editable-field.component";
 import { EditableFieldOptions } from "../editable-field/editable-field.state";
+import { trim } from "../helpers";
 import { Column } from "../types";
+import { Icon } from "../utils/icons";
+import { columnNameValidation } from "../utils/validation";
 import { KanbanState } from "./kanban.state";
 
 export class KanbanView extends BaseView<KanbanState> {
@@ -42,17 +45,12 @@ export class KanbanView extends BaseView<KanbanState> {
             title: '+ Add new column',
             placeholder: 'Enter new column\'s name',
             
-            prepareValue: (value: string) => value.trim().replace(/\s\s+/g, ' '),
-            onSubmit: (value: string) => this.eventEmitter.emit('create-new-column', value),
-            validation: (value: string) => {
-                if(value.length === 0)
-                    return [false, 'Column name can\'t be empty'];
-                
-                if(value.length > 40)
-                    return [false, 'Column name is too long'];
+            submitBtnContent: 'create',
+            cancelBtnContent: Icon.cross.outerHTML,
 
-                return [true, ''];
-            }
+            prepareValue: trim,
+            onSubmit: (value: string) => this.eventEmitter.emit('create-new-column', value),
+            validation: columnNameValidation
         };
         
         this.createComponent(addColumnContainer, EditableFieldComponent, options, 'add-column-field');

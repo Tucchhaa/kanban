@@ -3,9 +3,9 @@ import { CardOptions, CardState } from "../card/card.state";
 import { CardView } from "../card/card.view";
 import { BaseComponent } from "../base/component";
 import { DragController } from "../drag-drop/drag.controller";
-import { BaseController } from "../base/controller";
 import { DragState } from "../drag-drop/drag.state";
 import { DragView } from "../drag-drop/drag.view";
+import { CardController } from "../card/card.controller";
 
 export class CardComponent extends BaseComponent<CardOptions, CardState, CardView> {
     constructor(container: HTMLElement | null, cardOptions: CardOptions) {
@@ -18,11 +18,5 @@ export class CardComponent extends BaseComponent<CardOptions, CardState, CardVie
         this.registerController(() => new DragController<Card>(this.state.card));
         
         super.render();
-    }
-}
-
-class CardController extends BaseController {
-    constructor() {
-        super();
     }
 }

@@ -1,7 +1,3 @@
-export const isDefined = (x: any) => x !== null && x !== undefined;
-
-export const isUndefined = (x: any) => x === undefined;
-
 export const noop = () => {};
 
 export const processClasses = (classes?: string[] | string) => {
@@ -54,11 +50,4 @@ export const focusEndOfContenteditable = (contentEditableElement: HTMLElement) =
     selection.addRange(range);//make the range you have just created the visible selection
 }
 
-export const isMouseInsideElement = (e: MouseEvent, element: HTMLElement | DOMRect) => {
-    const position = element instanceof DOMRect ? element : element.getBoundingClientRect();
-
-    return (
-        e.clientX >= position.x  && e.clientX <= position.x + position.width &&
-        e.clientY >= position.y  && e.clientY <= position.y + position.height 
-    );
-}
+export const trim = (value: string) => value.trim().replace(/\s\s+/g, ' ');

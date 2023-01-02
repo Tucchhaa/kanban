@@ -71,7 +71,7 @@ export abstract class BaseView<TState extends BaseStateType = BaseStateType> ext
         return element;
     }
 
-    protected createComponent(container: HTMLElement, componentType: ComponentClass, options: object, key?: string) {
+    protected createComponent(container: HTMLElement, componentType: ComponentClass, options: object, key?: string): BaseComponentType {
         const newComponent = new componentType(container, options);
         key = key ?? newComponent.constructor.name;
 

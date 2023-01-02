@@ -23,9 +23,17 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
 
     private renderClosed(fragment: DocumentFragment) {
         const btn = this.createDOMElement('div', 'title');
+        const open = () => this.eventEmitter.emit('open');
 
-        btn.innerText = this.state.showValue ? this.state.value : this.state.title;
-        btn.addEventListener('click', () => this.eventEmitter.emit('open'));
+        if(this.state.titleTemplate) {
+            const template = this.state.titleTemplate(open);
+
+            template && btn.appendChild(template);
+        }
+        else {
+            btn.innerText = this.state.title ? this.state.title : this.state.value;
+            btn.addEventListener('click', open);
+        }
 
         fragment.appendChild(btn);
     }
@@ -66,8 +74,8 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
         
         input.addEventListener('input', () => this.eventEmitter.emit('value-changed', input.innerText));
         input.addEventListener('keydown', (e: KeyboardEvent) => e.key === 'Enter' && this.eventEmitter.emit('enter-pressed'));
-        input.addEventListener('focusin', () => this.eventEmitter.emit('focusin'));
-        input.addEventListener('focusout', () => this.eventEmitter.emit('focusout'));
+        input.addEventListener('focus', () => this.eventEmitter.emit('focus'));
+        input.addEventListener('blur', (e: FocusEvent) => this.eventEmitter.emit('blur', e));
 
         input.innerText = this.state.value;
 
@@ -96,13 +104,15 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
         
             const submitBtn = this.createDOMElement('span');
             this.createComponent(submitBtn, ButtonComponent, {
-                text: 'submit', 
+                className: 'submit',
+                text: this.state.submitBtnContent, 
                 onClick: submitAction
             }, 'submit-btn');
 
             const cancelBtn = this.createDOMElement('span');
             this.createComponent(cancelBtn, ButtonComponent, {
-                text: 'cancel', 
+                className: 'cancel',
+                text: this.state.cancelBtnContent, 
                 onClick: closeAction
             }, 'cancel-btn');
             

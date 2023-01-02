@@ -10,10 +10,6 @@ export class ColumnState extends BaseState<ColumnOptions> {
         return this.options.column!;
     }
 
-    public get columnCards() {
-        return this.options.column!.cards!;
-    }
-
     constructor(options: ColumnOptions) {
         const defaultOptions: ColumnOptions = {
             column: new Column('__empty-column__'),
@@ -27,7 +23,7 @@ export class ColumnState extends BaseState<ColumnOptions> {
     }
 
     public addCard(card: Card) {
-        const updatedCards = [...this.columnCards!, card];
+        const updatedCards = [...this.column.cards, card];
 
         this.updateCards(updatedCards);
     }

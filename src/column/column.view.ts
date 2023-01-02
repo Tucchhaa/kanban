@@ -5,6 +5,9 @@ import { EditableFieldComponent } from "../components/editable-field.component";
 import { EditableFieldOptions } from "../editable-field/editable-field.state";
 import { CardOptions } from "../card/card.state";
 import { BaseView } from "../base/view";
+import { Icon } from "../utils/icons";
+import { cardNameValidation, columnNameValidation } from "../utils/validation";
+import { trim } from "../helpers";
 
 export class ColumnView extends BaseView<ColumnState> {
     public draggableAreaElement?: HTMLElement;
@@ -15,8 +18,8 @@ export class ColumnView extends BaseView<ColumnState> {
     }
 
     protected _render(fragment: DocumentFragment): void {
-        this.renderHeading(fragment, this.state.column.name!);
-        this.renderContent(fragment, this.state.columnCards);
+        this.renderHeading(fragment, this.state.column.name);
+        this.renderContent(fragment, this.state.column.cards);
         this.renderAddCard(fragment);
     }
 
@@ -25,21 +28,15 @@ export class ColumnView extends BaseView<ColumnState> {
 
         const options: EditableFieldOptions = {
             value: text,
-            showValue: true,
+            placeholder: 'Column\'s name',
 
             submitOnOutsideClick: true,
+            resetValueOnClosed: false,
+
             buttonsTemplate: (close: () => void, submit: () => void) => { return undefined; },
             
-            prepareValue: (value: string) => value.trim().replace(/\s\s+/g, ' '),
-            validation: (value: string) => {
-                if(value.length === 0)
-                    return [false, 'Column name can\'t be empty'];
-                
-                if(value.length > 40)
-                    return [false, 'Column name is too long'];
-
-                return [true, ''];
-            },
+            prepareValue: trim,
+            validation: columnNameValidation,
             
             onSubmit: (value: string) => this.eventEmitter.emit('change-column-name', value),
             onOpened: () => this.eventEmitter.emit('disable-drag'),
@@ -79,17 +76,12 @@ export class ColumnView extends BaseView<ColumnState> {
             title: '+ Add new card',
             placeholder: 'Enter new card\'s name',
 
-            prepareValue: (value: string) => value.trim().replace(/\s\s+/g, ' '),
-            onSubmit: (value: string) => this.eventEmitter.emit('create-new-card', value),
-            validation: (value: string) => {
-                if(value.length === 0)
-                    return [false, 'Card name can\'t be empty'];
-                
-                if(value.length > 120)
-                    return [false, 'Card name is too long'];
+            submitBtnContent: 'create',
+            cancelBtnContent: Icon.cross.outerHTML,
 
-                return [true, ''];
-            }
+            prepareValue: trim,
+            onSubmit: (value: string) => this.eventEmitter.emit('create-new-card', value),
+            validation: cardNameValidation
         };
         this.createComponent(addCardContainer, EditableFieldComponent, options, 'add-card-field');
         

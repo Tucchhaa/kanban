@@ -1,18 +1,24 @@
 import { BaseState } from "../base/state";
 import { noop } from "../helpers";
+import { Icon } from "../utils/icons";
 
 export type EditableFieldOptions = {
     title?: string;
     value?: string;
     // if true, editable field show value instead of title. In helps to 
-    showValue?: boolean;
     placeholder?: string;
 
     isOpen?: boolean;
     validationMsg?: string | null;
 
     submitOnOutsideClick?: boolean;
-    buttonsTemplate?: (close: () => void, submit: () => void) => HTMLElement | undefined,
+    resetValueOnClosed?: boolean;
+
+    titleTemplate?: (open: () => void) => Node | undefined;
+    buttonsTemplate?: (close: () => void, submit: () => void) => Node | undefined,
+
+    submitBtnContent?: string;
+    cancelBtnContent?: string;
     
     prepareValue?: (value: string) => string,
     onSubmit?: (value: string) => void;
@@ -30,14 +36,11 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
         return this.options.value!;
     }
 
-    get showValue() {
-        return this.options.showValue!;
-    }
-
     get placeholder() {
         return this.options.placeholder!;
     }
 
+    // ===
 
     get isOpen() {
         return this.options.isOpen!;
@@ -51,10 +54,29 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
         return this.options.submitOnOutsideClick!;
     }
 
+    get resetValueOnClosed() {
+        return this.options.resetValueOnClosed!;
+    }
+
+    // ===
+
+    get titleTemplate() {
+        return this.options.titleTemplate;
+    }
+
     get buttonsTemplate() {
         return this.options.buttonsTemplate;
     }
 
+    get submitBtnContent() {
+        return this.options.submitBtnContent!;
+    }
+
+    get cancelBtnContent() {
+        return this.options.cancelBtnContent!;
+    }
+
+    // ===
 
     get prepareValue() {
         return this.options.prepareValue!;
@@ -78,16 +100,20 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
 
     constructor(options: EditableFieldOptions) {
         const defaultOptions: EditableFieldOptions = {
-            title: 'toggle',
+            title: "",
             value: "",
-            showValue: false,
             placeholder: "",
 
             isOpen: false,
             validationMsg: null,
             
             submitOnOutsideClick: false,
+            resetValueOnClosed: true,
+
+            titleTemplate: undefined,
             buttonsTemplate: undefined,
+            submitBtnContent: 'submit',
+            cancelBtnContent: 'cancel',
 
             prepareValue: value => value,
             validation: () => [true, ""],

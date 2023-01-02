@@ -60,12 +60,10 @@ export class EventEmitter implements IEventEmitter, IClearable {
 
     public onMany(events: string[], listener: CallableFunction): EventEmitter {
         for(const event of events) {
-
             if(!this.events[event])
                 this.events[event] = [];
 
             this.events[event].push(listener);
-            
         }
 
         return this;
@@ -73,16 +71,18 @@ export class EventEmitter implements IEventEmitter, IClearable {
 
     public unsubscribe(event: string, listener: CallableFunction): IEventEmitter {
         this.events[event] = this.events[event].filter(_listener => _listener !== listener);
-        
+
         return this;
     }
 
     public emit(event: string, ...param: any) {
-        for(const listener of this.onAnyListeners) {
+        for(let i=0; i < this.onAnyListeners.length; i++) {
+            const listener = this.onAnyListeners[i];
             listener(event, ...param);
         }
         
-        for(const listener of (this.events[event] ?? [])) {
+        for(let i=0; i < this.events[event]?.length; i++) {
+            const listener = this.events[event][i];
             listener(...param);
         }
 
