@@ -26,7 +26,7 @@ export class DragController<TItem extends object> extends BaseController {
     }
 
     private _sizes: { width: number, height: number } = { width: 50, height: 50 };
-    private offset: { x: number, y: number } = { x: 50, y: 50 };
+    private mouseOffset: { x: number, y: number } = { x: 50, y: 50 };
     
     // ===
 
@@ -53,9 +53,9 @@ export class DragController<TItem extends object> extends BaseController {
         this.element.style.cursor = 'grabbing';
 
         this._sizes = this.getElementSizes(this._element);
-        this.offset = this.getMouseOffsetInElement(this._element, e);
+        this.mouseOffset = this.getMouseOffsetInElement(this._element, e);
 
-        this._element.style.position = 'absolute';
+        this._element.style.position = 'fixed';
         this._element.style.width = this._sizes.width + 'px';
         this._element.style.height = this._sizes.height + 'px';
 
@@ -64,8 +64,9 @@ export class DragController<TItem extends object> extends BaseController {
 
     private onDrag(e: MouseEvent) {
         mouse.setPosition(e);
-        this._element.style.top = (e.clientY - this.offset.y) + 'px';
-        this._element.style.left = (e.clientX - this.offset.x) + 'px';
+
+        this._element.style.top = (e.clientY - this.mouseOffset.y) + 'px';
+        this._element.style.left = (e.clientX - this.mouseOffset.x) + 'px';
     }
     
     private dragEnd(e: MouseEvent) {
@@ -104,9 +105,11 @@ export class DragController<TItem extends object> extends BaseController {
     }
 
     private getMouseOffsetInElement(element: HTMLElement, e: MouseEvent) {
+        const position = element.getBoundingClientRect();
+
         return {
-            x: e.clientX - element.offsetLeft,
-            y: e.clientY - element.offsetTop
+            x: e.clientX - position.left,
+            y: e.clientY - position.top
         };
     }
 

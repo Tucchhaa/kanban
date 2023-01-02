@@ -53,7 +53,7 @@ window.addEventListener("load", () => {
                 { id: 9, name: 'card 1' }, { id: 10, name: 'card 2' }, { id: 11, name: 'card 3' },
                 { id: 12, name: 'card 4' }, { id: 13, name: 'card 5' }, { id: 14, name: 'card 6' },
                 { id: 15, name: 'card 7' }, { id: 16, name: 'card 8' }, { id: 17, name: 'card 9' },
-                { id: 20, name: 'card 6' },
+                { id: 20, name: 'card 10' },
             ]
         }]
     }

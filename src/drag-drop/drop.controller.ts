@@ -10,7 +10,7 @@ export class DropController<TItem extends object> extends BaseController {
     private draggingDirection: 'horizontal' | 'vertical';
 
     public drags: DragController<TItem>[] = [];
-    private dragsContainer?: HTMLElement;
+    private dropContainer?: HTMLElement;
 
     private shadowElement: HTMLElement = document.createElement('div');
     private shadowIndex: number = -1;
@@ -35,7 +35,7 @@ export class DropController<TItem extends object> extends BaseController {
 
         this.eventEmitter
             .on('process-drag', this.onProcessDrag.bind(this))
-            .on('drags-container-rendered', (dragsContainer: HTMLElement) => this.dragsContainer = dragsContainer);
+            .on('drags-container-rendered', (dragsContainer: HTMLElement) => this.dropContainer = dragsContainer);
     }
 
     // ===
@@ -80,7 +80,7 @@ export class DropController<TItem extends object> extends BaseController {
     private drag(e: MouseEvent, dragController: DragController<TItem>) {
         const direction = this.dropState.direction;
         const isInsertBefore = this.isInsertBefore();
-        const dropPosition = this.dragsContainer!.getBoundingClientRect();
+        const dropPosition = this.dropContainer!.getBoundingClientRect();
         const currentDragElement = dragController.element;
 
         // Shadow above or left
@@ -90,9 +90,9 @@ export class DropController<TItem extends object> extends BaseController {
         ) {
             this.shadowIndex = 0;
 
-            this.dragsContainer?.children.length ?
-                this.dragsContainer!.firstChild?.before(this.shadowElement) :
-                this.dragsContainer!.appendChild(this.shadowElement);
+            this.dropContainer?.children.length ?
+                this.dropContainer!.firstChild?.before(this.shadowElement) :
+                this.dropContainer!.appendChild(this.shadowElement);
         }
         // Shadow below or right
         else if(
@@ -101,9 +101,9 @@ export class DropController<TItem extends object> extends BaseController {
         ) {
             this.shadowIndex = this.drags.length;
 
-            this.dragsContainer?.children.length ?
-                this.dragsContainer!.lastChild?.after(this.shadowElement) :
-                this.dragsContainer!.appendChild(this.shadowElement);
+            this.dropContainer?.children.length ?
+                this.dropContainer!.lastChild?.after(this.shadowElement) :
+                this.dropContainer!.appendChild(this.shadowElement);
         }
         // Shadow inside
         else  {

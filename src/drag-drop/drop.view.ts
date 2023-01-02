@@ -9,8 +9,8 @@ export class DropView<TState extends BaseStateType = BaseStateType> extends Base
     }
 
     protected _render(fragment: DocumentFragment): void {
-        const dragsContainer = (this.view as any).dragsContainer ?? this.container;
+        const dropContainer = (this.view as any).dragsContainer ?? this.container;
 
-        this.eventEmitter.emit('drags-container-rendered', dragsContainer);
+        this.eventEmitter.emit('drags-container-rendered', dropContainer);
     }
 }
