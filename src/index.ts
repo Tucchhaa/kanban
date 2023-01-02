@@ -21,6 +21,7 @@ local storage
 delete card
 scroll to down when adding card
 save scroll position on renders
+implement renderElements on all components
 */
 
 window.addEventListener("load", () => {    

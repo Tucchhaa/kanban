@@ -26,6 +26,9 @@ export class KanbanController extends BaseController<KanbanState, KanbanView> {
                 if(isOrderChanged)
                     this.render();
 
+                // if(change.value.length !== change.previousValue.length)
+                //     this.render();
+
                 break;
 
             default:

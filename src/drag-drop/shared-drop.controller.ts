@@ -11,14 +11,14 @@ export class SharedDropController<TItem extends object> extends BaseController {
 
         this.dropController = this.getRequiredController<DropController<TItem>>(DropController.name);
     
-        this.eventEmitter.on('process-shared-drag', this.onProcessSharedDrag.bind(this));
+        this.eventEmitter.on('process-drag', this.onProcessDrag.bind(this));
     }
 
     public get columnName() {
         return this.dropController.columnName;
     }
 
-    public onProcessSharedDrag(dragComponent: BaseComponentType | DragController<TItem>) {
+    public onProcessDrag(dragComponent: BaseComponentType | DragController<TItem>) {
         const dragController = 
             dragComponent instanceof BaseComponent ?
             dragComponent.getRequiredController<DragController<TItem>>(DragController.name) : dragComponent;
@@ -43,7 +43,7 @@ export class SharedDropController<TItem extends object> extends BaseController {
     }
 
     public onSharedDragStart(e: MouseEvent, dragController: DragController<TItem>) {
-        this.onProcessSharedDrag(dragController);
+        this.onProcessDrag(dragController);
         this.dropController.onProcessDrag(dragController);
 
         this.dropController.startDrag(e, dragController);

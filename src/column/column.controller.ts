@@ -1,5 +1,6 @@
 import { BaseController } from "../base/controller";
 import { StateChange } from "../base/state";
+import { DropController } from "../drag-drop/drop.controller";
 import { isDeepEqual } from "../helpers";
 import { Card } from "../types";
 import { ColumnState } from "./column.state";
@@ -22,14 +23,15 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
                 break;
 
             case 'column.cards':
-                const previousOrder = change.previousValue.map((card: Card) => card.id);
-                const currentOrder = change.value.map((card: Card) => card.id);
+                if(change.value.length !== change.previousValue.length) {
+                    const contentContainer = this.view.getElementContainer('content');
+                    const { scrollTop } = contentContainer;
+                
+                    this.getRequiredController(DropController.name).clear();
+                    this.view.renderElement('content');
 
-                const isOrderChanged = !isDeepEqual(previousOrder, currentOrder); 
-
-                if(isOrderChanged)
-                    this.render();
-
+                    contentContainer.scrollTop = scrollTop;
+                }
                 break;
 
             default:

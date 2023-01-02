@@ -18,16 +18,18 @@ export class ColumnView extends BaseView<ColumnState> {
     }
 
     protected _render(fragment: DocumentFragment): void {
-        this.renderHeading(fragment, this.state.column.name);
-        this.renderContent(fragment, this.state.column.cards);
-        this.renderAddCard(fragment);
+        fragment.append(
+            this.createRenderElement('heading', this.createDOMElement('div', 'heading'), this.renderHeading.bind(this)),
+            this.createRenderElement('content', this.createDOMElement('div', 'content'), this.renderContent.bind(this)),
+            this.createRenderElement('add-card', this.createDOMElement('div', 'add-card'), this.renderAddCard.bind(this)),
+        );
     }
 
-    private renderHeading(fragment: DocumentFragment, text: string) {
-        const headingContainer = this.createDOMElement('div', 'heading');
+    private renderHeading(container: HTMLElement) {
+        this.draggableAreaElement = container;
 
         const options: EditableFieldOptions = {
-            value: text,
+            value: this.state.column.name,
             placeholder: 'Column\'s name',
 
             submitOnOutsideClick: true,
@@ -42,36 +44,25 @@ export class ColumnView extends BaseView<ColumnState> {
             onOpened: () => this.eventEmitter.emit('disable-drag'),
             onClosed: () => this.eventEmitter.emit('enable-drag')
         };
-        this.createComponent(headingContainer, EditableFieldComponent, options, 'heading-field');
-        
-        this.draggableAreaElement = headingContainer;
-
-        fragment.appendChild(headingContainer);
+        this.createComponent(container, EditableFieldComponent, options, 'heading-field');
     }
 
-    private renderContent(fragment: DocumentFragment, cards: Card[]) {
-        const content = this.createDOMElement('div', 'content');
+    private renderContent(container: HTMLElement) {
+        this.dragsContainer = container;
 
-        for(let index = 0; index < cards.length; index++) {
-            const card = cards[index];
+        for(const card of this.state.column.cards) {
             const cardContainer = this.createDOMElement('div');
 
             const cardOptions: CardOptions = { card };
             const cardCompoment = this.createComponent(cardContainer, CardComponent, cardOptions, `card${card.id}`);
 
-            setTimeout(() => this.eventEmitter.emit('process-shared-drag', cardCompoment));
             setTimeout(() => this.eventEmitter.emit('process-drag', cardCompoment));
             
-            content.appendChild(cardContainer);
+            container.appendChild(cardContainer);
         }
-
-        this.dragsContainer = content;
-        fragment.appendChild(content);
     }
 
-    private renderAddCard(fragment: DocumentFragment) {
-        const addCardContainer = this.createDOMElement('div', 'add-card');
-
+    private renderAddCard(container: HTMLElement) {
         const options: EditableFieldOptions = {
             title: '+ Add new card',
             placeholder: 'Enter new card\'s name',
@@ -83,8 +74,6 @@ export class ColumnView extends BaseView<ColumnState> {
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-card', value),
             validation: cardNameValidation
         };
-        this.createComponent(addCardContainer, EditableFieldComponent, options, 'add-card-field');
-        
-        fragment.append(addCardContainer);
+        this.createComponent(container, EditableFieldComponent, options, 'add-card-field');
     }
 }
