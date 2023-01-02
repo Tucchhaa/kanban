@@ -1,11 +1,11 @@
 import { BaseState } from "../base/state";
 import { noop } from "../helpers";
-import { Icon } from "../utils/icons";
+import { EditableFieldController } from "./editable-field.controller";
 
 export type EditableFieldOptions = {
     title?: string;
     value?: string;
-    // if true, editable field show value instead of title. In helps to 
+
     placeholder?: string;
 
     isOpen?: boolean;
@@ -122,6 +122,6 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
             onSubmit: noop
         };
 
-        super(options, defaultOptions);
+        super(defaultOptions, options, [EditableFieldController]);
     }
 }

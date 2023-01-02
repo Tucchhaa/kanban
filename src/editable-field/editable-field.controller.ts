@@ -1,4 +1,5 @@
 import { BaseController } from "../base/controller";
+import { StateChange } from "../base/state";
 import { focusEndOfContenteditable } from "../helpers";
 import { EditableFieldState } from "./editable-field.state";
 import { EditableFieldView } from "./editable-field.view";
@@ -24,6 +25,16 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
             .on('value-changed', this.onValueChanged.bind(this));
     }
 
+    public stateChanged(change: StateChange): void {
+        switch(change.name) {
+            case 'value':
+                break;
+
+            default:
+                this.render();
+        }
+    }
+
     private focusInput() {
         const input = this.view.input as HTMLInputElement|undefined;
 
@@ -45,7 +56,7 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
             this.state.onOpened();
         }
         else {
-            this.state.resetValueOnClosed && this.state.updateByKey('value', '', false);
+            this.state.resetValueOnClosed && this.state.updateByKey('value', '');
 
             this.onBlur();
             this.state.onClosed();
@@ -78,7 +89,7 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
 
         if(result) {
             this.lastSavedValue = value;
-            this.state.updateByKey('value', value, false);
+            this.state.updateByKey('value', value);
             this.state.onSubmit(value);
             this.toggleInput(false);
         }
@@ -92,7 +103,7 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
     }
 
     private onValueChanged(value: string) {
-        this.state.updateByKey('value', value, false);
+        this.state.updateByKey('value', value);
 
         this.updatePlaceholder();
     }

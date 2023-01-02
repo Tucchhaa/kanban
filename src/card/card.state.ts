@@ -15,6 +15,6 @@ export class CardState extends BaseState<CardOptions> {
             card: new Card("__empty-card__")
         }
         
-        super(options, defaultOptions);
+        super(defaultOptions, options);
     }
 }

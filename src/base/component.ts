@@ -1,4 +1,4 @@
-import { BaseState, BaseStateType } from "../base/state";
+import { BaseStateType, IState } from "../base/state";
 import { BaseView } from "../base/view";
 import { Dictionary } from "../types";
 import { ComponentModule, ComponentProps } from "./component-module";
@@ -6,11 +6,11 @@ import { BaseController } from "./controller";
 import { EventEmitter, IEventEmitter } from "./event-emitter";
 import { IClearable } from "./idisposable"; 
 
-export type BaseComponentType = BaseComponent<object, BaseState<object>, BaseView>;
+export type BaseComponentType = BaseComponent<object, IState<object>, BaseView>;
 
 export class BaseComponent<
     TOptions extends object, 
-    TState extends BaseState<TOptions>, 
+    TState extends IState<TOptions>, 
     TView extends BaseView
 > implements IClearable {
     private _name: string;
@@ -28,7 +28,7 @@ export class BaseComponent<
         stateType: new(options: TOptions) => TState, 
         viewType: new(container: HTMLElement) => TView, 
         container: HTMLElement | null, 
-        options: TOptions | TState
+        options: TOptions
     ) {
         if(!container) {
             throw new Error(`${name}Component container is not defined`);
@@ -40,9 +40,7 @@ export class BaseComponent<
         
         // === Create state
 
-        options instanceof BaseState ?
-            this._state = options :
-            this._state = this.createComponentModule(() => new stateType(options));
+        this._state = this.createComponentModule(() => new stateType(options));
 
         this.registerState(() => this._state);
 

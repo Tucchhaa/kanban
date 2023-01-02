@@ -10,9 +10,7 @@ export class CardController extends BaseController<CardState> {
     }
 
     private onChangeCardName(newName: string) {
-        this.state.updateBy(state => {
-            state.card!.name = newName;
-        }, false);
+        this.state.updateByKey('card.name', newName);
 
         this.eventEmitter.emit('update-card', this.state.card);
     }

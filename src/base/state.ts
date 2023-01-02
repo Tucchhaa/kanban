@@ -1,86 +1,132 @@
-import { isObject } from "../helpers";
+import { clone, isArray, isDeepEqual, isObject } from "../helpers";
 import { ComponentModule } from "./component-module";
 
 export interface OptionsType {
     [id: string]: any;
 }
 
+export type StateChange = {
+    name: string;
+    previousValue: any;
+    value: any;
+    state: BaseStateType;
+}
+
 export interface IState<TOptions extends OptionsType> {
     getOptions(): TOptions;
 
-    update(newOptions: TOptions, needRender: boolean): void;
+    update(updatedOptions: TOptions): void;
 
-    updateBy(func: (options: TOptions) => void, needRender: boolean): void;
+    updateBy(func: (options: TOptions) => void): void;
 
-    updateByKey(key: string, value: any, needRender: boolean): void;
+    updateByKey(key: string, value: any): void;
 }
 
-export type BaseStateType = BaseState<OptionsType>;
+export type BaseStateType = IState<OptionsType>;
 
-export class BaseState<TOptions extends OptionsType> extends ComponentModule {
+export class BaseState<TOptions extends OptionsType> extends ComponentModule implements IState<TOptions> {
     protected options: TOptions;
 
-    constructor(options: TOptions, defaultOptions: TOptions) {
+    private changes: StateChange[];
+
+    private subscribedControllers: any[];
+
+    constructor(defaultOptions: TOptions, options: TOptions, subscribedControllers: any[] = []) {
         super();
 
-        this.options = this.updateRecusively(defaultOptions, options);
+        this.options = clone(Object.assign({}, defaultOptions, options));
+
+        this.changes = [];
+
+        this.subscribedControllers = subscribedControllers;
     }
 
-    public update(newOptions: TOptions, needRender = true) {
-        this.options = this.updateRecusively(Object.assign({}, this.options), newOptions);
-
-        if(needRender) {
-            this.eventEmitter.emit('render');
-        }
+    public getOptions(): TOptions {
+        return this.options;
     }
 
-    private updateRecusively(options: TOptions, newOptions: TOptions) {
-        for(const key in newOptions) {
-            if(!this.checkKey(options, key) || newOptions[key] === undefined)
-                continue;
-            
-            if(isObject(options[key]) && isObject(newOptions[key]))
-                (options[key] as OptionsType) = this.updateRecusively(options[key], newOptions[key]);
-            else 
-                options[key] = newOptions[key];
-        } 
+    public update(updatedOptions: TOptions) {
+        this.changes = [];
+        this.updateRecursively(this.options, updatedOptions);
 
-        return options;
+        this.callStateChanged(this.changes);
     }
 
-    public updateByKey(key: string, value: any, needRender = true) {
-        if(!this.checkKey(this.options, key))
-            return;
+    public updateByKey(key: string, value: any): void {
+        const path = key.split('.');
 
-        (this.options[key] as OptionsType) = value;
+        if(!path.length)
+            throw new Error(`Invalid argument: key - ${key}`);
 
-        if(needRender) {
-            this.eventEmitter.emit('render');
-        }
+        const updatedOptions = this.createUpdatedOptionsByPath(path, value);
+
+        this.update(updatedOptions as TOptions);
     }
 
-    public updateBy(func: (options: TOptions) => void, needRender = true) {
-        func(this.options);
+    public updateBy(func: (options: TOptions) => void): void {
+        const updatedOptions = clone(this.options);
+
+        func(updatedOptions);
         
-        if(needRender) {
-            this.eventEmitter.emit('render');
+        this.update(updatedOptions);
+    }
+
+    // ===
+
+    private callStateChanged(changes: StateChange[]) {
+        for(const change of changes) {
+            for(const controller of this.subscribedControllers) {
+                this.getRequiredController(controller.name).stateChanged(change);
+            }
         }
     }
 
-    public get(key: string): any {
-        if(this.checkKey(this.options, key)) {
-            return this.options[key];
-        }
+    private updateRecursively(options: TOptions, updatedOptions: TOptions, path: string = "") {
+        if(isArray(options)) {
+            if(!isDeepEqual(options, updatedOptions)) {
+                const newValue = clone(updatedOptions);
 
-        return undefined;
+                this.changes.push({
+                    name: path,
+                    previousValue: clone(options),
+                    value: newValue,
+                    state: this
+                });
+    
+                options.splice(0, options.length, ...newValue);
+            }
+        }
+        else if(isObject(options)) {
+            for(const key in updatedOptions) {
+                if(!options.hasOwnProperty(key))
+                    throw new Error(`No such property: '${key}' in ${this.constructor.name}`);
+    
+                const currentValue = options[key];
+                const newValue = updatedOptions[key];
+                const fullName = path ? `${path}.${key}` : key;
+
+                if(isObject(currentValue))
+                    this.updateRecursively(currentValue, newValue, fullName);
+
+                else if(currentValue !== newValue) {
+                    this.changes.push({
+                        name: fullName,
+                        previousValue: currentValue,
+                        value: newValue,
+                        state: this
+                    });
+
+                    options[key] = newValue;
+                }
+            }
+        }
     }
 
-    private checkKey(object: TOptions, key: string) {
-        if(Array.isArray(object) || object.hasOwnProperty(key)) {
-            return true;
-        }
+    private createUpdatedOptionsByPath(path: string[], value: string): object {
+        const key = path.shift()!;
 
-        console.error(`No such property: '${key}' in ${this.constructor.name}`);
-        return false;
+        return path.length === 0 ?
+            { [key]: value } :
+            { [key]: this.createUpdatedOptionsByPath(path, value) };
     }
 }

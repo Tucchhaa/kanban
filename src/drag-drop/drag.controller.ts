@@ -1,4 +1,5 @@
 import { BaseController } from "../base/controller";
+import { StateChange } from "../base/state";
 import { mouse } from "../utils/mouse-direction";
 import { DragState } from "./drag.state";
 
@@ -27,7 +28,7 @@ export class DragController<TItem extends object> extends BaseController {
 
     private _sizes: { width: number, height: number } = { width: 50, height: 50 };
     private mouseOffset: { x: number, y: number } = { x: 50, y: 50 };
-    
+
     // ===
 
     public get item() {
@@ -44,10 +45,23 @@ export class DragController<TItem extends object> extends BaseController {
 
     // ===
 
+    public stateChanged(change: StateChange): void {
+        switch(change.name) {
+            case "isDragging":
+            case "disabled":
+                break;
+            
+            default:
+                this.render();
+        }
+    }
+
+    // ===
+
     private onDragStart(e: MouseEvent) {
         e.preventDefault();
         mouse.setPosition(e);
-        this.dragState.updateByKey('isDragging', true, false);
+        this.dragState.updateByKey('isDragging', true);
 
         this.element.classList.add('state-dragging');
         this.element.style.cursor = 'grabbing';
@@ -70,7 +84,7 @@ export class DragController<TItem extends object> extends BaseController {
     }
     
     private dragEnd(e: MouseEvent) {
-        this.dragState.updateByKey('isDragging', false, false);
+        this.dragState.updateByKey('isDragging', false);
         this.element.classList.remove('state-dragging');
 
         this.element.style.removeProperty('cursor');
@@ -115,10 +129,10 @@ export class DragController<TItem extends object> extends BaseController {
 
     // ===
     private onDisableDrag() {
-        this.dragState.updateByKey('disabled', true, false);
+        this.dragState.updateByKey('disabled', true);
     }
 
     private onEnableDrag() {
-        this.dragState.updateByKey('disabled', false, false);
+        this.dragState.updateByKey('disabled', false);
     }
 }

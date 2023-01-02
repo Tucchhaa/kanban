@@ -130,6 +130,7 @@ export class DropController<TItem extends object> extends BaseController {
     }
 
     private endDrag(e: MouseEvent, dragController: DragController<TItem>) {
+        this.shadowElement.before(dragController.element);
         this.hideShadow();
         this.updateItemsOrder(dragController);
     }

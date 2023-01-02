@@ -14,26 +14,47 @@ export const concatClasses = (classes1?: string[] | string, classes2?: string[] 
 
 export const isObject = (object: any) => object !== null && typeof(object) === 'object';
 
-export const isDeepEqual = (object1: any, object2: any) => {
-    const objKeys1 = Object.keys(object1);
-    const objKeys2 = Object.keys(object2);
+export const isArray = (object: any) => Array.isArray(object);
 
-    if (objKeys1.length !== objKeys2.length) return false;
+export const isDeepEqual = (a: any, b: any) => {
+    if(typeof(a) !== typeof(b) || isArray(a) !== isArray(b))
+        return false;
 
-    for (let key of objKeys1) {
-        const value1 = object1[key];
-        const value2 = object2[key];
+    else if(isObject(a)) {
+        const keys1 = Object.keys(a);
+        const keys2 = Object.keys(b);
 
-        const isObjects = isObject(value1) && isObject(value2);
+        if (keys1.length !== keys2.length) return false;
 
-        if (
-            (isObjects && !isDeepEqual(value1, value2)) ||
-            (!isObjects && value1 !== value2)
-        )
-            return false;
+        for (let key of keys1) {
+            const value1 = a[key];
+            const value2 = b[key];
 
+            if (!isDeepEqual(value1, value2))
+                return false;
+
+        }
+        return true;
     }
-    return true;
+    
+    return a === b;
+};
+
+export const clone = (value: any) => {
+    if(isArray(value)) {
+        return value.map((item: any) => clone(item));
+    }
+    else if(isObject(value)) {
+        const result = {};
+
+        for(const key in value)
+            (result as any)[key] = clone(value[key]);
+
+        return result;
+    }
+    else {
+        return value;
+    }
 };
 
 export const generateID = (prefix: string = "") => {
@@ -41,13 +62,13 @@ export const generateID = (prefix: string = "") => {
 }
 
 export const focusEndOfContenteditable = (contentEditableElement: HTMLElement) => {
-    let range = document.createRange();//Create a range (a range is a like the selection but invisible)
-    range.selectNodeContents(contentEditableElement);//Select the entire contents of the element with the range
-    range.collapse(false);//collapse the range to the end point. false means collapse to end rather than the start
+    let range = document.createRange();
+    range.selectNodeContents(contentEditableElement);
+    range.collapse(false);
     
-    let selection = window.getSelection()!;//get the selection object (allows you to change selection)
-    selection.removeAllRanges();//remove any selections already made
-    selection.addRange(range);//make the range you have just created the visible selection
+    let selection = window.getSelection()!;
+    selection.removeAllRanges();
+    selection.addRange(range);
 }
 
 export const trim = (value: string) => value.trim().replace(/\s\s+/g, ' ');
