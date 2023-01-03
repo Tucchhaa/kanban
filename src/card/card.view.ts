@@ -6,37 +6,30 @@ import { Icon } from "../utils/icons";
 import { cardNameValidation } from "../utils/validation";
 import { CardState } from "./card.state";
 
-type ToolbarHandlers = {
-    changeNameHandler: (e: MouseEvent) => void,
-    deleteHandler: (e: MouseEvent) => void
-};
-
 export class CardView extends BaseView<CardState> {
+    public editFieldComponent?: EditableFieldComponent;
+
     constructor() {
         super(['card']);
     }
 
     protected _render(fragment: DocumentFragment): void {
-        const nameFieldContainer = this.createDOMElement('div');
+        fragment.append(
+            this.createRenderElement('card', this.createDOMElement('div'), this.renderCard.bind(this)),
+            this.createRenderElement('toolbar', this.createDOMElement('div', 'toolbar'), this.renderToolbar.bind(this)),
+        );
+    }
 
+    private renderCard(container: HTMLElement) {
         const options: EditableFieldOptions = {
             value: this.state.card.name!,
             placeholder: 'Card\'s name',
 
-            titleTemplate: (open: () => void) => {
-                const fragment = document.createDocumentFragment();
-
+            titleTemplate: () => {
                 const title = this.createDOMElement('div');
                 title.innerText = this.state.card.name;
 
-                const toolbar = this.createToolbar({
-                    changeNameHandler: open,
-                    deleteHandler: () => {}
-                });
-
-                fragment.append(title, toolbar);
-
-                return fragment;
+                return title;
             },
             submitBtnContent: 'save',
             cancelBtnContent: Icon.cross.outerHTML,
@@ -49,31 +42,26 @@ export class CardView extends BaseView<CardState> {
 
             onSubmit: (value: string) => this.eventEmitter.emit('change-card-name', value),
             onOpened: () => {
-                this.container.style.cursor = 'default';
-                this.eventEmitter.emit('disable-drag');
+                this.eventEmitter.emit('edit-field-opened');
             },
             onClosed: () => {
-                this.container.style.removeProperty('cursor');
-                this.eventEmitter.emit('enable-drag');
+                this.eventEmitter.emit('edit-field-closed');
             }
         };
-        this.createComponent(nameFieldContainer, EditableFieldComponent, options, 'card-name-field');
-    
-        fragment.appendChild(nameFieldContainer);
+        this.editFieldComponent = this.createComponent(container, EditableFieldComponent, options, 'card-name-field') as EditableFieldComponent;
     }
 
-    private createToolbar(handlers: ToolbarHandlers) {
+    private renderToolbar(container: HTMLElement) {
+        container.style.display = this.state.isToolbarHidden ? 'none' : 'block';
+
         const changeNameBtn = this.createDOMElement('button', 'change-name');
         changeNameBtn.appendChild(Icon.pencil);
-        changeNameBtn.addEventListener('click', handlers.changeNameHandler);
+        changeNameBtn.addEventListener('click', () => this.eventEmitter.emit('change-card-name-click'));
 
         const deleteBtn = this.createDOMElement('button', 'delete-card');
         deleteBtn.appendChild(Icon.delete);
-        deleteBtn.addEventListener('click', handlers.deleteHandler);
+        deleteBtn.addEventListener('click', () => this.eventEmitter.emit('delete-card-click'));
 
-        const toolbar = this.createDOMElement('div', 'toolbar');
-        toolbar.append(changeNameBtn, deleteBtn);
-
-        return toolbar;
+        container.append(changeNameBtn, deleteBtn);
     }
 }

@@ -58,6 +58,11 @@ class RenderElementsManager {
 
         this.currentElement.componentKeys = [];
     }
+
+    public clear() {
+        this.elements = {};
+        this.currentElementKey = "";
+    }
 }
 
 export abstract class BaseView<TState extends BaseStateType = BaseStateType> extends ComponentModule<TState> {
@@ -103,6 +108,8 @@ export abstract class BaseView<TState extends BaseStateType = BaseStateType> ext
         // this level
         for(const func of this.onClear)
             func();
+
+        this.renderElementsManager.clear();
 
         super.clear();
         

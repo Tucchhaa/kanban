@@ -39,24 +39,23 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
     }
 
     private renderOpened(fragment: DocumentFragment) {
-        this.renderInput(fragment);
-        this.renderValidationMessage(fragment);
-        this.renderButtons(fragment);
+        fragment.append(
+            this.createRenderElement('input', this.createDOMElement('div', 'input-wrapper'), this.renderInput.bind(this)),
+            this.createRenderElement('validation-msg', this.createDOMElement('div'), this.renderValidationMessage.bind(this)),
+            this.createRenderElement('buttons', this.createDOMElement('div', 'buttons'), this.renderButtons.bind(this))
+        )
 
         setTimeout(() => this.setDocumentMouseDownListener());
     }
 
-    private renderInput(fragment: DocumentFragment) {
+    private renderInput(inputWrapper: HTMLElement) {
         this.placeholder = this.createPlaceholder();
         this.input = this.createInput();
 
-        const container = this.createDOMElement('div', 'input-container');
-        container.append(this.placeholder, this.input);
+        const inputContainer = this.createDOMElement('div', 'input-container');
+        inputContainer.append(this.placeholder, this.input);
 
-        const wrapper = this.createDOMElement('div', 'input-wrapper');
-        wrapper.append(container);
-
-        fragment.appendChild(wrapper);
+        inputWrapper.appendChild(inputContainer);
     }
 
     private createPlaceholder() {
@@ -82,26 +81,25 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
         return input;
     }
 
-    private renderValidationMessage(fragment: DocumentFragment) {
+    private renderValidationMessage(container: HTMLElement) {
         if(this.state.validationMsg) {
             const message = this.createDOMElement('div', 'validation-msg');
             message.innerText = this.state.validationMsg;
-            fragment.appendChild(message);
+            container.appendChild(message);
         }
     }
 
-    private renderButtons(fragment: DocumentFragment) {
+    private renderButtons(container: HTMLElement) {
         const submitAction = () => this.eventEmitter.emit('submit');
         const closeAction = () => this.eventEmitter.emit('close');
 
         if(this.state.buttonsTemplate) {
-            const buttons = this.state.buttonsTemplate(submitAction, closeAction);
-
-            buttons && fragment.appendChild(buttons);
+            this.state.buttonsTemplate(container, {
+                submit: submitAction, 
+                close: closeAction
+            });
         }
         else {
-            const buttons = this.createDOMElement('div', 'buttons');
-        
             const submitBtn = this.createDOMElement('span');
             this.createComponent(submitBtn, ButtonComponent, {
                 className: 'submit',
@@ -116,9 +114,7 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
                 onClick: closeAction
             }, 'cancel-btn');
             
-            buttons.append(submitBtn, cancelBtn);
-
-            fragment.appendChild(buttons);
+            container.append(submitBtn, cancelBtn);
         }
     }
 

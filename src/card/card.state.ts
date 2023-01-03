@@ -1,8 +1,10 @@
 import { BaseState } from "../base/state";
 import { Card } from "../types";
+import { CardController } from "./card.controller";
 
 export type CardOptions = {
     card?: Card;
+    isToolbarHidden?: boolean;
 }
 
 export class CardState extends BaseState<CardOptions> {
@@ -10,11 +12,16 @@ export class CardState extends BaseState<CardOptions> {
         return this.options.card!;
     }
 
+    public get isToolbarHidden() {
+        return this.options.isToolbarHidden!;
+    }
+
     constructor(options: CardOptions) {
-        const defaultOptions = {
-            card: new Card("__empty-card__")
+        const defaultOptions: CardOptions = {
+            card: new Card("__empty-card__"),
+            isToolbarHidden: false
         }
         
-        super(defaultOptions, options);
+        super(defaultOptions, options, [CardController]);
     }
 }

@@ -15,7 +15,7 @@ export type EditableFieldOptions = {
     resetValueOnClosed?: boolean;
 
     titleTemplate?: (open: () => void) => Node | undefined;
-    buttonsTemplate?: (close: () => void, submit: () => void) => Node | undefined,
+    buttonsTemplate?: (container: HTMLElement, handlers: { close: () => void, submit: () => void }) => Node | undefined,
 
     submitBtnContent?: string;
     cancelBtnContent?: string;

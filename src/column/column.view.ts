@@ -35,7 +35,7 @@ export class ColumnView extends BaseView<ColumnState> {
             submitOnOutsideClick: true,
             resetValueOnClosed: false,
 
-            buttonsTemplate: (close: () => void, submit: () => void) => { return undefined; },
+            buttonsTemplate: () => { return undefined; },
             
             prepareValue: trim,
             validation: columnNameValidation,
