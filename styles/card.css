@@ -22,7 +22,7 @@
 }
 
 .kanban-column .card .toolbar {
-    padding: 7px 0 5px;
+    padding: 7px 5px 5px;
     text-align: right;
     opacity: 0;
 }

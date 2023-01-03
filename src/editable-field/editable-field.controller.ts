@@ -45,7 +45,7 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
         }
     }
 
-    private toggleInput(isOpen: boolean) {
+    public toggleInput(isOpen: boolean) {
         this.state.update({ 
             isOpen, validationMsg: null, value: this.lastSavedValue
         });
