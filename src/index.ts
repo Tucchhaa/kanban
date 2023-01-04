@@ -2,6 +2,8 @@ import { KanbanComponent } from "./components/kanban.component";
 import { KanbanOptions } from "./kanban/kanban.state";
 
 /*
+https://fontawesome.com/v4/icons/
+
 Known issues:
 reopen editable-field - нужно передавать старое состояние при ререндере
 перекрытия событий в eventEmitter: решение -> добавить неймспейсы
@@ -21,7 +23,13 @@ local storage
 delete card
 scroll to down when adding card
 save scroll position on renders
-implement renderElements on all components
+do not render all columns on columnUpdate
+implement renderElements on KanbanView
+*/
+
+/*
+1) карточка становится fixed
+2) вставляется shadow
 */
 
 window.addEventListener("load", () => {    

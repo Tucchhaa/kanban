@@ -1,4 +1,3 @@
-import { Card } from "../types";
 import { CardComponent } from "../components/card.component";
 import { ColumnState } from "./column.state";
 import { EditableFieldComponent } from "../components/editable-field.component";

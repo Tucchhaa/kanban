@@ -200,3 +200,26 @@ export class DropController<TItem extends object> extends BaseController {
         return this.draggingDirection === 'vertical' ? mouse.vertical === 'up' : mouse.horizontal === 'left'
     }
 }
+
+/*
+
+    private scrollDropContainer() {
+        const direction = this.dropState.direction;
+        const mousePosition = mouse.getPosition();
+        const dropPosition = this.dropContainer!.getBoundingClientRect();
+
+        if(direction === 'vertical') {
+            if(mousePosition.y >= dropPosition.top && mousePosition.y <= dropPosition.top + 50) {
+                mouse.vertical = 'up';
+                this.dropContainer?.scrollBy({top: -40, behavior: 'smooth' });
+            }
+            else if(mousePosition.y <= dropPosition.bottom && mousePosition.y >= dropPosition.bottom - 50) {
+                mouse.vertical = 'down';
+                this.dropContainer?.scrollBy({top: +40, behavior: 'smooth' });
+            }
+        }
+        else {
+
+        }
+    }
+*/

@@ -49,14 +49,14 @@ export class SharedDropController<TItem extends object> extends BaseController {
         this.dropController.startDrag(e, dragController);
     }
 
-    public onDragStartToShared(dragController: DragController<TItem>) {
+    public onDragStartInShared(dragController: DragController<TItem>) {
         dragController.eventEmitter.emit('unsubscribe-drag-listeners');
 
         this.dropController.removeDrag(dragController);
         this.dropController.hideShadow();
     }
 
-    public onDragEndToShared(dragController: DragController<TItem>) {
+    public onDragEndInShared(dragController: DragController<TItem>) {
         this.dropController.removeDrag(dragController);
 
         this.eventEmitter.emit('update-items-order', this.dropController.drags.map(drag => drag.item));

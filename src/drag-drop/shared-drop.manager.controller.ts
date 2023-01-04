@@ -47,7 +47,7 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
     private onDrag(e: MouseEvent, fromDrop: SharedDropController<TItem>, dragController: DragController<TItem>) {
         for(const toDrop of this.drops) {
             if(toDrop !== this.currentDrop  && this.isAbleToDrop(toDrop.container)) {
-                this.currentDrop?.onDragStartToShared(dragController);
+                this.currentDrop?.onDragStartInShared(dragController);
 
                 toDrop.onSharedDragStart(e, dragController);
                 
@@ -62,7 +62,7 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
         this.isDragging = false;
 
         if(toDrop !== this.originDrop) {
-            this.originDrop?.onDragEndToShared(dragController);
+            this.originDrop?.onDragEndInShared(dragController);
         }
     }
 }
