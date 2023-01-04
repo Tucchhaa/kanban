@@ -56,7 +56,10 @@ export class EditableFieldController extends BaseController<EditableFieldState, 
             this.state.onOpened();
         }
         else {
-            this.state.resetValueOnClosed && this.state.updateByKey('value', '');
+            if(this.state.resetValueOnClosed) {
+                this.lastSavedValue = '';
+                this.state.updateByKey('value', '');
+            }
 
             this.onBlur();
             this.state.onClosed();

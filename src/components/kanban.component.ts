@@ -6,7 +6,6 @@ import { DropState } from "../drag-drop/drop.state";
 import { Column } from "../types";
 import { DropController } from "../drag-drop/drop.controller";
 import { SharedDropManagerController } from "../drag-drop/shared-drop.manager.controller";
-import { DropView } from "../drag-drop/drop.view";
 import { mouse } from "../utils/mouse-direction";
 
 export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, KanbanView> {
@@ -28,7 +27,6 @@ export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, K
         this.registerState(() => new DropState<Column>({
             isEqual: (cardA, cardB) => cardA.id === cardB.id
         }))
-        this.extendView(() => new DropView());
         this.registerController(() => new DropController<Column>());
 
         super.render();

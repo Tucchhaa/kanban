@@ -1,69 +1,11 @@
 import { processClasses } from "../helpers";
-import { Dictionary } from "../types";
+import { ClassList, Dictionary } from "../types";
 import { BaseComponentType } from "./component";
 import { ComponentModule } from "./component-module";
+import { RenderElementsManager } from "./render-elements.manager";
 import { BaseStateType } from "./state";
 
 type ComponentClass = new(container: HTMLElement, options: object) => BaseComponentType;
-
-type RenderElement = {
-    key: string;
-    container: HTMLElement,
-    componentKeys: string[],
-    render: (container: HTMLElement) => void
-};
-
-class RenderElementsManager {
-    private elements: Dictionary<RenderElement | undefined> = {};
-    private currentElementKey: string = "";
-
-    private get currentElement() {
-        return this.elements[this.currentElementKey]!;
-    }
-
-    public create(element: RenderElement) {
-        const { key } = element;
-
-        if(this.elements[key])
-            throw new Error(`Render error: Render elements must have unique names. Repating name: ${key}`);
-
-        this.elements[key] = element;
-    }
-
-    public render(elementKey: string, components: Dictionary<BaseComponentType>) {
-        this.currentElementKey = elementKey;
-
-        this.clearComponents(components);
-        this.currentElement.container.innerHTML = "";
-        this.currentElement.render(this.currentElement.container);
-
-        this.currentElementKey = "";
-    }
-
-    public getContainer(elementKey: string) {
-        return this.elements[elementKey]!.container;
-    }
-
-    public onComponentCreated(key: string) {
-        if(this.elements[this.currentElementKey]) {
-            this.currentElement.componentKeys.push(key);
-        }
-    }
-
-    private clearComponents(components: Dictionary<BaseComponentType>) {
-        for(const key of this.currentElement.componentKeys) {
-            components[key].clear();
-            delete components[key];
-        }
-
-        this.currentElement.componentKeys = [];
-    }
-
-    public clear() {
-        this.elements = {};
-        this.currentElementKey = "";
-    }
-}
 
 export abstract class BaseView<TState extends BaseStateType = BaseStateType> extends ComponentModule<TState> {
     private components: Dictionary<BaseComponentType> = {};
@@ -73,7 +15,7 @@ export abstract class BaseView<TState extends BaseStateType = BaseStateType> ext
 
     protected onClear: { (): void }[] = [];
 
-    constructor(classes?: string[] | string) {
+    constructor(classes?: ClassList) {
         super();
 
         this.container.classList.add(...processClasses(classes));
@@ -122,7 +64,7 @@ export abstract class BaseView<TState extends BaseStateType = BaseStateType> ext
 
     protected abstract _render(fragment: DocumentFragment, data?: any): void;
 
-    protected createDOMElement(tagName: string, classes?: string[] | string) {
+    protected createDOMElement(tagName: string, classes?: ClassList) {
         const element = document.createElement(tagName);
 
         if(classes) {
@@ -174,13 +116,6 @@ export abstract class BaseView<TState extends BaseStateType = BaseStateType> ext
     }
 
     // ===
-
-    private clearComponentsByKeys(keys: string[]) {
-        for(const key of keys) {
-            this.components[key].clear();
-            delete this.components[key];
-        }
-    }
 
     private clearInternalComponents() {
         for(const key in this.components) {

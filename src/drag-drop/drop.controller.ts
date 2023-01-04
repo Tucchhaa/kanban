@@ -1,5 +1,6 @@
 import { BaseComponent, BaseComponentType } from "../base/component";
 import { BaseController } from "../base/controller";
+import { UndefinedViewPropertyError } from "../utils/errors";
 import { mouse } from "../utils/mouse-direction";
 import { DragController } from "./drag.controller";
 import { DropState } from "./drop.state";
@@ -31,11 +32,20 @@ export class DropController<TItem extends object> extends BaseController {
         
         setTimeout(() => {
             this.columnName = (this.container.querySelector('.title') as HTMLElement).innerText;
-        })
+        });
 
         this.eventEmitter
             .on('process-drag', this.onProcessDrag.bind(this))
-            .on('drags-container-rendered', (dragsContainer: HTMLElement) => this.dropContainer = dragsContainer);
+            .on('rendered', () => {
+                const { dropContainer } = this.view as any;
+
+                if(!dropContainer)
+                    throw new UndefinedViewPropertyError(DropController.name, this.componentName, 'dropContainer');
+
+                this.dropContainer = dropContainer;
+
+                this.dropContainer?.classList.add('droppable');
+            });
     }
 
     // ===
@@ -73,15 +83,15 @@ export class DropController<TItem extends object> extends BaseController {
     public startDrag(e: MouseEvent, dragController: DragController<TItem>) {
         this.shadowIndex = this.getItemIndex(dragController.item);
 
-        this.showShadow(dragController.element);
         this.drag(e, dragController);
     }
 
-    private drag(e: MouseEvent, dragController: DragController<TItem>) {
+    private drag(e: MouseEvent, currentDrag: DragController<TItem>) {
         const direction = this.dropState.direction;
         const isInsertBefore = this.isInsertBefore();
         const dropPosition = this.dropContainer!.getBoundingClientRect();
-        const currentDragElement = dragController.element;
+        const currentDragElement = currentDrag.element;
+        const movingElement = currentDrag.container;
 
         // Shadow above or left
         if(
@@ -91,8 +101,8 @@ export class DropController<TItem extends object> extends BaseController {
             this.shadowIndex = 0;
 
             this.dropContainer?.children.length ?
-                this.dropContainer!.firstChild?.before(this.shadowElement) :
-                this.dropContainer!.appendChild(this.shadowElement);
+                this.dropContainer!.firstChild?.before(movingElement) :
+                this.dropContainer!.appendChild(movingElement);
         }
         // Shadow below or right
         else if(
@@ -102,8 +112,8 @@ export class DropController<TItem extends object> extends BaseController {
             this.shadowIndex = this.drags.length;
 
             this.dropContainer?.children.length ?
-                this.dropContainer!.lastChild?.after(this.shadowElement) :
-                this.dropContainer!.appendChild(this.shadowElement);
+                this.dropContainer!.lastChild?.after(movingElement) :
+                this.dropContainer!.appendChild(movingElement);
         }
         // Shadow inside
         else  {
@@ -111,14 +121,14 @@ export class DropController<TItem extends object> extends BaseController {
                 const drag = this.drags[index];
                 const dragElement = drag.container; 
             
-                if(dragElement !== currentDragElement) {
+                if(!this.isItemsEqual(drag.item, currentDrag.item)) {
                     if(this.isAbleToDrop(dragElement)) {
                         if(isInsertBefore) {
-                            dragElement.before(this.shadowElement);
+                            dragElement.before(movingElement);
                             this.shadowIndex = index;
                         }
                         else {
-                            dragElement.after(this.shadowElement);
+                            dragElement.after(movingElement);
                             this.shadowIndex = index + 1; 
                         }
 
@@ -130,8 +140,7 @@ export class DropController<TItem extends object> extends BaseController {
     }
 
     private endDrag(e: MouseEvent, dragController: DragController<TItem>) {
-        this.shadowElement.before(dragController.element);
-        this.hideShadow();
+        this.shadowElement.before(dragController.container);
         this.updateItemsOrder(dragController);
     }
 
@@ -180,20 +189,6 @@ export class DropController<TItem extends object> extends BaseController {
         }
 
         return -1;
-    }
-
-    private showShadow(element: HTMLElement) {
-        this.shadowElement.classList.add('shadow');
-        this.shadowElement.style.display = 'block';
-        this.shadowElement.style.margin = getComputedStyle(element).margin;
-        this.shadowElement.style.width = element.clientWidth + 'px';
-        this.shadowElement.style.height = element.clientHeight + 'px';
-
-        element.before(this.shadowElement);
-    }
-
-    public hideShadow() {
-        this.shadowElement.style.display = 'none';
     }
 
     private isInsertBefore() {

@@ -8,15 +8,22 @@ import { Column } from "../types";
 import { Icon } from "../utils/icons";
 import { columnNameValidation } from "../utils/validation";
 import { KanbanState } from "./kanban.state";
+import {mouse} from "../utils/mouse-direction";
 
 export class KanbanView extends BaseView<KanbanState> {
+    public dropContainer: HTMLElement;
+
     constructor() {
         super(['kanban']);
+
+        this.dropContainer = this.container;
     }
 
     protected _render(fragment: DocumentFragment): void {
         this._renderColumns(fragment);
         this._renderAddColumn(fragment);
+
+        this.addMouseEventListeners();
     }
 
     private _renderColumns(fragment: DocumentFragment) {
@@ -25,7 +32,7 @@ export class KanbanView extends BaseView<KanbanState> {
         for(let index = 0; index < columns.length; index++) {
             const column = columns[index];
 
-            const columnContainer = this.createDOMElement('div');
+            const columnContainer = this.createDOMElement('div', 'kanban-column');
             const columnOptions: ColumnOptions = { column }
 
             const columnComponent = this.createComponent(columnContainer, ColumnComponent, columnOptions, `column${column.id}`);
@@ -56,5 +63,11 @@ export class KanbanView extends BaseView<KanbanState> {
         this.createComponent(addColumnContainer, EditableFieldComponent, options, 'add-column-field');
         
         fragment.append(addColumnContainer);
+    }
+
+    private addMouseEventListeners() {
+        const mouseMoveHandler = mouse.setPosition.bind(mouse);
+        document.addEventListener('mousemove', mouseMoveHandler);
+        this.onClear.push(() => document.removeEventListener('mousemove', mouseMoveHandler));
     }
 }

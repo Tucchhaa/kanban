@@ -8,16 +8,26 @@ import { CardState } from "./card.state";
 
 export class CardView extends BaseView<CardState> {
     public editFieldComponent?: EditableFieldComponent;
+    
+    public dragElement?: HTMLElement;
+    public dragWrapperElement?: HTMLElement;
 
     constructor() {
-        super(['card']);
+        super('card-wrapper');
     }
 
     protected _render(fragment: DocumentFragment): void {
-        fragment.append(
+        const cardContainer = this.createDOMElement('div', 'card');
+
+        cardContainer.append(
             this.createRenderElement('card', this.createDOMElement('div'), this.renderCard.bind(this)),
-            this.createRenderElement('toolbar', this.createDOMElement('div', 'toolbar'), this.renderToolbar.bind(this)),
+            this.createRenderElement('toolbar', this.createDOMElement('div', 'toolbar'), this.renderToolbar.bind(this))
         );
+
+        this.dragWrapperElement = this.container;
+        this.dragElement = cardContainer;
+
+        fragment.append(cardContainer);
     }
 
     private renderCard(container: HTMLElement) {

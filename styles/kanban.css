@@ -27,7 +27,7 @@
     user-select: none;
 }
 
-.kanban > .shadow {
+.kanban-column > .shadow {
     background-color: #012928;
     border-radius: 3px;
 }

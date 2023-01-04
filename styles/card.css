@@ -11,11 +11,6 @@
     transform: rotate(4deg);
 }
 
-.kanban-column .shadow {
-    border-radius: 3px;
-    background-color: lightgrey;
-}
-
 /* Card toolbar */
 .kanban-column .card:hover .toolbar {
     opacity: 1;

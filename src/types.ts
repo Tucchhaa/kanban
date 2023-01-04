@@ -4,6 +4,8 @@ export interface Dictionary<TValue> {
     [id: string]: TValue;
 }
 
+export type ClassList = string[] | string | undefined;
+
 export class Column {
     name: string;
     id: number | string;

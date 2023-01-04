@@ -6,22 +6,33 @@ import { CardOptions } from "../card/card.state";
 import { BaseView } from "../base/view";
 import { Icon } from "../utils/icons";
 import { cardNameValidation, columnNameValidation } from "../utils/validation";
-import { trim } from "../helpers";
+import { concatClasses, trim } from "../helpers";
+import { ClassList } from "../types";
 
 export class ColumnView extends BaseView<ColumnState> {
     public draggableAreaElement?: HTMLElement;
-    public dragsContainer?: HTMLElement;
 
-    constructor() {
-        super('kanban-column');
+    public dropContainer?: HTMLElement;
+    public dragElement?: HTMLElement;
+    public dragWrapperElement?: HTMLElement;
+
+    constructor(classes?: ClassList) {
+        super(concatClasses(classes, 'column-wrapper'));
     }
 
     protected _render(fragment: DocumentFragment): void {
-        fragment.append(
+        const columnContainer = this.createDOMElement('div', 'column');
+
+        columnContainer.append(
             this.createRenderElement('heading', this.createDOMElement('div', 'heading'), this.renderHeading.bind(this)),
             this.createRenderElement('content', this.createDOMElement('div', 'content'), this.renderContent.bind(this)),
             this.createRenderElement('add-card', this.createDOMElement('div', 'add-card'), this.renderAddCard.bind(this)),
         );
+
+        this.dragWrapperElement = this.container;
+        this.dragElement = columnContainer;
+
+        fragment.append(columnContainer);
     }
 
     private renderHeading(container: HTMLElement) {
@@ -47,7 +58,7 @@ export class ColumnView extends BaseView<ColumnState> {
     }
 
     private renderContent(container: HTMLElement) {
-        this.dragsContainer = container;
+        this.dropContainer = container;
 
         for(const card of this.state.column.cards) {
             const cardContainer = this.createDOMElement('div');

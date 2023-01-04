@@ -7,7 +7,6 @@ import { DropState } from "../drag-drop/drop.state";
 import { Card, Column } from "../types";
 import { DragState } from "../drag-drop/drag.state";
 import { DragController } from "../drag-drop/drag.controller";
-import { DropView } from "../drag-drop/drop.view";
 import { DragView } from "../drag-drop/drag.view";
 import { SharedDropController } from "../drag-drop/shared-drop.controller";
 import { mouse } from "../utils/mouse-direction";
@@ -33,8 +32,7 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
         this.registerState(() => new DropState<Card>({
             direction: 'vertical',
             isEqual: (cardA, cardB) => cardA.id === cardB.id
-        }))
-        this.extendView(() => new DropView());
+        }));
         this.registerController(() => new DropController<Card>(isAbleToDrop));
         this.registerController(() => new SharedDropController<Card>());
 

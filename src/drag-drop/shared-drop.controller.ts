@@ -53,7 +53,6 @@ export class SharedDropController<TItem extends object> extends BaseController {
         dragController.eventEmitter.emit('unsubscribe-drag-listeners');
 
         this.dropController.removeDrag(dragController);
-        this.dropController.hideShadow();
     }
 
     public onDragEndInShared(dragController: DragController<TItem>) {

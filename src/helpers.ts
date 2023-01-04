@@ -1,6 +1,8 @@
+import { ClassList } from "./types";
+
 export const noop = () => {};
 
-export const processClasses = (classes?: string[] | string) => {
+export const processClasses = (classes: ClassList) => {
     if(classes) {
         return typeof(classes) === 'string' ? [classes] : classes;
     }
@@ -8,7 +10,7 @@ export const processClasses = (classes?: string[] | string) => {
     return [];
 }
 
-export const concatClasses = (classes1?: string[] | string, classes2?: string[] | string) => {
+export const concatClasses = (classes1: ClassList, classes2: ClassList) => {
     return [...processClasses(classes1), ...processClasses(classes2)];
 }
 
