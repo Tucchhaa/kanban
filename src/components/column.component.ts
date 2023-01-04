@@ -9,7 +9,7 @@ import { DragState } from "../drag-drop/drag.state";
 import { DragController } from "../drag-drop/drag.controller";
 import { DragView } from "../drag-drop/drag.view";
 import { SharedDropController } from "../drag-drop/shared-drop.controller";
-import { mouse } from "../utils/mouse-direction";
+import { mouse } from "../utils/mouse";
 
 export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, ColumnView> {
     constructor(container: HTMLElement | null, columnOptions: ColumnOptions | ColumnState) {
@@ -18,11 +18,11 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
         this.registerController(() => new ColumnController());
 
         // DROP
-        const isAbleToDrop = (dragElement: HTMLElement) => {
-            const mousePosition = mouse.getPosition();
-            const position = dragElement.getBoundingClientRect();
+        const isMouseInsideDrag = (drag: DragController<Card>) => {
+            const mousePosition = mouse.position;
+            const position = drag.element.getBoundingClientRect();
 
-            const styles = getComputedStyle(dragElement);
+            const styles = getComputedStyle(drag.element);
             const marginLeft = parseInt(styles.marginLeft);
             const marginRight = parseInt(styles.marginRight);
 
@@ -33,7 +33,7 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
             direction: 'vertical',
             isEqual: (cardA, cardB) => cardA.id === cardB.id
         }));
-        this.registerController(() => new DropController<Card>(isAbleToDrop));
+        this.registerController(() => new DropController<Card>(isMouseInsideDrag));
         this.registerController(() => new SharedDropController<Card>());
 
         // DRAG

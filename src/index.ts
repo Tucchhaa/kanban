@@ -28,8 +28,16 @@ implement renderElements on KanbanView
 */
 
 /*
-1) карточка становится fixed
-2) вставляется shadow
+SCROLL ISSUES:
+a)
+1. scroll column
+2. drag drop column
+
+b)
+scroll column when dragging card touches dropContainer border
+
+c)
+scroll kanban when column is on borders
 */
 
 window.addEventListener("load", () => {    

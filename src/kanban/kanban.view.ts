@@ -8,7 +8,7 @@ import { Column } from "../types";
 import { Icon } from "../utils/icons";
 import { columnNameValidation } from "../utils/validation";
 import { KanbanState } from "./kanban.state";
-import {mouse} from "../utils/mouse-direction";
+import {mouse} from "../utils/mouse";
 
 export class KanbanView extends BaseView<KanbanState> {
     public dropContainer: HTMLElement;

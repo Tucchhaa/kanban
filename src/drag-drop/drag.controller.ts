@@ -1,7 +1,7 @@
 import { BaseController } from "../base/controller";
 import { StateChange } from "../base/state";
 import { UndefinedViewPropertyError } from "../utils/errors";
-import { mouse } from "../utils/mouse-direction";
+import { mouse } from "../utils/mouse";
 import { DragState } from "./drag.state";
 
 export class DragController<TItem extends object> extends BaseController {
@@ -76,7 +76,6 @@ export class DragController<TItem extends object> extends BaseController {
 
     private onDragStart(e: MouseEvent) {
         e.preventDefault();
-        mouse.setPosition(e);
 
         this.dragState.updateByKey('isDragging', true);
 
@@ -90,7 +89,7 @@ export class DragController<TItem extends object> extends BaseController {
     }
 
     private onDrag() {
-        const mousePosition = mouse.getPosition();
+        const mousePosition = mouse.position;
 
         this.element.style.top = (mousePosition.y - this.mouseOffset.y) + 'px';
         this.element.style.left = (mousePosition.x - this.mouseOffset.x) + 'px';

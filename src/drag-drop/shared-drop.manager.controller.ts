@@ -2,7 +2,7 @@ import { BaseComponentType } from "../base/component";
 import { BaseController } from "../base/controller";
 import { DragController } from "./drag.controller";
 import { SharedDropController } from "./shared-drop.controller";
-import { mouse } from "../utils/mouse-direction";
+import { mouse } from "../utils/mouse";
 
 export class SharedDropManagerController<TItem extends object> extends BaseController {
     private drops: SharedDropController<TItem>[];
@@ -36,7 +36,7 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
         this.drops.push(dropController);
     }
 
-    private onDragStart(e: MouseEvent, fromDrop: SharedDropController<TItem>, dragController: DragController<TItem>) {
+    private onDragStart(fromDrop: SharedDropController<TItem>, dragController: DragController<TItem>) {
         if(!this.isDragging) {
             this.isDragging = true;
             this.originDrop = fromDrop;
@@ -44,12 +44,12 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
         }
     }
 
-    private onDrag(e: MouseEvent, fromDrop: SharedDropController<TItem>, dragController: DragController<TItem>) {
+    private onDrag(fromDrop: SharedDropController<TItem>, dragController: DragController<TItem>) {
         for(const toDrop of this.drops) {
             if(toDrop !== this.currentDrop  && this.isAbleToDrop(toDrop.container)) {
                 this.currentDrop?.onDragStartInShared(dragController);
 
-                toDrop.onSharedDragStart(e, dragController);
+                toDrop.onSharedDragStart(dragController);
                 
                 this.currentDrop = toDrop;
                 
@@ -58,7 +58,7 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
         }
     }
 
-    private onDragEnd(e: MouseEvent, toDrop: SharedDropController<TItem>, dragController: DragController<TItem>) {
+    private onDragEnd(toDrop: SharedDropController<TItem>, dragController: DragController<TItem>) {
         this.isDragging = false;
 
         if(toDrop !== this.originDrop) {
