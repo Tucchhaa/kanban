@@ -50,6 +50,8 @@ window.addEventListener("load", () => {
                 { id: 12, name: 'card 4' }, { id: 13, name: 'card 5' }, { id: 14, name: 'card 6' },
                 { id: 15, name: 'card 7' }, { id: 16, name: 'card 8' }, { id: 17, name: 'card 9' },
                 { id: 20, name: 'card 10' },
+                { id: 21, name: 'card 11' }, { id: 22, name: 'card 12' }, { id: 23, name: 'card 13' },
+                { id: 24, name: 'card 14' },
             ]
         }]
     }

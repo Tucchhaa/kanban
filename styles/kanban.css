@@ -1,19 +1,39 @@
-.kanban {
+/* Cancel buttons with cross */
+.add-column .buttons .cancel,
+.kanban-column .card .editable-field .buttons .cancel,
+.add-card .buttons .cancel {
+    padding: 7px 10px;
+    color: #1a1a1a;
+}
+
+#kanban-container {
     height: 100vh;
+    box-sizing: border-box;
+    padding-bottom: 10px;
+    
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    background-color: #023e3d;
+}
+
+/* ===== */
+.kanban {
+    height: 100%;
     width: 100%;
-    /* min-width: min-content; */
-    padding: 15px 25px;
+    padding: 15px 25px 15px 5px;
+    margin-bottom: 8px;
     box-sizing: border-box;
 
     display: flex;
     align-items: flex-start;
 
-    background-color: #023e3d;
     overflow-x: auto;
-    /* background-color: #01483d; */
+    overflow-y: hidden;
 }
 
 .kanban .columns {
+    height: 100%;
     display: flex;
     align-items: flex-start;
 }
@@ -41,24 +61,25 @@
 /* Scrollbar */
 /* width */
 .kanban::-webkit-scrollbar {
-    width: 8px;
+    height: 12px;
 }
-
+::-webkit-scrollbar-button {
+    width: 8px;
+    height: 8px;
+}
 /* Track */
 .kanban::-webkit-scrollbar-track {
-    background: #cdcdcd;
-    border-radius: 3px;
-    /* background-color: #ecf0f1; */
+    background: #012928;
+    border-radius: 5px;
 }
 
 /* Handle */
 .kanban::-webkit-scrollbar-thumb {
-    background-color: #afafaf;
-    border-radius: 3px;
+    background: #186362;
+    border-radius: 5px;
 }
 
 /* Handle on hover */
 .kanban::-webkit-scrollbar-thumb:hover {
-    /* background-color: #a1a0a0; */
-    background-color: red;
+    background: #207776;
 }

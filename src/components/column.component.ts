@@ -31,7 +31,11 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
 
         this.registerState(() => new DropState<Card>({
             direction: 'vertical',
-            isItemsEqual: (cardA, cardB) => cardA.id === cardB.id
+
+            isItemsEqual: (cardA, cardB) => cardA.id === cardB.id,
+
+            scrollBoundaryRange: 70,
+            scrollSpeed: 120
         }));
         this.registerController(() => new DropController<Card>(isMouseInsideDrag));
         this.registerController(() => new SharedDropController<Card>());

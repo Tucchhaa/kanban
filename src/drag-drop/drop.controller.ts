@@ -109,7 +109,6 @@ export class DropController<TItem extends object> extends BaseController {
     // === DRAG EVENTS
     public startDrag(drag: DragController<TItem>) {
         this.drag(drag);
-        console.log('dragstart', this.columnName)
 
         this.dropInterval = setInterval(() => {
             this.scrollDropContainer();
@@ -159,7 +158,7 @@ export class DropController<TItem extends object> extends BaseController {
         }
     }
 
-    private scrollDropContainer() {
+    public scrollDropContainer() {
         let scrollOptions: SmoothScrollOptions | undefined;
         const { scrollBoundaryRange, scrollSpeed } = this.dropState;
         const { boundary, currentPosition } = this.getScrollBoundaries();

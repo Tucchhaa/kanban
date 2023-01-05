@@ -1,10 +1,11 @@
 .column-wrapper {
     padding-right: 10px;
+    height: 100%;
 }
 .column {
     min-height: 50px;
-    /* max-height: 100%; */
-    max-height: 400px;
+    max-height: 100%;
+    /* max-height: 400px; */
     border-radius: 3px;
 
     display: flex;

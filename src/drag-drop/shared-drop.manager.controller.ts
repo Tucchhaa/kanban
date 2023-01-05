@@ -3,6 +3,7 @@ import { BaseController } from "../base/controller";
 import { DragController } from "./drag.controller";
 import { SharedDropController } from "./shared-drop.controller";
 import { mouse } from "../utils/mouse";
+import { DropController } from "./drop.controller";
 
 export class SharedDropManagerController<TItem extends object> extends BaseController {
     private drops: SharedDropController<TItem>[];
@@ -10,6 +11,8 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
     private isDragging: boolean;
     private originDrop?: SharedDropController<TItem>;
     private currentDrop?: SharedDropController<TItem>;
+
+    private scrollInterval?: any;
 
     private isAbleToDrop: (dropElement: HTMLElement) => boolean;
 
@@ -23,6 +26,18 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
         this.isAbleToDrop = isAbleToDrop ?? mouse.isInsideElement;
 
         this.eventEmitter.on('process-shared-drop', (dropComponent: BaseComponentType) => this.processDrop(dropComponent));
+    }
+
+    public clear(): void {
+        clearInterval(this.scrollInterval);
+    }
+
+    private _dropController?: DropController<TItem>;
+    private get dropContrller() {
+        if(!this._dropController)
+            this._dropController = this.getController<DropController<TItem>>(DropController.name);
+
+        return this._dropController;
     }
 
     private processDrop(dropComponent: BaseComponentType) {
@@ -41,6 +56,10 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
             this.isDragging = true;
             this.originDrop = fromDrop;
             this.currentDrop = fromDrop;
+
+            this.scrollInterval = setInterval(() => {
+                this.dropContrller?.scrollDropContainer();
+            }, 100);
         }
     }
 
@@ -60,6 +79,7 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
 
     private onDragEnd(toDrop: SharedDropController<TItem>, dragController: DragController<TItem>) {
         this.isDragging = false;
+        clearInterval(this.scrollInterval);
 
         if(toDrop !== this.originDrop) {
             this.originDrop?.onDragEndInShared(dragController);
