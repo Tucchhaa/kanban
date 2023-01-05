@@ -1,3 +1,4 @@
+import { type } from "os";
 import { processClasses } from "../helpers";
 import { ClassList, Dictionary } from "../types";
 import { BaseComponentType } from "./component";
@@ -76,7 +77,10 @@ export abstract class BaseView<TState extends BaseStateType = BaseStateType> ext
         return element;
     }
 
-    protected createComponent(container: HTMLElement, componentType: ComponentClass, options: object, key?: string): BaseComponentType {
+    protected createComponent<TOptions extends object>(container: HTMLElement | string, componentType: ComponentClass, options: TOptions, key?: string): BaseComponentType {
+        if(typeof container === 'string')
+            container = this.createDOMElement(container);
+        
         const newComponent = new componentType(container, options);
         key = key ?? newComponent.constructor.name;
 
@@ -99,12 +103,17 @@ export abstract class BaseView<TState extends BaseStateType = BaseStateType> ext
             key: elementKey,
             container,
             componentKeys: [],
-            render: renderFunc
+            onClear: [],
+            render: renderFunc,
         });
 
         this.renderElement(elementKey);
 
         return container;
+    }
+
+    protected onClearRenderElement(elementKey: string, clearFunc: () => void) {
+        this.renderElementsManager.addClearFunc(elementKey, clearFunc);
     }
 
     public renderElement(elementKey: string) {

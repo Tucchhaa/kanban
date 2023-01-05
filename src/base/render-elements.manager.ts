@@ -5,6 +5,7 @@ type RenderElement = {
     key: string;
     container: HTMLElement,
     componentKeys: string[],
+    onClear: (() => void)[],
     render: (container: HTMLElement) => void
 };
 
@@ -28,7 +29,7 @@ export class RenderElementsManager {
     public render(elementKey: string, components: Dictionary<BaseComponentType>) {
         this.currentElementKey = elementKey;
 
-        this.clearComponents(components);
+        this.clearElement(elementKey, components);
         this.currentElement.container.innerHTML = "";
         this.currentElement.render(this.currentElement.container);
 
@@ -45,6 +46,17 @@ export class RenderElementsManager {
         }
     }
 
+    public addClearFunc(elementKey: string, clearFunc: () => void) {
+        this.elements[elementKey]!.onClear.push(clearFunc);
+    }
+
+    private clearElement(elementKey: string, components: Dictionary<BaseComponentType>) {
+        for(const clearFunc of this.elements[elementKey]!.onClear)
+            clearFunc();
+
+        this.clearComponents(components);
+    }
+
     private clearComponents(components: Dictionary<BaseComponentType>) {
         for(const key of this.currentElement.componentKeys) {
             components[key].clear();
@@ -55,6 +67,10 @@ export class RenderElementsManager {
     }
 
     public clear() {
+        for(const elementKey in this.elements)
+            for(const clearFunc of this.elements[elementKey]!.onClear)
+                clearFunc();
+
         this.elements = {};
         this.currentElementKey = "";
     }

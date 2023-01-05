@@ -7,7 +7,7 @@ import { BaseView } from "../base/view";
 import { Icon } from "../utils/icons";
 import { cardNameValidation, columnNameValidation } from "../utils/validation";
 import { concatClasses, trim } from "../helpers";
-import { ClassList } from "../types";
+import { Card, ClassList } from "../types";
 
 export class ColumnView extends BaseView<ColumnState> {
     public draggableAreaElement?: HTMLElement;
@@ -25,7 +25,7 @@ export class ColumnView extends BaseView<ColumnState> {
 
         columnContainer.append(
             this.createRenderElement('heading', this.createDOMElement('div', 'heading'), this.renderHeading.bind(this)),
-            this.createRenderElement('content', this.createDOMElement('div', 'content'), this.renderContent.bind(this)),
+            this.createRenderElement('cards', this.createDOMElement('div', 'cards'), this.renderCards.bind(this)),
             this.createRenderElement('add-card', this.createDOMElement('div', 'add-card'), this.renderAddCard.bind(this)),
         );
 
@@ -57,7 +57,7 @@ export class ColumnView extends BaseView<ColumnState> {
         this.createComponent(container, EditableFieldComponent, options, 'heading-field');
     }
 
-    private renderContent(container: HTMLElement) {
+    private renderCards(container: HTMLElement) {
         this.dropContainer = container;
 
         for(const card of this.state.column.cards) {
@@ -65,6 +65,9 @@ export class ColumnView extends BaseView<ColumnState> {
 
             const cardOptions: CardOptions = { card };
             const cardCompoment = this.createComponent(cardContainer, CardComponent, cardOptions, `card${card.id}`);
+
+            cardCompoment.eventEmitter.on('update-card', (card: Card) => this.eventEmitter.emit('update-card', card));
+            cardCompoment.eventEmitter.on('delete-card', (card: Card) => this.eventEmitter.emit('delete-card', card));
 
             setTimeout(() => this.eventEmitter.emit('process-drag', cardCompoment));
             
@@ -81,8 +84,10 @@ export class ColumnView extends BaseView<ColumnState> {
             cancelBtnContent: Icon.cross.outerHTML,
 
             prepareValue: trim,
+            validation: cardNameValidation,
+
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-card', value),
-            validation: cardNameValidation
+            onOpened: () => this.eventEmitter.emit('add-card-field-opened'),
         };
         this.createComponent(container, EditableFieldComponent, options, 'add-card-field');
     }

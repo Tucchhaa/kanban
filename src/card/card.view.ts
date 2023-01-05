@@ -1,4 +1,6 @@
 import { BaseView } from "../base/view";
+import { ButtonOptions } from "../button/button.state";
+import { ButtonComponent } from "../components/button.component";
 import { EditableFieldComponent } from "../components/editable-field.component";
 import { EditableFieldOptions } from "../editable-field/editable-field.state";
 import { trim } from "../helpers";
@@ -52,26 +54,75 @@ export class CardView extends BaseView<CardState> {
 
             onSubmit: (value: string) => this.eventEmitter.emit('change-card-name', value),
             onOpened: () => {
-                this.eventEmitter.emit('edit-field-opened');
+                this.eventEmitter.emit('update-toolbar-state', 'hidden');
+                this.eventEmitter.emit('disable-card-drag');
             },
             onClosed: () => {
-                this.eventEmitter.emit('edit-field-closed');
+                this.eventEmitter.emit('update-toolbar-state', 'default');
+                this.eventEmitter.emit('enable-card-drag');
             }
         };
         this.editFieldComponent = this.createComponent(container, EditableFieldComponent, options, 'card-name-field') as EditableFieldComponent;
     }
 
     private renderToolbar(container: HTMLElement) {
-        container.style.display = this.state.isToolbarHidden ? 'none' : 'block';
+        container.classList.remove('toolbar-hidden', 'toolbar-delete-prompt', 'toolbar-default');
+        container.classList.add(`toolbar-${this.state.toolbarState}`);
+        
+        switch(this.state.toolbarState) {
+            case 'hidden':
+                container.style.display = 'none';
 
-        const changeNameBtn = this.createDOMElement('button', 'change-name');
-        changeNameBtn.appendChild(Icon.pencil);
-        changeNameBtn.addEventListener('click', () => this.eventEmitter.emit('change-card-name-click'));
+                this.onClearRenderElement('toolbar', () => container.style.removeProperty('display'))
 
-        const deleteBtn = this.createDOMElement('button', 'delete-card');
-        deleteBtn.appendChild(Icon.delete);
-        deleteBtn.addEventListener('click', () => this.eventEmitter.emit('delete-card-click'));
+                break;
 
-        container.append(changeNameBtn, deleteBtn);
+            case 'delete-prompt':
+                container.style.display = 'block';
+
+                const prompt = this.createDOMElement('div', 'prompt-text');
+                prompt.innerText = 'Delete this card?';
+
+                const confirmBtnComponent = this.createComponent<ButtonOptions>('span', ButtonComponent, {
+                    text: 'confirm',
+                    className: 'prompt-confirm',
+                    onClick: () => this.eventEmitter.emit('delete-card-confirmed')
+                }, 'prompt-confirm-btn');
+
+                const cancelBtnComponent = this.createComponent<ButtonOptions>('span', ButtonComponent, {
+                    text: 'cancel',
+                    className: 'prompt-cancel',
+                    onClick: () => this.eventEmitter.emit('update-toolbar-state', 'default')
+                }, 'prompt-cancel-btn');
+               
+                // ===
+                
+                const promptBtns = this.createDOMElement('div', 'prompt-btns');
+                promptBtns.append(confirmBtnComponent.container, cancelBtnComponent.container);
+
+                container.append(prompt, promptBtns);
+
+                // ===
+                this.eventEmitter.emit('disable-card-drag');
+
+                setTimeout(() => {
+                    const mouseDownHandler = () => this.eventEmitter.emit('update-toolbar-state', 'default');
+                    document.addEventListener('click', mouseDownHandler);
+                    this.onClearRenderElement('toolbar', () => document.removeEventListener('click', mouseDownHandler));
+                    this.onClearRenderElement('toolbar', () => this.eventEmitter.emit('enable-card-drag'));
+                });
+
+                break;
+            default:
+                const changeNameBtn = this.createDOMElement('button', 'change-name');
+                changeNameBtn.appendChild(Icon.pencil);
+                changeNameBtn.addEventListener('click', () => this.eventEmitter.emit('change-card-name-click'));
+        
+                const deleteBtn = this.createDOMElement('button', 'delete-card');
+                deleteBtn.appendChild(Icon.delete);
+                deleteBtn.addEventListener('click', () => this.eventEmitter.emit('update-toolbar-state', 'delete-prompt'));
+        
+                container.append(changeNameBtn, deleteBtn);
+        }
     }
 }

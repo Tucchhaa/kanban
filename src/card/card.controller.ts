@@ -9,18 +9,19 @@ export class CardController extends BaseController<CardState, CardView> {
         super();
 
         this.eventEmitter
-            .on('edit-field-opened', this.onEditFieldOpened.bind(this))
-            .on('edit-field-closed', this.onEditFieldClosed.bind(this))
+            .on('disable-card-drag', this.onDisableCardDrag.bind(this))
+            .on('enable-card-drag', this.onEnableCardDrag.bind(this))
+
+            .on('update-toolbar-state', this.onUpdateToolbarState.bind(this))
 
             .on('change-card-name-click', this.onChangeCardNameClick.bind(this))
-            .on('delete-card-click', this.onDeleteCardClick.bind(this))
-
+            .on('delete-card-confirmed', this.onDeleteCardConfirmed.bind(this))
             .on('change-card-name', this.onChangeCardName.bind(this));
     }
 
     public stateChanged(change: StateChange): void {
         switch(change.name) {
-            case 'isToolbarHidden':
+            case 'toolbarState':
                 this.view.renderElement('toolbar');
                 break;
             case 'card.name':
@@ -30,32 +31,35 @@ export class CardController extends BaseController<CardState, CardView> {
         }
     }
 
-    private onEditFieldOpened() {
-        this.state.updateByKey('isToolbarHidden', true);
+    private onDisableCardDrag() {
         this.container.style.cursor = 'default';
         this.eventEmitter.emit('disable-drag');
     }
 
-    private onEditFieldClosed() {
-        this.state.updateByKey('isToolbarHidden', false);
+    private onEnableCardDrag() {
         this.container.style.removeProperty('cursor');
         this.eventEmitter.emit('enable-drag');
+    }
+
+    private onUpdateToolbarState(toolbarState: 'default' | 'hidden' | 'delete-prompt') {
+        this.state.updateByKey('toolbarState', toolbarState);
+
     }
 
     private onChangeCardNameClick() {
         const editFieldController = this.view.editFieldComponent!.getRequiredController<EditableFieldController>(EditableFieldController.name);
     
         editFieldController.toggleInput(true);
-        this.state.updateByKey('isToolbarHidden', true);
-    }
-    
-    private onDeleteCardClick() {
-
+        this.state.updateByKey('toolbarState', 'hidden');
     }
 
     private onChangeCardName(newName: string) {
         this.state.updateByKey('card.name', newName);
 
         this.eventEmitter.emit('update-card', this.state.card);
+    }
+
+    private onDeleteCardConfirmed() {
+        this.eventEmitter.emit('delete-card', this.state.card);
     }
 }
