@@ -2,6 +2,7 @@ import { ClassList } from "./types";
 
 export const noop = () => {};
 
+// Classes
 export const processClasses = (classes: ClassList) => {
     if(classes) {
         return typeof(classes) === 'string' ? [classes] : classes;
@@ -14,6 +15,7 @@ export const concatClasses = (classes1: ClassList, classes2: ClassList) => {
     return [...processClasses(classes1), ...processClasses(classes2)];
 }
 
+// Object comparison
 export const isObject = (object: any) => object !== null && typeof(object) === 'object';
 
 export const isArray = (object: any) => Array.isArray(object);
@@ -59,6 +61,16 @@ export const clone = (value: any) => {
     }
 };
 
+// Scroll
+export const hasVerticalScroll = (element: HTMLElement) => {
+    return element.clientHeight < element.scrollHeight;
+}
+
+export const hasHorizontalScroll = (element: HTMLElement) => {
+    return element.clientWidth < element.scrollWidth;
+}
+
+// Others
 export const generateID = (prefix: string = "") => {
     return prefix + `__id${Math.floor(Math.random() * Date.now())}`;
 }

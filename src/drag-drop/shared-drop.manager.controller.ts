@@ -46,7 +46,7 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
 
     private onDrag(fromDrop: SharedDropController<TItem>, dragController: DragController<TItem>) {
         for(const toDrop of this.drops) {
-            if(toDrop !== this.currentDrop  && this.isAbleToDrop(toDrop.container)) {
+            if(toDrop !== this.currentDrop  && this.isAbleToDrop(toDrop.dropContainer)) {
                 this.currentDrop?.onDragStartInShared(dragController);
 
                 toDrop.onSharedDragStart(dragController);

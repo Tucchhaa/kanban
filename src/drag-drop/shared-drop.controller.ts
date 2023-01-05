@@ -21,6 +21,10 @@ export class SharedDropController<TItem extends object> extends BaseController {
         this.eventEmitter.on('process-drag', this.onProcessDrag.bind(this));
     }
 
+    public get dropContainer() {
+        return this.dropController.dropContainer;
+    }
+
     public get columnName() {
         return this.dropController.columnName;
     }
@@ -59,14 +63,17 @@ export class SharedDropController<TItem extends object> extends BaseController {
     public onDragStartInShared(dragController: DragController<TItem>) {
         this.removeDrag(dragController);
 
+        this.dropController.clearDropInterval();
+
         dragController.eventEmitter.emit('unsubscribe-drag-listeners');
     }
 
     public onDragEndInShared(dragController: DragController<TItem>) {
-        // TODO
         this.removeDrag(dragController);
 
-        this.eventEmitter.emit('update-items-order', this.dropController.drags.map(drag => drag.item));
+        this.dropController.endDrag();
+        
+        // this.eventEmitter.emit('update-items-order', this.dropController.drags.map(drag => drag.item));
     }
 
     private removeDrag(dragController: DragController<TItem>) {

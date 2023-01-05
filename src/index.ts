@@ -11,33 +11,22 @@ reopen editable-field - нужно передавать старое состо�
 OPTIMIZATION: dragging: instead of iterating all cards on drag event, it is possible to add event listener on each card
 
 BUG:
-1) start drag
-2) move card to another column
-3) move card to its original position
-4) drag end
-=> Card is placed at the end
+1) scrollDirection is set even if no scrolling occuring
 
 TODO:
-scroll drop
 local storage
 delete card
 scroll to down when adding card
-save scroll position on renders
 do not render all columns on columnUpdate
 implement renderElements on KanbanView
 */
 
 /*
 SCROLL ISSUES:
-a)
-1. scroll column
-2. drag drop column
-
-b)
-scroll column when dragging card touches dropContainer border
 
 c)
 scroll kanban when column is on borders
+
 */
 
 window.addEventListener("load", () => {    

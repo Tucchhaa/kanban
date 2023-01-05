@@ -1,13 +1,16 @@
 import { BaseComponent, BaseComponentType } from "../base/component";
 import { BaseController } from "../base/controller";
+import { hasVerticalScroll } from "../helpers";
 import { UndefinedViewPropertyError } from "../utils/errors";
 import { mouse } from "../utils/mouse";
+import { smoothScroll, SmoothScrollOptions } from "../utils/smooth-scroll";
 import { DragController } from "./drag.controller";
 import { DropState } from "./drop.state";
 
 export class DropController<TItem extends object> extends BaseController {
     private dropState: DropState<TItem>;
-    private dropContainer?: HTMLElement;
+    private _dropContainer?: HTMLElement;
+    private dropInterval?: any;
 
     public drags: DragController<TItem>[] = [];
     private draggingDirection: 'horizontal' | 'vertical';
@@ -18,6 +21,10 @@ export class DropController<TItem extends object> extends BaseController {
     private scrollDirection?: 'start' | 'end';
 
     public columnName: string = "";
+
+    public get dropContainer() {
+        return this._dropContainer!;
+    }
 
     constructor(isMouseInsideDrag?: (drag: DragController<TItem>) => boolean) {
         super();
@@ -42,17 +49,24 @@ export class DropController<TItem extends object> extends BaseController {
                 if(!dropContainer)
                     throw new UndefinedViewPropertyError(DropController.name, this.componentName, 'dropContainer');
 
-                this.dropContainer = dropContainer;
+                this._dropContainer = dropContainer;
 
-                this.dropContainer?.classList.add('droppable');
+                this.dropContainer.classList.add('droppable');
             });
     }
 
     // ===
 
     public clear() {
+        this.clearDropInterval();
         this.drags = [];
     }
+
+    public clearDropInterval() {
+        clearInterval(this.dropInterval);
+    }
+
+    // ===
 
     public onProcessDrag(dragComponent: BaseComponentType | DragController<TItem>) {
         const dragController = 
@@ -69,7 +83,7 @@ export class DropController<TItem extends object> extends BaseController {
 
         dragController.eventEmitter
             .on('drag-start', onDragStart)
-            .on('drag', onDrag)
+            // .on('drag', onDrag)
             .on('drag-end', onDragEnd);
 
         // ===
@@ -77,7 +91,7 @@ export class DropController<TItem extends object> extends BaseController {
         dragController.eventEmitter.once('unsubscribe-drag-listeners', () => {
             dragController.eventEmitter            
                 .unsubscribe('drag-start', onDragStart)
-                .unsubscribe('drag', onDrag)
+                // .unsubscribe('drag', onDrag)
                 .unsubscribe('drag-end', onDragEnd)
         });
     }
@@ -85,25 +99,86 @@ export class DropController<TItem extends object> extends BaseController {
     // === DRAG EVENTS
     public startDrag(drag: DragController<TItem>) {
         this.drag(drag);
+        console.log('dragstart', this.columnName)
+
+        this.dropInterval = setInterval(() => {
+            this.scrollDropContainer();
+            this.drag(drag);
+        }, 100);
     }
 
     private drag(drag: DragController<TItem>) {
+        const scrollTop = this.dropContainer.scrollTop;
+
         const dragPosition = this.calculateDragPosition(drag);
         const positionChanged = this.changeDragPosition(drag, dragPosition);
 
-        positionChanged && this.moveDragToIndex(drag, dragPosition.index);
+        if(positionChanged) {
+            this.dropContainer.scrollTop = scrollTop;
+            this.moveDragToIndex(drag, dragPosition.index);
+        }
     }
 
-    private endDrag() {
+    public endDrag() {
+        this.clearDropInterval();
         this.eventEmitter.emit('update-items-order', this.drags.map(drag => drag.item));
     }
 
     // == PRIVATE
 
+    private scrollDropContainer() {
+        const direction = this.dropState.direction;
+        const mousePosition = mouse.position;
+        const dropPosition = this.dropContainer.getBoundingClientRect();
+
+        let scrollOptions: SmoothScrollOptions | undefined;
+
+        if(direction === 'vertical' && hasVerticalScroll(this.dropContainer)) {
+            // Scroll up
+            if(mousePosition.y < dropPosition.top + 80) {
+                this.scrollDirection = 'start';
+
+                // scroll to top
+                if(mousePosition.y < dropPosition.top) {
+                    scrollOptions = { time: 500, speedY: -15 };
+                }
+                else {
+                    const scrollDistance = (1 - (mousePosition.y - dropPosition.top) / 80) * 40;
+                    scrollOptions = { time: 80, y: -scrollDistance };
+                }
+
+            }
+            // Scroll down
+            else if(mousePosition.y > dropPosition.bottom - 80) {
+                this.scrollDirection = 'end';
+
+                // scroll to bottom
+                if(mousePosition.y > dropPosition.bottom) {
+                    scrollOptions = { time: 500, speedY: 15 };
+                }
+                else {
+                    const scrollDistance = (1 - (dropPosition.bottom - mousePosition.y) / 80) * 40;
+                    scrollOptions = { time: 80, y: scrollDistance };
+                }
+            }
+        }
+        else {
+            
+        }
+
+        if(scrollOptions) {
+            smoothScroll(this.dropContainer, scrollOptions);
+            // smoothScroll(this.dropContainer, scrollOptions, () => { this.scrollDirection = undefined; });
+        }
+        else {
+            this.scrollDirection = undefined;
+        }
+    }
+
     private calculateDragPosition(drag: DragController<TItem>): ({ index: number, isInsertBefore: boolean }) {
         const direction = this.dropState.direction;
         const mousePosition = mouse.position;
-        const dropPosition = this.dropContainer!.getBoundingClientRect();
+        const dropPosition = this.dropContainer.getBoundingClientRect();
         
         let isInsertBefore = this.isInsertBefore();
         let index = -1;
@@ -127,7 +202,6 @@ export class DropController<TItem extends object> extends BaseController {
         // Shadow inside
         else  {
             for(let i = 0; i < this.drags.length; i++) {
-                // console.log(!this.isSameDrag(this.drags[index], drag), this.isMouseInsideDrag(drag))
                 if(!this.isSameDrag(this.drags[i], drag) && this.isMouseInsideDrag(this.drags[i])) {
                     index = i;
                     break;
@@ -143,7 +217,7 @@ export class DropController<TItem extends object> extends BaseController {
         
         if(index === -1)
             return false;
-            
+        console.log(index, isInsertBefore, this.scrollDirection)
         const insertNearDrag = this.drags[index];
 
         if(insertNearDrag && !this.isSameDrag(insertNearDrag, drag)) {
@@ -159,9 +233,10 @@ export class DropController<TItem extends object> extends BaseController {
                     return true;
                 }
             }
+
         }
-        else if(this.dropContainer!.children.length !== this.drags.length) {
-            this.dropContainer!.appendChild(drag.container);
+        else if(this.dropContainer.children.length !== this.drags.length) {
+            this.dropContainer.appendChild(drag.container);
             return true;
         }
 
@@ -189,28 +264,3 @@ export class DropController<TItem extends object> extends BaseController {
         return this.draggingDirection === 'vertical' ? mouse.vertical === 'up' : mouse.horizontal === 'left';
     }
 }
-
-/*
-
-    private scrollDropContainer() {
-        const direction = this.dropState.direction;
-        const mousePosition = mouse.position;
-        const dropPosition = this.dropContainer!.getBoundingClientRect();
-
-        if(direction === 'vertical') {
-            if(mousePosition.y >= dropPosition.top && mousePosition.y <= dropPosition.top + 50) {
-                this.scrollDirection = 'start';
-                this.dropContainer?.scrollBy({top: -40, behavior: 'smooth' });
-            }
-            else if(mousePosition.y <= dropPosition.bottom && mousePosition.y >= dropPosition.bottom - 50) {
-                this.scrollDirection = 'end';
-                this.dropContainer?.scrollBy({top: +40, behavior: 'smooth' });
-            }
-            else
-                this.scrollDirection = undefined;
-        }
-        else {
-            
-        }
-    }
-*/
