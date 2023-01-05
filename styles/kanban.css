@@ -1,6 +1,7 @@
 .kanban {
     height: 100vh;
-    min-width: min-content;
+    width: 100%;
+    /* min-width: min-content; */
     padding: 15px 25px;
     box-sizing: border-box;
 
@@ -8,18 +9,23 @@
     align-items: flex-start;
 
     background-color: #023e3d;
+    overflow-x: auto;
     /* background-color: #01483d; */
 }
 
-.kanban > .kanban-column,
-.kanban > .add-column {
+.kanban .columns {
+    display: flex;
+    align-items: flex-start;
+}
+
+.kanban .kanban-column,
+.kanban .add-column {
+    min-width: 250px;
     width: 250px;
-    box-sizing: border-box;
-    border-radius: 3px;
     word-wrap: break-word;
 }
 
-.kanban > .add-column, 
+.kanban .add-column, 
 .kanban-column {
     -webkit-user-select: none;  
     -moz-user-select: none;
@@ -30,4 +36,29 @@
 .kanban-column > .shadow {
     background-color: #012928;
     border-radius: 3px;
+}
+
+/* Scrollbar */
+/* width */
+.kanban::-webkit-scrollbar {
+    width: 8px;
+}
+
+/* Track */
+.kanban::-webkit-scrollbar-track {
+    background: #cdcdcd;
+    border-radius: 3px;
+    /* background-color: #ecf0f1; */
+}
+
+/* Handle */
+.kanban::-webkit-scrollbar-thumb {
+    background-color: #afafaf;
+    border-radius: 3px;
+}
+
+/* Handle on hover */
+.kanban::-webkit-scrollbar-thumb:hover {
+    /* background-color: #a1a0a0; */
+    background-color: red;
 }

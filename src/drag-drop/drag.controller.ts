@@ -173,7 +173,7 @@ export class DragController<TItem extends object> extends BaseController {
         this.shadowElement.classList.add('shadow');
 
         this.shadowElement.style.margin = this.elementStyles.margin;
-        console.log(this.elementStyles.margin)
+
         this.shadowElement.style.width = '100%';
         this.shadowElement.style.height = this.element.clientHeight + 'px';
         

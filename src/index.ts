@@ -12,21 +12,15 @@ OPTIMIZATION: dragging: instead of iterating all cards on drag event, it is poss
 
 BUG:
 1) scrollDirection is set even if no scrolling occuring
+2) Drag card to left side of kanban
+3) Drag column -> column name change starts
+4) if drag between card gaps
 
 TODO:
 local storage
 delete card
 scroll to down when adding card
 do not render all columns on columnUpdate
-implement renderElements on KanbanView
-*/
-
-/*
-SCROLL ISSUES:
-
-c)
-scroll kanban when column is on borders
-
 */
 
 window.addEventListener("load", () => {    

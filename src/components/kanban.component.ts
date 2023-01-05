@@ -25,7 +25,10 @@ export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, K
 
         // Drop
         this.registerState(() => new DropState<Column>({
-            isEqual: (cardA, cardB) => cardA.id === cardB.id
+            isItemsEqual: (cardA, cardB) => cardA.id === cardB.id,
+
+            scrollBoundaryRange: 150,
+            scrollSpeed: 100
         }))
         this.registerController(() => new DropController<Column>());
 

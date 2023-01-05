@@ -4,6 +4,8 @@
     background-color: rgba(0, 0, 0, 0.7);
     text-align: center;
     cursor: pointer;
+    box-sizing: border-box;
+    border-radius: 3px;
 }
 .add-column:hover {
     background-color: rgba(0, 0, 0, 1);

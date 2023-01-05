@@ -1,6 +1,6 @@
 import { BaseComponent, BaseComponentType } from "../base/component";
 import { BaseController } from "../base/controller";
-import { hasVerticalScroll } from "../helpers";
+import { hasHorizontalScroll, hasVerticalScroll } from "../helpers";
 import { UndefinedViewPropertyError } from "../utils/errors";
 import { mouse } from "../utils/mouse";
 import { smoothScroll, SmoothScrollOptions } from "../utils/smooth-scroll";
@@ -9,7 +9,10 @@ import { DropState } from "./drop.state";
 
 export class DropController<TItem extends object> extends BaseController {
     private dropState: DropState<TItem>;
+
+    private _dropScrollContainer?: HTMLElement;
     private _dropContainer?: HTMLElement;
+    
     private dropInterval?: any;
 
     public drags: DragController<TItem>[] = [];
@@ -22,9 +25,15 @@ export class DropController<TItem extends object> extends BaseController {
 
     public columnName: string = "";
 
+    // ===
     public get dropContainer() {
         return this._dropContainer!;
     }
+
+    public get dropScrollContainer() {
+        return this._dropScrollContainer!;
+    }
+    // ===
 
     constructor(isMouseInsideDrag?: (drag: DragController<TItem>) => boolean) {
         super();
@@ -35,7 +44,7 @@ export class DropController<TItem extends object> extends BaseController {
         const isMouseInsideElement = mouse.isInsideElement.bind(mouse);
 
         this.isMouseInsideDrag = isMouseInsideDrag ?? ((drag: DragController<TItem>) => isMouseInsideElement(drag.element));
-        this.isItemsEqual = this.dropState.isEqual();
+        this.isItemsEqual = this.dropState.isItemsEqual;
         
         setTimeout(() => {
             this.columnName = (this.container.querySelector('.title') as HTMLElement).innerText;
@@ -44,12 +53,13 @@ export class DropController<TItem extends object> extends BaseController {
         this.eventEmitter
             .on('process-drag', this.onProcessDrag.bind(this))
             .on('rendered', () => {
-                const { dropContainer } = this.view as any;
+                const { dropContainer, dropScrollContainer } = this.view as any;
 
                 if(!dropContainer)
                     throw new UndefinedViewPropertyError(DropController.name, this.componentName, 'dropContainer');
 
                 this._dropContainer = dropContainer;
+                this._dropScrollContainer = dropScrollContainer ?? dropContainer;
 
                 this.dropContainer.classList.add('droppable');
             });
@@ -124,56 +134,82 @@ export class DropController<TItem extends object> extends BaseController {
         this.eventEmitter.emit('update-items-order', this.drags.map(drag => drag.item));
     }
 
-    // == PRIVATE
+    // === SCROLLING
+
+    private getScrollBoundaries() {
+        const scrollPosition = this.dropScrollContainer.getBoundingClientRect();
+        const direction = this.dropState.direction;
+
+        if(direction === 'vertical') {
+            return {
+                boundary: {
+                    start: scrollPosition.top,
+                    end: scrollPosition.bottom,
+                },
+                currentPosition: mouse.position.y
+            }
+        }
+
+        return {
+            boundary: {
+                start: scrollPosition.left,
+                end: scrollPosition.right,
+            },
+            currentPosition: mouse.position.x
+        }
+    }
 
     private scrollDropContainer() {
-        const direction = this.dropState.direction;
-        const mousePosition = mouse.position;
-        const dropPosition = this.dropContainer.getBoundingClientRect();
-
         let scrollOptions: SmoothScrollOptions | undefined;
+        const { scrollBoundaryRange, scrollSpeed } = this.dropState;
+        const { boundary, currentPosition } = this.getScrollBoundaries();
 
-        if(direction === 'vertical' && hasVerticalScroll(this.dropContainer)) {
-            // Scroll up
-            if(mousePosition.y < dropPosition.top + 80) {
-                this.scrollDirection = 'start';
-
-                // scroll to top
-                if(mousePosition.y < dropPosition.top) {
+        if(hasVerticalScroll(this.dropScrollContainer) || hasHorizontalScroll(this.dropScrollContainer)) {
+            if(currentPosition < boundary.start + scrollBoundaryRange) {
+                // scroll to very start
+                if(currentPosition < boundary.start) {
                     scrollOptions = { time: 500, speedY: -15 };
                 }
+                // scroll to start
                 else {
-                    const scrollDistance = (1 - (mousePosition.y - dropPosition.top) / 80) * 40;
+                    const scrollDistance = (1 - (currentPosition - boundary.start) / scrollBoundaryRange) * scrollSpeed;
                     scrollOptions = { time: 80, y: -scrollDistance };
                 }
 
             }
-            // Scroll down
-            else if(mousePosition.y > dropPosition.bottom - 80) {
-                this.scrollDirection = 'end';
-
-                // scroll to bottom
-                if(mousePosition.y > dropPosition.bottom) {
+            else if(currentPosition > boundary.end - scrollBoundaryRange) {
+                // scroll to very end
+                if(currentPosition > boundary.end) {
                     scrollOptions = { time: 500, speedY: 15 };
                 }
+                // scroll to end
                 else {
-                    const scrollDistance = (1 - (dropPosition.bottom - mousePosition.y) / 80) * 40;
+                    const scrollDistance = (1 - (boundary.end - currentPosition) / scrollBoundaryRange) * scrollSpeed;
                     scrollOptions = { time: 80, y: scrollDistance };
                 }
             }
         }
-        else {
-            
-        }
 
         if(scrollOptions) {
-            smoothScroll(this.dropContainer, scrollOptions);
+            this.scrollDirection = scrollOptions.y! > 0 || scrollOptions.speedY! > 0 ? 'end' : 'start';
+
+            if(this.dropState.direction === 'horizontal') {
+                scrollOptions.speedX = scrollOptions.speedY;
+                scrollOptions.x = scrollOptions.y;
+
+                delete scrollOptions.speedY;
+                delete scrollOptions.y;
+            }
+
+            smoothScroll(this.dropScrollContainer, scrollOptions);
             // smoothScroll(this.dropContainer, scrollOptions, () => { this.scrollDirection = undefined; });
         }
         else {
             this.scrollDirection = undefined;
         }
     }
+
+    // == PRIVATE
 
     private calculateDragPosition(drag: DragController<TItem>): ({ index: number, isInsertBefore: boolean }) {
         const direction = this.dropState.direction;
@@ -217,7 +253,7 @@ export class DropController<TItem extends object> extends BaseController {
         
         if(index === -1)
             return false;
-        console.log(index, isInsertBefore, this.scrollDirection)
+
         const insertNearDrag = this.drags[index];
 
         if(insertNearDrag && !this.isSameDrag(insertNearDrag, drag)) {

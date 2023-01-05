@@ -16,7 +16,7 @@ export class SharedDropController<TItem extends object> extends BaseController {
         this.dropState = this.getRequiredState<DropState<TItem>>(DropState.name);
         this.dropController = this.getRequiredController<DropController<TItem>>(DropController.name);
 
-        this.isItemsEqual = this.dropState.isEqual();
+        this.isItemsEqual = this.dropState.isItemsEqual;
 
         this.eventEmitter.on('process-drag', this.onProcessDrag.bind(this));
     }
