@@ -12,11 +12,10 @@ OPTIMIZATION: dragging: instead of iterating all cards on drag event, it is poss
 
 BUG:
 1) scrollDirection is set even if no scrolling occuring
-3) Drag column -> column name change starts
+2) Drag column -> column name change starts
 
 TODO:
 local storage
-do not render all columns on columnUpdate (scroll resets on columns)
 when adding card -> mount element to .cards
 animations
 componentModule addClearableEventListener(docuemnt, event, handler)
