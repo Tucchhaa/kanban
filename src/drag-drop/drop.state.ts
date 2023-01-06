@@ -2,7 +2,11 @@ import { BaseState } from "../base/state";
 
 type DropOptions<TItem extends object> = {
     direction?: 'horizontal' | 'vertical';
-    isEqual?: ((itemA: TItem, itemB: TItem) => boolean) | null;
+
+    isItemsEqual?: ((itemA: TItem, itemB: TItem) => boolean) | null;
+
+    scrollBoundaryRange?: number;
+    scrollSpeed?: number;
 }
 
 export class DropState<TItem extends object> extends BaseState<DropOptions<TItem>> {
@@ -10,14 +14,26 @@ export class DropState<TItem extends object> extends BaseState<DropOptions<TItem
         return this.options.direction!;
     }
     
-    public isEqual() {
-        return this.options.isEqual!;
+    public get isItemsEqual() {
+        return this.options.isItemsEqual!;
+    }
+
+    public get scrollBoundaryRange() {
+        return this.options.scrollBoundaryRange!;
+    }
+
+    public get scrollSpeed() {
+        return this.options.scrollSpeed!;
     }
 
     constructor(options: DropOptions<TItem>) {
         const defaultOptions: DropOptions<TItem> = {
             direction: 'horizontal',
-            isEqual: (itemA: TItem, itemB: TItem) => itemA === itemB
+
+            isItemsEqual: (itemA: TItem, itemB: TItem) => itemA === itemB,
+
+            scrollBoundaryRange: 80,
+            scrollSpeed: 40
         };
 
         super(defaultOptions, options);

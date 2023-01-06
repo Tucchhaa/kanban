@@ -8,24 +8,35 @@ import { Column } from "../types";
 import { Icon } from "../utils/icons";
 import { columnNameValidation } from "../utils/validation";
 import { KanbanState } from "./kanban.state";
+import {mouse} from "../utils/mouse";
 
 export class KanbanView extends BaseView<KanbanState> {
+    public dropContainer?: HTMLElement;
+    public dropScrollContainer?: HTMLElement;
+
     constructor() {
         super(['kanban']);
     }
 
     protected _render(fragment: DocumentFragment): void {
-        this._renderColumns(fragment);
-        this._renderAddColumn(fragment);
+        this.dropScrollContainer = this.container;
+        this.dropContainer = this.createRenderElement('columns', this.createDOMElement('div', 'columns'), this.renderColumns.bind(this));
+
+        fragment.append(
+            this.dropContainer,
+            this.createRenderElement('add-column', this.createDOMElement('div', 'add-column'), this.renderAddColumn.bind(this))
+        );
+
+        this.addMouseEventListeners();
     }
 
-    private _renderColumns(fragment: DocumentFragment) {
+    private renderColumns(container: HTMLElement) {
         const columns = this.state.columns;
 
         for(let index = 0; index < columns.length; index++) {
             const column = columns[index];
 
-            const columnContainer = this.createDOMElement('div');
+            const columnContainer = this.createDOMElement('div', 'kanban-column');
             const columnOptions: ColumnOptions = { column }
 
             const columnComponent = this.createComponent(columnContainer, ColumnComponent, columnOptions, `column${column.id}`);
@@ -34,13 +45,11 @@ export class KanbanView extends BaseView<KanbanState> {
             setTimeout(() => this.eventEmitter.emit('process-drag', columnComponent));
             setTimeout(() => this.eventEmitter.emit('process-shared-drop', columnComponent));
 
-            fragment.appendChild(columnContainer);
+            container.appendChild(columnContainer);
         }
     }
 
-    private _renderAddColumn(fragment: DocumentFragment) {
-        const addColumnContainer = this.createDOMElement('div', ['add-column']);
-
+    private renderAddColumn(container: HTMLElement) {
         const options: EditableFieldOptions = {
             title: '+ Add new column',
             placeholder: 'Enter new column\'s name',
@@ -53,8 +62,12 @@ export class KanbanView extends BaseView<KanbanState> {
             validation: columnNameValidation
         };
         
-        this.createComponent(addColumnContainer, EditableFieldComponent, options, 'add-column-field');
-        
-        fragment.append(addColumnContainer);
+        this.createComponent(container, EditableFieldComponent, options, 'add-column-field');
+    }
+
+    private addMouseEventListeners() {
+        const mouseMoveHandler = mouse.setPosition.bind(mouse);
+        document.addEventListener('mousemove', mouseMoveHandler);
+        this.onClear.push(() => document.removeEventListener('mousemove', mouseMoveHandler));
     }
 }

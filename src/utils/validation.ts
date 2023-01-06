@@ -2,7 +2,7 @@ export const cardNameValidation = (value: string): [boolean, string] => {
     if(value.length === 0)
         return [false, 'Card name can\'t be empty'];
     
-    if(value.length > 120)
+    if(value.length > 200)
         return [false, 'Card name is too long'];
 
     return [true, ''];

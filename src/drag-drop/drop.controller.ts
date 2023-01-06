@@ -1,41 +1,79 @@
 import { BaseComponent, BaseComponentType } from "../base/component";
 import { BaseController } from "../base/controller";
-import { mouse } from "../utils/mouse-direction";
+import { hasHorizontalScroll, hasVerticalScroll } from "../helpers";
+import { UndefinedViewPropertyError } from "../utils/errors";
+import { mouse } from "../utils/mouse";
+import { smoothScroll, SmoothScrollOptions } from "../utils/smooth-scroll";
 import { DragController } from "./drag.controller";
 import { DropState } from "./drop.state";
 
 export class DropController<TItem extends object> extends BaseController {
     private dropState: DropState<TItem>;
+
+    private _dropScrollContainer?: HTMLElement;
+    private _dropContainer?: HTMLElement;
     
-    private draggingDirection: 'horizontal' | 'vertical';
+    private dropInterval?: any;
 
     public drags: DragController<TItem>[] = [];
-    private dropContainer?: HTMLElement;
+    private draggingDirection: 'horizontal' | 'vertical';
 
-    private shadowElement: HTMLElement = document.createElement('div');
-    private shadowIndex: number = -1;
+    private isMouseInsideDrag: (drag: DragController<TItem>) => boolean;
+    private isItemsEqual: (itemA: TItem, itemB: TItem) => boolean;
 
-    private isAbleToDrop: (dropElement: HTMLElement) => boolean;
-    public isItemsEqual: (itemA: TItem, itemB: TItem) => boolean;
+    private scrollDirection?: 'start' | 'end';
 
     public columnName: string = "";
 
-    constructor(isAbleToDrop?: (dropElement: HTMLElement) => boolean) {
+    // ===
+    public get dropContainer() {
+        return this._dropContainer!;
+    }
+
+    public get dropScrollContainer() {
+        return this._dropScrollContainer!;
+    }
+    // ===
+
+    constructor(isMouseInsideDrag?: (drag: DragController<TItem>) => boolean) {
         super();
 
         this.dropState = this.getRequiredState<DropState<TItem>>(DropState.name);
         this.draggingDirection = this.dropState.direction;
 
-        this.isAbleToDrop = isAbleToDrop ?? mouse.isInsideElement.bind(mouse);
-        this.isItemsEqual = this.dropState.isEqual();
+        const isMouseInsideElement = mouse.isInsideElement.bind(mouse);
+
+        this.isMouseInsideDrag = isMouseInsideDrag ?? ((drag: DragController<TItem>) => isMouseInsideElement(drag.element));
+        this.isItemsEqual = this.dropState.isItemsEqual;
         
         setTimeout(() => {
             this.columnName = (this.container.querySelector('.title') as HTMLElement).innerText;
-        })
+        });
 
         this.eventEmitter
             .on('process-drag', this.onProcessDrag.bind(this))
-            .on('drags-container-rendered', (dragsContainer: HTMLElement) => this.dropContainer = dragsContainer);
+            .on('rendered', () => {
+                const { dropContainer, dropScrollContainer } = this.view as any;
+
+                if(!dropContainer)
+                    throw new UndefinedViewPropertyError(DropController.name, this.componentName, 'dropContainer');
+
+                this._dropContainer = dropContainer;
+                this._dropScrollContainer = dropScrollContainer ?? dropContainer;
+
+                this.dropContainer.classList.add('droppable');
+            });
+    }
+
+    // ===
+
+    public clear() {
+        this.clearDropInterval();
+        this.drags = [];
+    }
+
+    public clearDropInterval() {
+        clearInterval(this.dropInterval);
     }
 
     // ===
@@ -49,13 +87,13 @@ export class DropController<TItem extends object> extends BaseController {
 
         // ===
 
-        const onDragStart = (e: MouseEvent) => this.startDrag(e, dragController);
-        const onDrag = (e: MouseEvent) => this.drag(e, dragController);
-        const onDragEnd = (e: MouseEvent) => this.endDrag(e, dragController);
+        const onDragStart = () => this.startDrag(dragController);
+        const onDrag      = () => this.drag(dragController);
+        const onDragEnd   = () => this.endDrag();
 
         dragController.eventEmitter
             .on('drag-start', onDragStart)
-            .on('drag', onDrag)
+            // .on('drag', onDrag)
             .on('drag-end', onDragEnd);
 
         // ===
@@ -63,140 +101,201 @@ export class DropController<TItem extends object> extends BaseController {
         dragController.eventEmitter.once('unsubscribe-drag-listeners', () => {
             dragController.eventEmitter            
                 .unsubscribe('drag-start', onDragStart)
-                .unsubscribe('drag', onDrag)
+                // .unsubscribe('drag', onDrag)
                 .unsubscribe('drag-end', onDragEnd)
         });
     }
 
-
     // === DRAG EVENTS
-    public startDrag(e: MouseEvent, dragController: DragController<TItem>) {
-        this.shadowIndex = this.getItemIndex(dragController.item);
+    public startDrag(drag: DragController<TItem>) {
+        this.drag(drag);
 
-        this.showShadow(dragController.element);
-        this.drag(e, dragController);
+        this.dropInterval = setInterval(() => {
+            this.scrollDropContainer();
+            this.drag(drag);
+        }, 100);
     }
 
-    private drag(e: MouseEvent, dragController: DragController<TItem>) {
+    private drag(drag: DragController<TItem>) {
+        const scrollTop = this.dropContainer.scrollTop;
+
+        const dragPosition = this.calculateDragPosition(drag);
+        const positionChanged = this.changeDragPosition(drag, dragPosition);
+
+        if(positionChanged) {
+            this.dropContainer.scrollTop = scrollTop;
+            this.moveDragToIndex(drag, dragPosition.index);
+        }
+    }
+
+    public endDrag() {
+        this.clearDropInterval();
+        this.eventEmitter.emit('update-items-order', this.drags.map(drag => drag.item));
+    }
+
+    // === SCROLLING
+
+    private getScrollBoundaries() {
+        const scrollPosition = this.dropScrollContainer.getBoundingClientRect();
         const direction = this.dropState.direction;
-        const isInsertBefore = this.isInsertBefore();
-        const dropPosition = this.dropContainer!.getBoundingClientRect();
-        const currentDragElement = dragController.element;
 
-        // Shadow above or left
-        if(
-            (direction === 'vertical' && e.clientY <= dropPosition.y) || 
-            (direction === 'horizontal' && e.clientX <= dropPosition.x)
-        ) {
-            this.shadowIndex = 0;
-
-            this.dropContainer?.children.length ?
-                this.dropContainer!.firstChild?.before(this.shadowElement) :
-                this.dropContainer!.appendChild(this.shadowElement);
+        if(direction === 'vertical') {
+            return {
+                boundary: {
+                    start: scrollPosition.top,
+                    end: scrollPosition.bottom,
+                },
+                currentPosition: mouse.position.y
+            }
         }
-        // Shadow below or right
-        else if(
-            (direction === 'vertical' && e.clientY >= dropPosition.y + dropPosition.height) || 
-            (direction === 'horizontal' && e.clientX >= dropPosition.x + dropPosition.width)
-        ) {
-            this.shadowIndex = this.drags.length;
 
-            this.dropContainer?.children.length ?
-                this.dropContainer!.lastChild?.after(this.shadowElement) :
-                this.dropContainer!.appendChild(this.shadowElement);
+        return {
+            boundary: {
+                start: scrollPosition.left,
+                end: scrollPosition.right,
+            },
+            currentPosition: mouse.position.x
         }
-        // Shadow inside
-        else  {
-            for(let index=0; index < this.drags.length; index++) {
-                const drag = this.drags[index];
-                const dragElement = drag.container; 
-            
-                if(dragElement !== currentDragElement) {
-                    if(this.isAbleToDrop(dragElement)) {
-                        if(isInsertBefore) {
-                            dragElement.before(this.shadowElement);
-                            this.shadowIndex = index;
-                        }
-                        else {
-                            dragElement.after(this.shadowElement);
-                            this.shadowIndex = index + 1; 
-                        }
+    }
 
-                        break;
-                    }
+    public scrollDropContainer() {
+        let scrollOptions: SmoothScrollOptions | undefined;
+        const { scrollBoundaryRange, scrollSpeed } = this.dropState;
+        const { boundary, currentPosition } = this.getScrollBoundaries();
+
+        if(hasVerticalScroll(this.dropScrollContainer) || hasHorizontalScroll(this.dropScrollContainer)) {
+            if(currentPosition < boundary.start + scrollBoundaryRange) {
+                // scroll to very start
+                if(currentPosition < boundary.start) {
+                    scrollOptions = { time: 500, speedY: -15 };
+                }
+                // scroll to start
+                else {
+                    const scrollDistance = (1 - (currentPosition - boundary.start) / scrollBoundaryRange) * scrollSpeed;
+                    scrollOptions = { time: 80, y: -scrollDistance };
+                }
+
+            }
+            else if(currentPosition > boundary.end - scrollBoundaryRange) {
+                // scroll to very end
+                if(currentPosition > boundary.end) {
+                    scrollOptions = { time: 500, speedY: 15 };
+                }
+                // scroll to end
+                else {
+                    const scrollDistance = (1 - (boundary.end - currentPosition) / scrollBoundaryRange) * scrollSpeed;
+                    scrollOptions = { time: 80, y: scrollDistance };
                 }
             }
         }
-    }
 
-    private endDrag(e: MouseEvent, dragController: DragController<TItem>) {
-        this.shadowElement.before(dragController.element);
-        this.hideShadow();
-        this.updateItemsOrder(dragController);
-    }
+        if(scrollOptions) {
+            this.scrollDirection = scrollOptions.y! > 0 || scrollOptions.speedY! > 0 ? 'end' : 'start';
 
-    private updateItemsOrder(dragController: DragController<TItem>) {
-        const currentItem = dragController.item;
-        const newOrder: TItem[] = [];
-        const insertBeforeIndex = this.shadowIndex;
+            if(this.dropState.direction === 'horizontal') {
+                scrollOptions.speedX = scrollOptions.speedY;
+                scrollOptions.x = scrollOptions.y;
 
-        for(let index=0; index < this.drags.length; index++) {
-            const item = this.drags[index].item;
-
-            if(index === insertBeforeIndex)
-                newOrder.push(currentItem);
-
-            if(this.isItemsEqual(item, currentItem)) {
-                continue;
+                delete scrollOptions.speedY;
+                delete scrollOptions.y;
             }
-            
-            newOrder.push(item);
+
+            smoothScroll(this.dropScrollContainer, scrollOptions);
+            // smoothScroll(this.dropContainer, scrollOptions, () => { this.scrollDirection = undefined; });
+        }
+        else {
+            this.scrollDirection = undefined;
+        }
+    }
+
+    // == PRIVATE
+
+    private calculateDragPosition(drag: DragController<TItem>): ({ index: number, isInsertBefore: boolean }) {
+        const direction = this.dropState.direction;
+        const mousePosition = mouse.position;
+        const dropPosition = this.dropContainer.getBoundingClientRect();
+        
+        let isInsertBefore = this.isInsertBefore();
+        let index = -1;
+
+        // Shadow above or left
+        if(
+            (direction === 'vertical' && mousePosition.y <= dropPosition.y) || 
+            (direction === 'horizontal' && mousePosition.x <= dropPosition.x)
+        ) {
+            index = 0;
+            isInsertBefore = true;
+        }
+        // Shadow below or right
+        else if(
+            (direction === 'vertical' && mousePosition.y >= dropPosition.y + dropPosition.height) || 
+            (direction === 'horizontal' && mousePosition.x >= dropPosition.x + dropPosition.width)
+        ) {
+            index = this.drags.length - 1;
+            isInsertBefore = false;
+        }
+        // Shadow inside
+        else  {
+            for(let i = 0; i < this.drags.length; i++) {
+                if(!this.isSameDrag(this.drags[i], drag) && this.isMouseInsideDrag(this.drags[i])) {
+                    index = i;
+                    break;
+                }
+            }
         }
 
-        if(insertBeforeIndex === this.drags.length)
-            newOrder.push(currentItem);
-
-        this.eventEmitter.emit('update-items-order', newOrder);
+        return { index, isInsertBefore };
     }
 
-    public clear() {
-        this.shadowIndex = -1;
-        this.drags = [];
-    }
+    private changeDragPosition(drag: DragController<TItem>, dragPosition: { index: number, isInsertBefore: boolean }): boolean {
+        const { index, isInsertBefore } = dragPosition;
+        
+        if(index === -1)
+            return false;
 
-    // === SHARED DROP
-    public removeDrag(dragController: DragController<TItem>) {
-        this.drags = this.drags.filter(drag => drag !== dragController);
-    }
+        const insertNearDrag = this.drags[index];
 
-    // === PRIVATE METHODS
-    private getItemIndex(item: TItem): number {
-        for(let index=0; index < this.drags.length; index++) {
-            const itemB = this.drags[index].item;
-
-            if(this.isItemsEqual(item, itemB)) {
-                return index;
+        if(insertNearDrag && !this.isSameDrag(insertNearDrag, drag)) {
+            if(isInsertBefore) {
+                if(index === 0 || !this.isSameDrag(this.drags[index - 1], drag)) {
+                    insertNearDrag.container.before(drag.container)
+                    return true;
+                }
             }
+            else {
+                if(index + 1 === this.drags.length || !this.isSameDrag(this.drags[index + 1], drag)) {
+                    insertNearDrag.container.after(drag.container);
+                    return true;
+                }
+            }
+
+        }
+        else if(this.dropContainer.children.length !== this.drags.length) {
+            this.dropContainer.appendChild(drag.container);
+            return true;
         }
 
-        return -1;
+        return false;
     }
 
-    private showShadow(element: HTMLElement) {
-        this.shadowElement.classList.add('shadow');
-        this.shadowElement.style.display = 'block';
-        this.shadowElement.style.margin = getComputedStyle(element).margin;
-        this.shadowElement.style.width = element.clientWidth + 'px';
-        this.shadowElement.style.height = element.clientHeight + 'px';
-
-        element.before(this.shadowElement);
+    private isSameDrag(dragA: DragController<TItem>, dragB: DragController<TItem>) {
+        return this.isItemsEqual(dragA.item, dragB.item);
     }
 
-    public hideShadow() {
-        this.shadowElement.style.display = 'none';
+    private moveDragToIndex(drag: DragController<TItem>, toIndex: number) {
+        const fromIndex = this.drags.indexOf(drag);
+
+        // remove from old index
+        this.drags.splice(fromIndex, 1);
+
+        // add to new index
+        this.drags.splice(toIndex, 0, drag);
     }
 
     private isInsertBefore() {
-        return this.draggingDirection === 'vertical' ? mouse.vertical === 'up' : mouse.horizontal === 'left'
+        if(this.scrollDirection)
+            return this.scrollDirection === 'start';
+
+        return this.draggingDirection === 'vertical' ? mouse.vertical === 'up' : mouse.horizontal === 'left';
     }
 }

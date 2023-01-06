@@ -6,8 +6,7 @@ import { DropState } from "../drag-drop/drop.state";
 import { Column } from "../types";
 import { DropController } from "../drag-drop/drop.controller";
 import { SharedDropManagerController } from "../drag-drop/shared-drop.manager.controller";
-import { DropView } from "../drag-drop/drop.view";
-import { mouse } from "../utils/mouse-direction";
+import { mouse } from "../utils/mouse";
 
 export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, KanbanView> {
     constructor(container: HTMLElement | null, options: KanbanOptions) {
@@ -17,7 +16,7 @@ export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, K
 
         // Shared drop
         const isAbleToDrop = (dropElement: HTMLElement) => {
-            const mousePosition = mouse.getPosition();
+            const mousePosition = mouse.position;
             const position = dropElement.getBoundingClientRect();
 
             return mousePosition.x >= position.x && mousePosition.x <= position.x + position.width;
@@ -26,9 +25,11 @@ export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, K
 
         // Drop
         this.registerState(() => new DropState<Column>({
-            isEqual: (cardA, cardB) => cardA.id === cardB.id
+            isItemsEqual: (cardA, cardB) => cardA.id === cardB.id,
+
+            scrollBoundaryRange: 150,
+            scrollSpeed: 100
         }))
-        this.extendView(() => new DropView());
         this.registerController(() => new DropController<Column>());
 
         super.render();

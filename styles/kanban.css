@@ -1,25 +1,51 @@
-.kanban {
+/* Cancel buttons with cross */
+.add-column .buttons .cancel,
+.kanban-column .card .editable-field .buttons .cancel,
+.add-card .buttons .cancel {
+    padding: 7px 10px;
+    color: #1a1a1a;
+}
+
+#kanban-container {
     height: 100vh;
-    min-width: min-content;
-    padding: 15px 25px;
+    box-sizing: border-box;
+    padding-bottom: 10px;
+    
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    background-color: #023e3d;
+}
+
+/* ===== */
+.kanban {
+    height: 100%;
+    width: 100%;
+    padding: 15px 25px 15px 5px;
+    margin-bottom: 8px;
     box-sizing: border-box;
 
     display: flex;
     align-items: flex-start;
 
-    background-color: #023e3d;
-    /* background-color: #01483d; */
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
-.kanban > .kanban-column,
-.kanban > .add-column {
+.kanban .columns {
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+}
+
+.kanban .kanban-column,
+.kanban .add-column {
+    min-width: 250px;
     width: 250px;
-    box-sizing: border-box;
-    border-radius: 3px;
     word-wrap: break-word;
 }
 
-.kanban > .add-column, 
+.kanban .add-column, 
 .kanban-column {
     -webkit-user-select: none;  
     -moz-user-select: none;
@@ -27,7 +53,33 @@
     user-select: none;
 }
 
-.kanban > .shadow {
+.kanban-column > .shadow {
     background-color: #012928;
     border-radius: 3px;
+}
+
+/* Scrollbar */
+/* width */
+.kanban::-webkit-scrollbar {
+    height: 12px;
+}
+::-webkit-scrollbar-button {
+    width: 8px;
+    height: 8px;
+}
+/* Track */
+.kanban::-webkit-scrollbar-track {
+    background: #012928;
+    border-radius: 5px;
+}
+
+/* Handle */
+.kanban::-webkit-scrollbar-thumb {
+    background: #186362;
+    border-radius: 5px;
+}
+
+/* Handle on hover */
+.kanban::-webkit-scrollbar-thumb:hover {
+    background: #207776;
 }

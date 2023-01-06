@@ -1,6 +1,6 @@
 import { BaseStateType, IState } from "../base/state";
 import { BaseView } from "../base/view";
-import { Dictionary } from "../types";
+import { ClassList, Dictionary } from "../types";
 import { ComponentModule, ComponentProps } from "./component-module";
 import { BaseController } from "./controller";
 import { EventEmitter, IEventEmitter } from "./event-emitter";
@@ -26,7 +26,7 @@ export class BaseComponent<
     constructor(
         name: string,
         stateType: new(options: TOptions) => TState, 
-        viewType: new(container: HTMLElement) => TView, 
+        viewType: new(classes?: ClassList) => TView, 
         container: HTMLElement | null, 
         options: TOptions
     ) {
@@ -46,7 +46,7 @@ export class BaseComponent<
 
         // === Create view
 
-        this._view = this.createComponentModule(() => new viewType(container));
+        this._view = this.createComponentModule(() => new viewType());
         this.eventEmitter.on('render', () => {
             this.clear();
             this.render();

@@ -1,18 +1,20 @@
 import { BaseStateType } from "../base/state";
 import { BaseView } from "../base/view";
 import { concatClasses } from "../helpers";
+import { ClassList } from "../types";
 import { DragState } from "./drag.state";
 
 export class DragView<TState extends BaseStateType> extends BaseView<TState> {
-    constructor(classes?: string[] | string) {
-        const _classes = concatClasses('draggable', classes);
-        super(_classes);
+    constructor(classes?: ClassList) {
+        super(classes);
     }
 
     protected _render(fragment: DocumentFragment): void {
-        const dragState = this.getRequiredState<DragState>(DragState.name);
+        this.subscribeEventHandlers();
+    }
 
-        // ===
+    private subscribeEventHandlers() {
+        const dragState = this.getRequiredState<DragState>(DragState.name);
 
         let isMouseDown: boolean;
         let initX: number, initY: number;
@@ -38,7 +40,7 @@ export class DragView<TState extends BaseStateType> extends BaseView<TState> {
         }
 
         // ===
-        let draggableArea = (this.view as any).draggableAreaElement ?? this.container;
+        let draggableArea = (this.view as any).draggableAreaElement || (this.view as any).dragElement || this.container;
 
         draggableArea.addEventListener('mousedown', onMouseDown);
         draggableArea.addEventListener('mousemove', onMouseMove);

@@ -19,7 +19,7 @@ export class Mouse {
         this.oldY = e.clientY; 
     }
 
-    public getPosition() {
+    public get position() {
         return {x: this.oldX, y: this.oldY };
     }
 
@@ -32,7 +32,7 @@ export class Mouse {
     }
 
     public isInsideElement(element: HTMLElement) {
-        const mousePosition = this.getPosition();
+        const mousePosition = this.position;
         const elementPosition = element instanceof DOMRect ? element : element.getBoundingClientRect();
     
         return (

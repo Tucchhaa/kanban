@@ -1,8 +1,12 @@
-.kanban-column {
+.column-wrapper {
+    padding-right: 10px;
+    height: 100%;
+}
+.column {
     min-height: 50px;
-    /* max-height: 100%; */
-    max-height: 400px;
-    margin-right: 10px;
+    max-height: 100%;
+    /* max-height: 600px; */
+    border-radius: 3px;
 
     display: flex;
     flex-direction: column;
@@ -11,35 +15,42 @@
     padding: 3px;
 }
 
-.kanban-column.state-dragging {
+.column.state-dragging {
     transform: rotate(2deg);
+    z-index: 1000;
 }
 
-.kanban-column > .content {
+.column .cards {
     overflow-y: auto;
     min-height: 5px;
+    position: relative;
+}
+
+.column .cards .shadow {
+    border-radius: 3px;
+    background-color: lightgrey;
 }
 
 /* Scrollbar */
 /* width */
-.kanban-column > .content::-webkit-scrollbar {
+.column .cards::-webkit-scrollbar {
     width: 8px;
 }
 
 /* Track */
-.kanban-column > .content::-webkit-scrollbar-track {
+.column .cards::-webkit-scrollbar-track {
     background: #cdcdcd;
     border-radius: 3px;
     /* background-color: #ecf0f1; */
 }
 
 /* Handle */
-.kanban-column > .content::-webkit-scrollbar-thumb {
+.column .cards::-webkit-scrollbar-thumb {
     background-color: #afafaf;
     border-radius: 3px;
 }
 
 /* Handle on hover */
-.kanban-column > .content::-webkit-scrollbar-thumb:hover {
+.column .cards::-webkit-scrollbar-thumb:hover {
     background-color: #a1a0a0;
 }

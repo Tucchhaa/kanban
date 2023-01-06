@@ -3,6 +3,7 @@ import { StateChange } from "../base/state";
 import { DropController } from "../drag-drop/drop.controller";
 import { isDeepEqual } from "../helpers";
 import { Card } from "../types";
+import { smoothScroll } from "../utils/smooth-scroll";
 import { ColumnState } from "./column.state";
 import { ColumnView } from "./column.view";
 
@@ -12,7 +13,11 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
         
         this.eventEmitter
             .on('change-column-name', this.onChangeColumnName.bind(this))
+            
             .on('create-new-card', this.onCreateNewCard.bind(this))
+            .on('delete-card', this.onDeleteCard.bind(this))
+            .on('add-card-field-opened', this.onAddCardFieldOpened.bind(this))
+
             .on('update-card', this.onUpdateCard.bind(this))
             .on('update-items-order', this.onUpdateCardsOrder.bind(this));
     }
@@ -24,13 +29,13 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
 
             case 'column.cards':
                 if(change.value.length !== change.previousValue.length) {
-                    const contentContainer = this.view.getElementContainer('content');
-                    const { scrollTop } = contentContainer;
+                    const cardsContainer = this.view.getElementContainer('cards');
+                    const { scrollTop } = cardsContainer;
                 
                     this.getRequiredController(DropController.name).clear();
-                    this.view.renderElement('content');
+                    this.view.renderElement('cards');
 
-                    contentContainer.scrollTop = scrollTop;
+                    cardsContainer.scrollTop = scrollTop;
                 }
                 break;
 
@@ -48,7 +53,19 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
         this.state.createCard(new Card(cardName));
     }
 
+    private onDeleteCard(card: Card) {
+        console.log(card);
+        this.state.deleteCard(card);
+    }
+
+    private onAddCardFieldOpened() {
+        const cardsContainer = this.view.getElementContainer('cards');
+
+        smoothScroll(cardsContainer, { time: 500, speedY: 30 });
+    }
+
     private onUpdateCard(card: Card) {
+        console.log('daupte')
         this.state.updateCard(card.id, card);
     }
 

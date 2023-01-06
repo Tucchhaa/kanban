@@ -2,16 +2,27 @@ import { BaseComponent, BaseComponentType } from "../base/component";
 import { BaseController } from "../base/controller";
 import { DragController } from "./drag.controller";
 import { DropController } from "./drop.controller";
+import { DropState } from "./drop.state";
 
 export class SharedDropController<TItem extends object> extends BaseController {
+    private dropState: DropState<TItem>;
     private dropController: DropController<TItem>;
+
+    private isItemsEqual: (itemA: TItem, itemB: TItem) => boolean;
 
     constructor() {
         super();
 
+        this.dropState = this.getRequiredState<DropState<TItem>>(DropState.name);
         this.dropController = this.getRequiredController<DropController<TItem>>(DropController.name);
-    
+
+        this.isItemsEqual = this.dropState.isItemsEqual;
+
         this.eventEmitter.on('process-drag', this.onProcessDrag.bind(this));
+    }
+
+    public get dropContainer() {
+        return this.dropController.dropContainer;
     }
 
     public get columnName() {
@@ -23,9 +34,9 @@ export class SharedDropController<TItem extends object> extends BaseController {
             dragComponent instanceof BaseComponent ?
             dragComponent.getRequiredController<DragController<TItem>>(DragController.name) : dragComponent;
 
-        const onDragStart = (e: MouseEvent) => this.eventEmitter.emit('shared-drag-start', e, this, dragController);
-        const onDrag      = (e: MouseEvent) => this.eventEmitter.emit('shared-drag', e, this, dragController);
-        const onDragEnd   = (e: MouseEvent) => this.eventEmitter.emit('shared-drag-end', e, this, dragController);
+        const onDragStart = () => this.eventEmitter.emit('shared-drag-start', this, dragController);
+        const onDrag      = () => this.eventEmitter.emit('shared-drag', this, dragController);
+        const onDragEnd   = () => this.eventEmitter.emit('shared-drag-end', this, dragController);
 
         dragController.eventEmitter
             .on('drag-start', onDragStart)
@@ -42,23 +53,30 @@ export class SharedDropController<TItem extends object> extends BaseController {
         });
     }
 
-    public onSharedDragStart(e: MouseEvent, dragController: DragController<TItem>) {
+    public onSharedDragStart(dragController: DragController<TItem>) {
         this.onProcessDrag(dragController);
         this.dropController.onProcessDrag(dragController);
 
-        this.dropController.startDrag(e, dragController);
+        this.dropController.startDrag(dragController);
     }
 
-    public onDragStartToShared(dragController: DragController<TItem>) {
+    public onDragStartInShared(dragController: DragController<TItem>) {
+        this.removeDrag(dragController);
+
+        this.dropController.clearDropInterval();
+
         dragController.eventEmitter.emit('unsubscribe-drag-listeners');
-
-        this.dropController.removeDrag(dragController);
-        this.dropController.hideShadow();
     }
 
-    public onDragEndToShared(dragController: DragController<TItem>) {
-        this.dropController.removeDrag(dragController);
+    public onDragEndInShared(dragController: DragController<TItem>) {
+        this.removeDrag(dragController);
 
-        this.eventEmitter.emit('update-items-order', this.dropController.drags.map(drag => drag.item));
+        this.dropController.endDrag();
+        
+        // this.eventEmitter.emit('update-items-order', this.dropController.drags.map(drag => drag.item));
+    }
+
+    private removeDrag(dragController: DragController<TItem>) {
+        this.dropController.drags = this.dropController.drags.filter(drag => !this.isItemsEqual(drag.item, dragController.item))
     }
 }

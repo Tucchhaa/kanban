@@ -35,4 +35,10 @@ export class ColumnState extends BaseState<ColumnOptions> {
 
         this.updateCards(updatedCards);
     }
+
+    public deleteCard(card: Card) {
+        const updatedCards = this.column.cards.filter(_card => _card.id !== card.id);
+
+        this.updateCards(updatedCards);
+    }
 }

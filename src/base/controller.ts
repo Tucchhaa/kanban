@@ -6,7 +6,12 @@ export class BaseController<
     TState extends BaseStateType = BaseStateType,
     TView extends BaseView = BaseView
 > extends ComponentModule<TState, TView> {
-    public clear(): void {}
+    protected onClear: { (): void }[] = [];
+
+    public clear(): void {
+        for(const func of this.onClear)
+            func();
+    }
 
     public stateChanged(change: StateChange): void {}
 
