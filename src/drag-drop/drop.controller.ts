@@ -61,7 +61,6 @@ export class DropController<TItem extends object> extends BaseController {
                 this._dropContainer = dropContainer;
                 this._dropScrollElement = dropScrollElement ?? dropContainer;
 
-                console.log(this.dropScrollElement);
                 this.dropContainer.classList.add('droppable');
             });
     }

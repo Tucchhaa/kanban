@@ -11,7 +11,7 @@ reopen editable-field - нужно передавать старое состо�
 OPTIMIZATION: dragging: instead of iterating all cards on drag event, it is possible to add event listener on each card
 
 BUG:
-1) scrollDirection is set even if no scrolling occuring
+1) scrollDirection is set even if no scrolling occuring -> that prevents droping after last card
 2) Drag column -> column name change starts
 
 TODO:

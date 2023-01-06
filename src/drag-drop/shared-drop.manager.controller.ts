@@ -33,11 +33,11 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
     }
 
     private _dropController?: DropController<TItem>;
-    private get dropContrller() {
+    private get dropController() {
         if(!this._dropController)
             this._dropController = this.getController<DropController<TItem>>(DropController.name);
 
-        return this._dropController;
+        return this._dropController!;
     }
 
     private processDrop(dropComponent: BaseComponentType) {
@@ -45,7 +45,7 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
 
         dropController.eventEmitter
             .on('shared-drag-start', this.onDragStart.bind(this))
-            .on('shared-drag', this.onDrag.bind(this))
+            // .on('shared-drag', this.onDrag.bind(this))
             .on('shared-drag-end', this.onDragEnd.bind(this));
 
         this.drops.push(dropController);
@@ -58,7 +58,8 @@ export class SharedDropManagerController<TItem extends object> extends BaseContr
             this.currentDrop = fromDrop;
 
             this.scrollInterval = setInterval(() => {
-                this.dropContrller?.scrollDropContainer();
+                this.dropController.scrollDropContainer();
+                this.onDrag(fromDrop, dragController);
             }, 100);
         }
     }

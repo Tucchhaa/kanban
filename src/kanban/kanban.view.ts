@@ -22,7 +22,7 @@ export class KanbanView extends BaseView<KanbanState> {
     protected _render(fragment: DocumentFragment): void {
         this.dropScrollElement = this.container;
         this.grabScrollElement = this.container;
-        console.log(this.container);
+
         this.dropContainer = this.createRenderElement('columns', this.createDOMElement('div', 'columns'), this.renderColumns.bind(this));
 
         fragment.append(
