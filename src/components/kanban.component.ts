@@ -9,6 +9,7 @@ import { SharedDropManagerController } from "../drag-drop/shared-drop.manager.co
 import { mouse } from "../utils/mouse";
 import { GrabScrollController } from "../grab-scroll/grab-scroll.controller";
 import { GrabScrollState } from "../grab-scroll/grab-scroll.state";
+import { DragController } from "../drag-drop/drag.controller";
 
 export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, KanbanView> {
     constructor(container: HTMLElement | null, options: KanbanOptions) {
@@ -26,13 +27,18 @@ export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, K
         this.registerController(() => new SharedDropManagerController(isAbleToDrop));
 
         // Drop
+        const isMouseInsideDrag = (drag: DragController<Column>) => {
+            const position = drag.container.getBoundingClientRect();
+
+            return mouse.position.x >= position.left && mouse.position.x <= position.right;
+        }
         this.registerState(() => new DropState<Column>({
             isItemsEqual: (cardA, cardB) => cardA.id === cardB.id,
 
             scrollBoundaryRange: 150,
             scrollSpeed: 100
         }))
-        this.registerController(() => new DropController<Column>());
+        this.registerController(() => new DropController<Column>(isMouseInsideDrag));
 
         // Grab scrolling
         this.registerState(() => new GrabScrollState({}));
