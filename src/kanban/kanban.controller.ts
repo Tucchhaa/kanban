@@ -18,17 +18,6 @@ export class KanbanController extends BaseController<KanbanState, KanbanView> {
     public stateChanged(change: StateChange): void {
         switch(change.name) {
             case 'columns':
-                const previousOrder = change.previousValue.map((column: Column) => column.id);
-                const currentOrder = change.value.map((column: Column) => column.id);
-
-                const isOrderChanged = !isDeepEqual(previousOrder, currentOrder); 
-
-                if(isOrderChanged)
-                    this.render();
-
-                // if(change.value.length !== change.previousValue.length)
-                //     this.render();
-
                 break;
 
             default:

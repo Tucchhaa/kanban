@@ -2,6 +2,7 @@ import { BaseView } from "../base/view";
 import { ButtonOptions } from "../button/button.state";
 import { ButtonComponent } from "../components/button.component";
 import { EditableFieldComponent } from "../components/editable-field.component";
+import { PromptComponent } from "../components/prompt.component";
 import { EditableFieldOptions } from "../editable-field/editable-field.state";
 import { trim } from "../helpers";
 import { Icon } from "../utils/icons";
@@ -78,31 +79,12 @@ export class CardView extends BaseView<CardState> {
                 break;
 
             case 'delete-prompt':
-                container.style.display = 'block';
+                this.createComponent(container, PromptComponent, {
+                    text: 'Delete this card?',
+                    onConfirm: () => this.eventEmitter.emit('delete-card-confirmed'),
+                    onCancel: () => this.eventEmitter.emit('update-toolbar-state', 'default')
+                })
 
-                const prompt = this.createDOMElement('div', 'prompt-text');
-                prompt.innerText = 'Delete this card?';
-
-                const confirmBtnComponent = this.createComponent<ButtonOptions>('span', ButtonComponent, {
-                    text: 'confirm',
-                    className: 'prompt-confirm',
-                    onClick: () => this.eventEmitter.emit('delete-card-confirmed')
-                }, 'prompt-confirm-btn');
-
-                const cancelBtnComponent = this.createComponent<ButtonOptions>('span', ButtonComponent, {
-                    text: 'cancel',
-                    className: 'prompt-cancel',
-                    onClick: () => this.eventEmitter.emit('update-toolbar-state', 'default')
-                }, 'prompt-cancel-btn');
-               
-                // ===
-                
-                const promptBtns = this.createDOMElement('div', 'prompt-btns');
-                promptBtns.append(confirmBtnComponent.container, cancelBtnComponent.container);
-
-                container.append(prompt, promptBtns);
-
-                // ===
                 this.eventEmitter.emit('disable-card-drag');
 
                 setTimeout(() => {

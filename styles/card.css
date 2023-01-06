@@ -107,3 +107,8 @@
     font-size: 14px;
     padding: 1px 3px;
 }
+
+.kanban-column .card .editable-field .buttons .submit {
+    padding: 7px 10px;
+    font-size: 13px;
+}

@@ -72,6 +72,8 @@ export class BaseComponent<
 
             controller?.clear();
         }
+
+        this.eventEmitter.clear();
     }
 
     // === GETTERS

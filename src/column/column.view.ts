@@ -66,6 +66,12 @@ export class ColumnView extends BaseView<ColumnState> {
             const cardOptions: CardOptions = { card };
             const cardCompoment = this.createComponent(cardContainer, CardComponent, cardOptions, `card${card.id}`);
 
+            // ===
+
+            cardCompoment.eventEmitter.on('drag-start', () => this.eventEmitter.emit('card-drag-start'));
+            cardCompoment.eventEmitter.on('drag-end',   () => this.eventEmitter.emit('card-drag-end'));
+
+            // ===
             cardCompoment.eventEmitter.on('update-card', (card: Card) => this.eventEmitter.emit('update-card', card));
             cardCompoment.eventEmitter.on('delete-card', (card: Card) => this.eventEmitter.emit('delete-card', card));
 

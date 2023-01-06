@@ -1,7 +1,7 @@
 import { Dictionary } from "../types";
 import { IClearable } from "./idisposable";
 
-export interface IEventEmitter {
+export interface IEventEmitter extends IClearable {
     on(event: string, listener: CallableFunction): IEventEmitter;
 
     once(event: string, listener: CallableFunction): IEventEmitter;
@@ -17,7 +17,7 @@ export interface IEventEmitter {
 
 // ===
 
-export class EventEmitter implements IEventEmitter, IClearable {
+export class EventEmitter implements IEventEmitter {
     private events: Dictionary<CallableFunction[]>;
     private onAnyListeners: CallableFunction[];
     private onceListeners: Dictionary<CallableFunction[]>;
@@ -92,5 +92,9 @@ export class EventEmitter implements IEventEmitter, IClearable {
         }
     }
 
-    public clear(): void { }
+    public clear(): void {
+        // this.events = {};
+        // this.onAnyListeners = [];
+        // this.onceListeners = {};
+    }
 }

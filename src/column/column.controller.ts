@@ -19,7 +19,7 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
             .on('add-card-field-opened', this.onAddCardFieldOpened.bind(this))
 
             .on('update-card', this.onUpdateCard.bind(this))
-            .on('update-items-order', this.onUpdateCardsOrder.bind(this));
+            .on('update-items-order', this.onUpdateCardsOrder.bind(this))
     }
 
     public stateChanged(change: StateChange): void {
