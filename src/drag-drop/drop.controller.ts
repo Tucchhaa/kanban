@@ -10,7 +10,7 @@ import { DropState } from "./drop.state";
 export class DropController<TItem extends object> extends BaseController {
     private dropState: DropState<TItem>;
 
-    private _dropScrollContainer?: HTMLElement;
+    private _dropScrollElement?: HTMLElement;
     private _dropContainer?: HTMLElement;
     
     private dropInterval?: any;
@@ -30,8 +30,8 @@ export class DropController<TItem extends object> extends BaseController {
         return this._dropContainer!;
     }
 
-    public get dropScrollContainer() {
-        return this._dropScrollContainer!;
+    public get dropScrollElement() {
+        return this._dropScrollElement!;
     }
     // ===
 
@@ -53,14 +53,15 @@ export class DropController<TItem extends object> extends BaseController {
         this.eventEmitter
             .on('process-drag', this.onProcessDrag.bind(this))
             .on('rendered', () => {
-                const { dropContainer, dropScrollContainer } = this.view as any;
+                const { dropContainer, dropScrollElement } = this.view as any;
 
                 if(!dropContainer)
                     throw new UndefinedViewPropertyError(DropController.name, this.componentName, 'dropContainer');
 
                 this._dropContainer = dropContainer;
-                this._dropScrollContainer = dropScrollContainer ?? dropContainer;
+                this._dropScrollElement = dropScrollElement ?? dropContainer;
 
+                console.log(this.dropScrollElement);
                 this.dropContainer.classList.add('droppable');
             });
     }
@@ -136,7 +137,7 @@ export class DropController<TItem extends object> extends BaseController {
     // === SCROLLING
 
     private getScrollBoundaries() {
-        const scrollPosition = this.dropScrollContainer.getBoundingClientRect();
+        const scrollPosition = this.dropScrollElement.getBoundingClientRect();
         const direction = this.dropState.direction;
 
         if(direction === 'vertical') {
@@ -163,7 +164,7 @@ export class DropController<TItem extends object> extends BaseController {
         const { scrollBoundaryRange, scrollSpeed } = this.dropState;
         const { boundary, currentPosition } = this.getScrollBoundaries();
 
-        if(hasVerticalScroll(this.dropScrollContainer) || hasHorizontalScroll(this.dropScrollContainer)) {
+        if(hasVerticalScroll(this.dropScrollElement) || hasHorizontalScroll(this.dropScrollElement)) {
             if(currentPosition < boundary.start + scrollBoundaryRange) {
                 // scroll to very start
                 if(currentPosition < boundary.start) {
@@ -200,7 +201,7 @@ export class DropController<TItem extends object> extends BaseController {
                 delete scrollOptions.y;
             }
 
-            smoothScroll(this.dropScrollContainer, scrollOptions);
+            smoothScroll(this.dropScrollElement, scrollOptions);
             // smoothScroll(this.dropContainer, scrollOptions, () => { this.scrollDirection = undefined; });
         }
         else {

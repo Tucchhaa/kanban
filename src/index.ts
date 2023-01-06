@@ -20,7 +20,7 @@ do not render all columns on columnUpdate (scroll resets on columns)
 when adding card -> mount element to .cards
 grab kanban to scroll
 animations
-prompt component
+componentModule addClearableEventListener(docuemnt, event, handler)
 */
 
 window.addEventListener("load", () => {    

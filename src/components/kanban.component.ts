@@ -7,6 +7,8 @@ import { Column } from "../types";
 import { DropController } from "../drag-drop/drop.controller";
 import { SharedDropManagerController } from "../drag-drop/shared-drop.manager.controller";
 import { mouse } from "../utils/mouse";
+import { GrabScrollController } from "../grab-scroll/grab-scroll.controller";
+import { GrabScrollState } from "../grab-scroll/grab-scroll.state";
 
 export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, KanbanView> {
     constructor(container: HTMLElement | null, options: KanbanOptions) {
@@ -31,6 +33,10 @@ export class KanbanComponent extends BaseComponent<KanbanOptions, KanbanState, K
             scrollSpeed: 100
         }))
         this.registerController(() => new DropController<Column>());
+
+        // Grab scrolling
+        this.registerState(() => new GrabScrollState({}));
+        this.registerController(() => new GrabScrollController());
 
         super.render();
     }

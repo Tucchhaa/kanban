@@ -17,13 +17,7 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
 
         this.registerController(() => new ColumnController());
 
-        // DROP
-        const isMouseInsideDrag = (drag: DragController<Card>) => {
-            const position = drag.container.getBoundingClientRect();
-
-            return mouse.position.y >= position.top && mouse.position.y <= position.bottom;
-        }
-
+        // SHARED DROP
         this.registerState(() => new DropState<Card>({
             direction: 'vertical',
 
@@ -32,6 +26,13 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
             scrollBoundaryRange: 70,
             scrollSpeed: 120
         }));
+
+        // DROP
+        const isMouseInsideDrag = (drag: DragController<Card>) => {
+            const position = drag.container.getBoundingClientRect();
+
+            return mouse.position.y >= position.top && mouse.position.y <= position.bottom;
+        }
         this.registerController(() => new DropController<Card>(isMouseInsideDrag));
         this.registerController(() => new SharedDropController<Card>());
 

@@ -12,14 +12,17 @@ import {mouse} from "../utils/mouse";
 
 export class KanbanView extends BaseView<KanbanState> {
     public dropContainer?: HTMLElement;
-    public dropScrollContainer?: HTMLElement;
+    public dropScrollElement?: HTMLElement;
+    public grabScrollElement?: HTMLElement;
 
     constructor() {
         super(['kanban']);
     }
 
     protected _render(fragment: DocumentFragment): void {
-        this.dropScrollContainer = this.container;
+        this.dropScrollElement = this.container;
+        this.grabScrollElement = this.container;
+        console.log(this.container);
         this.dropContainer = this.createRenderElement('columns', this.createDOMElement('div', 'columns'), this.renderColumns.bind(this));
 
         fragment.append(
@@ -41,6 +44,14 @@ export class KanbanView extends BaseView<KanbanState> {
 
             const columnComponent = this.createComponent(columnContainer, ColumnComponent, columnOptions, `column${column.id}`);
             columnComponent.eventEmitter.on('update-column', (column: Column) => this.eventEmitter.emit('update-column', column));
+
+            // ===
+            columnComponent.eventEmitter.on('drag-start', () => this.eventEmitter.emit('disable-grab-scroll'));
+            columnComponent.eventEmitter.on('drag-end', () => this.eventEmitter.emit('enable-grab-scroll'));
+
+            columnComponent.eventEmitter.on('card-drag-start', () => this.eventEmitter.emit('disable-grab-scroll'));
+            columnComponent.eventEmitter.on('card-drag-end', () => this.eventEmitter.emit('enable-grab-scroll'));
+            // ===
 
             setTimeout(() => this.eventEmitter.emit('process-drag', columnComponent));
             setTimeout(() => this.eventEmitter.emit('process-shared-drop', columnComponent));
