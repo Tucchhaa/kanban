@@ -16,9 +16,7 @@ BUG:
 
 TODO:
 local storage
-delete card
-scroll to down when adding card
-do not render all columns on columnUpdate
+do not render all columns on columnUpdate (scroll resets on columns)
 when adding card -> mount element to .cards
 grab kanban to scroll
 animations

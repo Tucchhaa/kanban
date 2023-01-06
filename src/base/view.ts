@@ -63,7 +63,7 @@ export abstract class BaseView<TState extends BaseStateType = BaseStateType> ext
 
     // === PROTECTED METHODS
 
-    protected abstract _render(fragment: DocumentFragment, data?: any): void;
+    protected abstract _render(fragment: DocumentFragment): void;
 
     protected createDOMElement(tagName: string, classes?: ClassList) {
         const element = document.createElement(tagName);
