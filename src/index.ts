@@ -12,9 +12,7 @@ OPTIMIZATION: dragging: instead of iterating all cards on drag event, it is poss
 
 BUG:
 1) scrollDirection is set even if no scrolling occuring
-2) Drag card to left side of kanban
 3) Drag column -> column name change starts
-4) if drag between card gaps
 
 TODO:
 local storage
@@ -31,33 +29,6 @@ window.addEventListener("load", () => {
     const container = document.getElementById("kanban");
 
     const config: KanbanOptions = {
-        // columns: [{
-        //     name: 'In Progress',
-        //     id: 0,
-        //     cards: [
-        //         { id: 0, name: 'card 1' }, { id: 1, name: 'card 2' }, { id: 2, name: 'card 3' },
-        //         { id: 3, name: 'card 1' }, { id: 4, name: 'card 2' }, { id: 5, name: 'card 3' },
-        //         { id: 6, name: 'card 1' }, { id: 7, name: 'card 2' }, { id: 8, name: 'card 3' },
-        //     ]
-        // }, {
-        //     name: 'Done',
-        //     id: 1,
-        //     cards: [
-        //         { id: 18, name: 'card 4' }, { id: 19, name: 'card 5' },
-        //         { id: 25, name: 'card 6 jsnda aksdn lsadm aas as lorem aksldm asdkl asld []wqekr saodj s wek nasda lskdan sdm lasjd kalns' }
-        //     ]
-        // }, {
-        //     name: 'Waiting',
-        //     id: 2,
-        //     cards: [
-        //         { id: 9, name: 'card 1' }, { id: 10, name: 'card 2' }, { id: 11, name: 'card 3' },
-        //         { id: 12, name: 'card 4' }, { id: 13, name: 'card 5' }, { id: 14, name: 'card 6' },
-        //         { id: 15, name: 'card 7' }, { id: 16, name: 'card 8' }, { id: 17, name: 'card 9' },
-        //         { id: 20, name: 'card 10' },
-        //         { id: 21, name: 'card 11' }, { id: 22, name: 'card 12' }, { id: 23, name: 'card 13' },
-        //         { id: 24, name: 'card 14' },
-        //     ]
-        // }]
         columns: [{
             name: 'Plans for day',
             id: 0,

@@ -19,14 +19,9 @@ export class ColumnComponent extends BaseComponent<ColumnOptions, ColumnState, C
 
         // DROP
         const isMouseInsideDrag = (drag: DragController<Card>) => {
-            const mousePosition = mouse.position;
-            const position = drag.element.getBoundingClientRect();
+            const position = drag.container.getBoundingClientRect();
 
-            const styles = getComputedStyle(drag.element);
-            const marginLeft = parseInt(styles.marginLeft);
-            const marginRight = parseInt(styles.marginRight);
-
-            return mousePosition.y >= position.y - marginLeft && mousePosition.y <= position.y + position.height + marginRight;
+            return mouse.position.y >= position.top && mouse.position.y <= position.bottom;
         }
 
         this.registerState(() => new DropState<Card>({

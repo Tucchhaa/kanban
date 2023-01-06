@@ -1,5 +1,5 @@
 {
-  "name": "list-component-mvc",
+  "name": "kanban",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Tucchhaa/list-component-mvc.git"
+    "url": "git+https://github.com/Tucchhaa/kanban.git"
   },
   "author": "Eldar Iusupzhanov",
   "license": "ISC",
