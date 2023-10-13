@@ -44,15 +44,16 @@ export const isDeepEqual = (a: any, b: any) => {
     return a === b;
 };
 
-export const clone = (value: any) => {
+export const clone = (value: any, inc=0) => {
+    if(inc > 10) debugger;
     if(isArray(value)) {
         return value.map((item: any) => clone(item));
     }
-    else if(isObject(value)) {
+    else if(isObject(value) && value instanceof HTMLElement === false) {
         const result = {};
 
         for(const key in value)
-            (result as any)[key] = clone(value[key]);
+            (result as any)[key] = clone(value[key], inc+1);
 
         return result;
     }
