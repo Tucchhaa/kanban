@@ -52,6 +52,7 @@ export class DropController<TItem extends object> extends BaseController {
 
         this.eventEmitter
             .on('process-drag', this.onProcessDrag.bind(this))
+            .on('drag-deleted', this.onDragDeleted.bind(this))
             .on('rendered', () => {
                 const { dropContainer, dropScrollElement } = this.view as any;
 
@@ -104,6 +105,10 @@ export class DropController<TItem extends object> extends BaseController {
                 // .unsubscribe('drag', onDrag)
                 .unsubscribe('drag-end', onDragEnd)
         });
+    }
+
+    private onDragDeleted(item: TItem) {
+        this.removeDragByItem(item);
     }
 
     // === DRAG EVENTS
@@ -297,5 +302,9 @@ export class DropController<TItem extends object> extends BaseController {
             return this.scrollDirection === 'start';
 
         return this.draggingDirection === 'vertical' ? mouse.vertical === 'up' : mouse.horizontal === 'left';
+    }
+
+    public removeDragByItem(item: TItem) {
+        this.drags = this.drags.filter(drag => !this.isItemsEqual(drag.item, item));
     }
 }

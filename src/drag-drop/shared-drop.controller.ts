@@ -77,6 +77,6 @@ export class SharedDropController<TItem extends object> extends BaseController {
     }
 
     private removeDrag(dragController: DragController<TItem>) {
-        this.dropController.drags = this.dropController.drags.filter(drag => !this.isItemsEqual(drag.item, dragController.item))
+        this.dropController.removeDragByItem(dragController.item);
     }
 }

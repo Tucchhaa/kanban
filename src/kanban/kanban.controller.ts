@@ -44,6 +44,8 @@ export class KanbanController extends BaseController<KanbanState, KanbanView> {
         this.state.deleteColumn(column);
 
         this.container.querySelectorAll('.kanban-column')[index].remove();
+
+        this.eventEmitter.emit('drag-deleted', column);
     }
 
     private onUpdateColumnsOrder(columns: Column[]) {
