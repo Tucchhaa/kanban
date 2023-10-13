@@ -15,10 +15,10 @@ export type EditableFieldOptions = {
     resetValueOnClosed?: boolean;
 
     titleTemplate?: (open: () => void) => Node | undefined;
-    buttonsTemplate?: (container: HTMLElement, handlers: { close: () => void, submit: () => void }) => Node | undefined,
+    buttonsTemplate?: (container: HTMLElement, handlers: { close: () => void, submit: () => void }) => Node | undefined;
 
-    submitBtnContent?: string;
-    cancelBtnContent?: string;
+    submitBtnContent?: HTMLElement;
+    cancelBtnContent?: HTMLElement;
     
     prepareValue?: (value: string) => string,
     onSubmit?: (value: string) => void;
@@ -112,8 +112,8 @@ export class EditableFieldState extends BaseState<EditableFieldOptions> {
 
             titleTemplate: undefined,
             buttonsTemplate: undefined,
-            submitBtnContent: 'submit',
-            cancelBtnContent: 'cancel',
+            submitBtnContent: undefined,
+            cancelBtnContent: undefined,
 
             prepareValue: value => value,
             validation: () => [true, ""],

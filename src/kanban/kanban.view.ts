@@ -51,6 +51,7 @@ export class KanbanView extends BaseView<KanbanState> {
 
         const columnComponent = this.createComponent(columnElement, ColumnComponent, columnOptions, `column${column.id}`);
         columnComponent.eventEmitter.on('update-column', (column: Column) => this.eventEmitter.emit('update-column', column));
+        columnComponent.eventEmitter.on('delete-column', (column: Column) => this.eventEmitter.emit('delete-column', column));
 
         // ===
         columnComponent.eventEmitter.on('drag-start', () => this.eventEmitter.emit('disable-grab-scroll'));
@@ -71,8 +72,8 @@ export class KanbanView extends BaseView<KanbanState> {
             title: '+ Add new column',
             placeholder: 'Enter new column\'s name',
             
-            submitBtnContent: 'create',
-            cancelBtnContent: Icon.cross.outerHTML,
+            submitBtnContent: this.getAddColumnSubmitBtnContent(),
+            cancelBtnContent: this.getAddColumnCancelBtnContent(),
 
             prepareValue: trim,
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-column', value),
@@ -80,6 +81,20 @@ export class KanbanView extends BaseView<KanbanState> {
         };
         
         this.createComponent(container, EditableFieldComponent, options, 'add-column-field');
+    }
+
+    private getAddColumnSubmitBtnContent() {
+        const content = this.createDOMElement('span');
+        content.innerText = 'create';
+        
+        return content;
+    }
+
+    private getAddColumnCancelBtnContent() {
+        const content = this.createDOMElement('span');
+        content.append(Icon.cross);
+        
+        return content;
     }
 
     private addMouseEventListeners() {

@@ -8,6 +8,10 @@ import { Icon } from "../utils/icons";
 import { cardNameValidation, columnNameValidation } from "../utils/validation";
 import { concatClasses, trim } from "../helpers";
 import { Card, ClassList } from "../types";
+import { ButtonComponent } from "../components/button.component";
+import { ButtonOptions } from "../button/button.state";
+import { PromptComponent } from "../components/prompt.component";
+import { PromptOptions } from "../prompt/prompt.state";
 
 export class ColumnView extends BaseView<ColumnState> {
     public draggableAreaElement?: HTMLElement;
@@ -38,6 +42,22 @@ export class ColumnView extends BaseView<ColumnState> {
     private renderHeading(container: HTMLElement) {
         this.draggableAreaElement = container;
 
+        switch(this.state.toolbarState) {
+            case 'delete-prompt':
+                const columnNameElement = this.createColumnName();
+                const deletePromptElement = this.createDeletePrompt();
+
+                container.append(columnNameElement, deletePromptElement);
+                break;
+            default:
+                const headingFieldElement = this.createHeadingField();
+                const deleteBtn = this.createHeadingDeleteBtn();
+                
+                container.append(headingFieldElement, deleteBtn);
+        }
+    }
+
+    private createHeadingField() {
         const options: EditableFieldOptions = {
             value: this.state.column.name,
             placeholder: 'Column\'s name',
@@ -54,7 +74,46 @@ export class ColumnView extends BaseView<ColumnState> {
             onOpened: () => this.eventEmitter.emit('disable-drag'),
             onClosed: () => this.eventEmitter.emit('enable-drag')
         };
-        this.createComponent(container, EditableFieldComponent, options, 'heading-field');
+
+        const field = this.createComponent('div', EditableFieldComponent, options, 'heading-field');
+
+        return field.container;
+    }
+
+    private createHeadingDeleteBtn() {
+        const deleteBtn = this.createComponent<ButtonOptions>('div', ButtonComponent, {
+            className: 'delete-column-btn',
+            icon: Icon.delete,
+            onClick: () => this.eventEmitter.emit('update-toolbar-state', 'delete-prompt')
+        });
+
+        return deleteBtn.container;
+    }
+
+    private createColumnName() {
+        const columnName = this.createDOMElement('div', 'column-name');
+        columnName.innerText = this.state.column.name;
+
+        return columnName;
+    }
+
+    private createDeletePrompt() {
+        const prompt = this.createComponent<PromptOptions>('div', PromptComponent, {
+            text: 'Delete this column?',
+            onConfirm: () => this.eventEmitter.emit('delete-column-confirmed'),
+            onCancel: () => this.eventEmitter.emit('update-toolbar-state', 'default')
+        })
+
+        this.eventEmitter.emit('disable-column-drag');
+
+        setTimeout(() => {
+            const mouseDownHandler = () => this.eventEmitter.emit('update-toolbar-state', 'default');
+            document.addEventListener('click', mouseDownHandler);
+            this.onClearRenderElement('heading', () => document.removeEventListener('click', mouseDownHandler));
+            this.onClearRenderElement('heading', () => this.eventEmitter.emit('enable-column-drag'));
+        });
+
+        return prompt.container;
     }
 
     private renderCards(container: HTMLElement) {
@@ -86,8 +145,8 @@ export class ColumnView extends BaseView<ColumnState> {
             title: '+ Add new card',
             placeholder: 'Enter new card\'s name',
 
-            submitBtnContent: 'create',
-            cancelBtnContent: Icon.cross.outerHTML,
+            submitBtnContent: this.getAddCardSubmitBtnContent(),
+            cancelBtnContent: this.getAddCardCancelBtnContent(),
 
             prepareValue: trim,
             validation: cardNameValidation,
@@ -96,5 +155,19 @@ export class ColumnView extends BaseView<ColumnState> {
             onOpened: () => this.eventEmitter.emit('add-card-field-opened'),
         };
         this.createComponent(container, EditableFieldComponent, options, 'add-card-field');
+    }
+
+    private getAddCardSubmitBtnContent() {
+        const content = this.createDOMElement('span');
+        content.innerText = 'create';
+        
+        return content;
+    }
+
+    private getAddCardCancelBtnContent() {
+        const content = this.createDOMElement('span');
+        content.append(Icon.cross);
+        
+        return content;
     }
 }

@@ -2,14 +2,24 @@ import { BaseState } from "../base/state";
 import { noop } from "../helpers";
 
 export type ButtonOptions = {
+    icon?: HTMLElement;
     text?: string;
+    content?: HTMLElement;
     className?: string;
     onClick?: (event: MouseEvent) => any;
 }
 
 export class ButtonState extends BaseState<ButtonOptions> {
+    get icon() {
+        return this.options.icon;
+    }
+
     get text() {
         return this.options.text!;
+    }
+
+    get content() {
+        return this.options.content;
     }
 
     get className() {
@@ -22,7 +32,9 @@ export class ButtonState extends BaseState<ButtonOptions> {
 
     constructor(state: ButtonOptions) {
         const defaultOptions = {
-            text: "button",
+            icon: undefined,
+            text: undefined,
+            content: undefined,
             className: "",
             onClick: noop
         };

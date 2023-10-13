@@ -14,9 +14,11 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
         if(this.state.isOpen) {
             this.renderOpened(fragment);
             this.container.classList.add('state-opened');
+            this.container.classList.remove('state-closed');
         }
         else {
             this.renderClosed(fragment);
+            this.container.classList.add('state-closed');
             this.container.classList.remove('state-opened');
         }
     }
@@ -100,21 +102,19 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
             });
         }
         else {
-            const submitBtn = this.createDOMElement('span');
-            this.createComponent(submitBtn, ButtonComponent, {
+            const submitBtn = this.createComponent('span', ButtonComponent, {
                 className: 'submit',
-                text: this.state.submitBtnContent, 
+                content: this.state.submitBtnContent, 
                 onClick: submitAction
             }, 'submit-btn');
 
-            const cancelBtn = this.createDOMElement('span');
-            this.createComponent(cancelBtn, ButtonComponent, {
+            const cancelBtn = this.createComponent('span', ButtonComponent, {
                 className: 'cancel',
-                text: this.state.cancelBtnContent, 
+                content: this.state.cancelBtnContent, 
                 onClick: closeAction
             }, 'cancel-btn');
             
-            container.append(submitBtn, cancelBtn);
+            container.append(submitBtn.container, cancelBtn.container);
         }
     }
 

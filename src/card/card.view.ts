@@ -44,8 +44,8 @@ export class CardView extends BaseView<CardState> {
 
                 return title;
             },
-            submitBtnContent: 'save',
-            cancelBtnContent: Icon.cross.outerHTML,
+            submitBtnContent: this.getSubmitBtnContent(),
+            cancelBtnContent: this.getCancelBtnContent(),
 
             submitOnOutsideClick: true,
             resetValueOnClosed: false,
@@ -63,7 +63,22 @@ export class CardView extends BaseView<CardState> {
                 this.eventEmitter.emit('enable-card-drag');
             }
         };
+
         this.editFieldComponent = this.createComponent(container, EditableFieldComponent, options, 'card-name-field') as EditableFieldComponent;
+    }
+
+    private getSubmitBtnContent() {
+        const content = this.createDOMElement('span');
+        content.innerText = 'save';
+        
+        return content;
+    }
+
+    private getCancelBtnContent() {
+        const content = this.createDOMElement('span');
+        content.append(Icon.cross);
+        
+        return content;
     }
 
     private renderToolbar(container: HTMLElement) {
@@ -96,15 +111,19 @@ export class CardView extends BaseView<CardState> {
 
                 break;
             default:
-                const changeNameBtn = this.createDOMElement('button', 'change-name');
-                changeNameBtn.appendChild(Icon.pencil);
-                changeNameBtn.addEventListener('click', () => this.eventEmitter.emit('change-card-name-click'));
+                const changeNameBtn = this.createComponent<ButtonOptions>('span', ButtonComponent, {
+                    className: 'change-name',
+                    icon: Icon.pencil,
+                    onClick: () => this.eventEmitter.emit('change-card-name-click')
+                }, 'change-name-btn');
+
+                const deleteBtn = this.createComponent<ButtonOptions>('span', ButtonComponent, {
+                    className: 'delete-card',
+                    icon: Icon.delete,
+                    onClick: () => this.eventEmitter.emit('update-toolbar-state', 'delete-prompt')
+                }, 'delete-card');
         
-                const deleteBtn = this.createDOMElement('button', 'delete-card');
-                deleteBtn.appendChild(Icon.delete);
-                deleteBtn.addEventListener('click', () => this.eventEmitter.emit('update-toolbar-state', 'delete-prompt'));
-        
-                container.append(changeNameBtn, deleteBtn);
+                container.append(changeNameBtn.container, deleteBtn.container);
         }
     }
 }

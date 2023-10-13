@@ -4,6 +4,8 @@ import { ColumnController } from "./column.controller";
 
 export type ColumnOptions = {
     column?: Column;
+
+    toolbarState?: 'default' | 'delete-prompt';
 }
 
 export class ColumnState extends BaseState<ColumnOptions> {
@@ -11,9 +13,14 @@ export class ColumnState extends BaseState<ColumnOptions> {
         return this.options.column!;
     }
 
+    public get toolbarState() {
+        return this.options.toolbarState!;
+    }
+
     constructor(options: ColumnOptions) {
         const defaultOptions: ColumnOptions = {
             column: new Column('__empty-column__'),
+            toolbarState: 'default',
         };
 
         super(defaultOptions, options, [ColumnController]);

@@ -43,7 +43,6 @@ export class CardController extends BaseController<CardState, CardView> {
 
     private onUpdateToolbarState(toolbarState: 'default' | 'hidden' | 'delete-prompt') {
         this.state.updateByKey('toolbarState', toolbarState);
-
     }
 
     private onChangeCardNameClick() {

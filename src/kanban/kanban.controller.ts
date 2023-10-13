@@ -12,6 +12,7 @@ export class KanbanController extends BaseController<KanbanState, KanbanView> {
         this.eventEmitter
             .on('create-new-column', this.onCreateNewColumn.bind(this))
             .on('update-column', this.onUpdateColumn.bind(this))
+            .on('delete-column', this.onDeleteColumn.bind(this))
             .on('update-items-order', this.onUpdateColumnsOrder.bind(this));
     }
 
@@ -35,6 +36,14 @@ export class KanbanController extends BaseController<KanbanState, KanbanView> {
 
     private onUpdateColumn(column: Column) {
         this.state.updateColumn(column.id, column);
+    }
+
+    private onDeleteColumn(column: Column) {
+        const index = this.state.columns.findIndex(_column => _column.id === column.id);
+
+        this.state.deleteColumn(column);
+
+        this.container.querySelectorAll('.kanban-column')[index].remove();
     }
 
     private onUpdateColumnsOrder(columns: Column[]) {
