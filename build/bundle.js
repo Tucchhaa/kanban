@@ -66,14 +66,16 @@ System.register("helpers", [], function (exports_2, context_2) {
                 }
                 return a === b;
             });
-            exports_2("clone", clone = (value) => {
+            exports_2("clone", clone = (value, inc = 0) => {
+                if (inc > 10)
+                    debugger;
                 if (isArray(value)) {
                     return value.map((item) => clone(item));
                 }
-                else if (isObject(value)) {
+                else if (isObject(value) && value instanceof HTMLElement === false) {
                     const result = {};
                     for (const key in value)
-                        result[key] = clone(value[key]);
+                        result[key] = clone(value[key], inc + 1);
                     return result;
                 }
                 else {
@@ -534,7 +536,6 @@ System.register("base/view", ["helpers", "base/component-module", "base/render-e
                     const newComponent = new componentType(container, options);
                     key = key !== null && key !== void 0 ? key : newComponent.constructor.name;
                     if (this.components[key]) {
-                        debugger;
                         throw new Error(`Render error: Elements of the same component must contain unique keys. Repating key: ${key}`);
                     }
                     this.components[key] = newComponent;
@@ -685,6 +686,10 @@ System.register("kanban/kanban.state", ["base/state", "kanban/kanban.controller"
                         const columnIndex = options.columns.findIndex((column) => id === column.id);
                         options.columns[columnIndex] = column;
                     });
+                }
+                deleteColumn(column) {
+                    const updatedColumns = this.columns.filter(_column => _column.id !== column.id);
+                    this.updateColumns(updatedColumns);
                 }
                 updateColumns(columns) {
                     this.updateByKey('columns', columns);
@@ -1380,8 +1385,8 @@ System.register("editable-field/editable-field.state", ["base/state", "helpers",
                         resetValueOnClosed: true,
                         titleTemplate: undefined,
                         buttonsTemplate: undefined,
-                        submitBtnContent: 'submit',
-                        cancelBtnContent: 'cancel',
+                        submitBtnContent: undefined,
+                        cancelBtnContent: undefined,
                         prepareValue: value => value,
                         validation: () => [true, ""],
                         onOpened: helpers_5.noop,
@@ -1410,8 +1415,14 @@ System.register("button/button.state", ["base/state", "helpers"], function (expo
         ],
         execute: function () {
             ButtonState = class ButtonState extends state_5.BaseState {
+                get icon() {
+                    return this.options.icon;
+                }
                 get text() {
                     return this.options.text;
+                }
+                get content() {
+                    return this.options.content;
                 }
                 get className() {
                     return this.options.className;
@@ -1421,7 +1432,9 @@ System.register("button/button.state", ["base/state", "helpers"], function (expo
                 }
                 constructor(state) {
                     const defaultOptions = {
-                        text: "button",
+                        icon: undefined,
+                        text: undefined,
+                        content: undefined,
                         className: "",
                         onClick: helpers_6.noop
                     };
@@ -1448,11 +1461,24 @@ System.register("button/button.view", ["base/view"], function (exports_21, conte
                     super();
                 }
                 _render(fragment) {
+                    var _a;
                     const btn = this.createDOMElement('button');
-                    btn.innerHTML = this.state.text;
+                    const content = (_a = this.state.content) !== null && _a !== void 0 ? _a : this.createContent();
+                    btn.appendChild(content);
                     btn.className = this.state.className;
                     btn.addEventListener('click', () => this.eventEmitter.emit('click'));
                     fragment.appendChild(btn);
+                }
+                createContent() {
+                    const fragment = document.createDocumentFragment();
+                    if (this.state.icon)
+                        fragment.append(this.state.icon);
+                    if (this.state.text) {
+                        const textElement = this.createDOMElement('span');
+                        textElement.innerText = this.state.text;
+                        fragment.append(textElement);
+                    }
+                    return fragment;
                 }
             };
             exports_21("ButtonView", ButtonView);
@@ -1533,9 +1559,11 @@ System.register("editable-field/editable-field.view", ["base/view", "components/
                     if (this.state.isOpen) {
                         this.renderOpened(fragment);
                         this.container.classList.add('state-opened');
+                        this.container.classList.remove('state-closed');
                     }
                     else {
                         this.renderClosed(fragment);
+                        this.container.classList.add('state-closed');
                         this.container.classList.remove('state-opened');
                     }
                 }
@@ -1596,19 +1624,17 @@ System.register("editable-field/editable-field.view", ["base/view", "components/
                         });
                     }
                     else {
-                        const submitBtn = this.createDOMElement('span');
-                        this.createComponent(submitBtn, button_component_1.ButtonComponent, {
+                        const submitBtn = this.createComponent('span', button_component_1.ButtonComponent, {
                             className: 'submit',
-                            text: this.state.submitBtnContent,
+                            content: this.state.submitBtnContent,
                             onClick: submitAction
                         }, 'submit-btn');
-                        const cancelBtn = this.createDOMElement('span');
-                        this.createComponent(cancelBtn, button_component_1.ButtonComponent, {
+                        const cancelBtn = this.createComponent('span', button_component_1.ButtonComponent, {
                             className: 'cancel',
-                            text: this.state.cancelBtnContent,
+                            content: this.state.cancelBtnContent,
                             onClick: closeAction
                         }, 'cancel-btn');
-                        container.append(submitBtn, cancelBtn);
+                        container.append(submitBtn.container, cancelBtn.container);
                     }
                 }
                 setDocumentMouseDownListener() {
@@ -1844,19 +1870,17 @@ System.register("prompt/prompt.view", ["base/view", "components/button.component
                     container.innerText = this.state.text;
                 }
                 renderButtons(container) {
-                    const confirmBtnContainer = this.createDOMElement('span');
-                    this.createComponent(confirmBtnContainer, button_component_2.ButtonComponent, {
+                    const confirmBtn = this.createComponent('span', button_component_2.ButtonComponent, {
                         text: 'confirm',
                         className: 'prompt-confirm',
                         onClick: this.state.onConfirm
                     }, 'prompt-confirm-btn');
-                    const cancelBtnContainer = this.createDOMElement('span');
-                    this.createComponent(cancelBtnContainer, button_component_2.ButtonComponent, {
+                    const cancelBtn = this.createComponent('span', button_component_2.ButtonComponent, {
                         text: 'cancel',
                         className: 'prompt-cancel',
                         onClick: this.state.onCancel
                     }, 'prompt-cancel-btn');
-                    container.append(confirmBtnContainer, cancelBtnContainer);
+                    container.append(confirmBtn.container, cancelBtn.container);
                 }
             };
             exports_29("PromptView", PromptView);
@@ -1950,14 +1974,17 @@ System.register("utils/validation", [], function (exports_32, context_32) {
         }
     };
 });
-System.register("card/card.view", ["base/view", "components/editable-field.component", "components/prompt.component", "helpers", "utils/icons", "utils/validation"], function (exports_33, context_33) {
+System.register("card/card.view", ["base/view", "components/button.component", "components/editable-field.component", "components/prompt.component", "helpers", "utils/icons", "utils/validation"], function (exports_33, context_33) {
     "use strict";
-    var view_4, editable_field_component_1, prompt_component_1, helpers_10, icons_1, validation_1, CardView;
+    var view_4, button_component_3, editable_field_component_1, prompt_component_1, helpers_10, icons_1, validation_1, CardView;
     var __moduleName = context_33 && context_33.id;
     return {
         setters: [
             function (view_4_1) {
                 view_4 = view_4_1;
+            },
+            function (button_component_3_1) {
+                button_component_3 = button_component_3_1;
             },
             function (editable_field_component_1_1) {
                 editable_field_component_1 = editable_field_component_1_1;
@@ -1996,8 +2023,8 @@ System.register("card/card.view", ["base/view", "components/editable-field.compo
                             title.innerText = this.state.card.name;
                             return title;
                         },
-                        submitBtnContent: 'save',
-                        cancelBtnContent: icons_1.Icon.cross.outerHTML,
+                        submitBtnContent: this.getSubmitBtnContent(),
+                        cancelBtnContent: this.getCancelBtnContent(),
                         submitOnOutsideClick: true,
                         resetValueOnClosed: false,
                         prepareValue: helpers_10.trim,
@@ -2013,6 +2040,16 @@ System.register("card/card.view", ["base/view", "components/editable-field.compo
                         }
                     };
                     this.editFieldComponent = this.createComponent(container, editable_field_component_1.EditableFieldComponent, options, 'card-name-field');
+                }
+                getSubmitBtnContent() {
+                    const content = this.createDOMElement('span');
+                    content.innerText = 'save';
+                    return content;
+                }
+                getCancelBtnContent() {
+                    const content = this.createDOMElement('span');
+                    content.append(icons_1.Icon.cross);
+                    return content;
                 }
                 renderToolbar(container) {
                     container.classList.remove('toolbar-hidden', 'toolbar-delete-prompt', 'toolbar-default');
@@ -2037,13 +2074,17 @@ System.register("card/card.view", ["base/view", "components/editable-field.compo
                             });
                             break;
                         default:
-                            const changeNameBtn = this.createDOMElement('button', 'change-name');
-                            changeNameBtn.appendChild(icons_1.Icon.pencil);
-                            changeNameBtn.addEventListener('click', () => this.eventEmitter.emit('change-card-name-click'));
-                            const deleteBtn = this.createDOMElement('button', 'delete-card');
-                            deleteBtn.appendChild(icons_1.Icon.delete);
-                            deleteBtn.addEventListener('click', () => this.eventEmitter.emit('update-toolbar-state', 'delete-prompt'));
-                            container.append(changeNameBtn, deleteBtn);
+                            const changeNameBtn = this.createComponent('span', button_component_3.ButtonComponent, {
+                                className: 'change-name',
+                                icon: icons_1.Icon.pencil,
+                                onClick: () => this.eventEmitter.emit('change-card-name-click')
+                            }, 'change-name-btn');
+                            const deleteBtn = this.createComponent('span', button_component_3.ButtonComponent, {
+                                className: 'delete-card',
+                                icon: icons_1.Icon.delete,
+                                onClick: () => this.eventEmitter.emit('update-toolbar-state', 'delete-prompt')
+                            }, 'delete-card');
+                            container.append(changeNameBtn.container, deleteBtn.container);
                     }
                 }
             };
@@ -2274,9 +2315,9 @@ System.register("components/card.component", ["card/card.state", "card/card.view
         }
     };
 });
-System.register("column/column.view", ["components/card.component", "components/editable-field.component", "base/view", "utils/icons", "utils/validation", "helpers"], function (exports_38, context_38) {
+System.register("column/column.view", ["components/card.component", "components/editable-field.component", "base/view", "utils/icons", "utils/validation", "helpers", "components/button.component", "components/prompt.component"], function (exports_38, context_38) {
     "use strict";
-    var card_component_1, editable_field_component_2, view_6, icons_2, validation_2, helpers_11, ColumnView;
+    var card_component_1, editable_field_component_2, view_6, icons_2, validation_2, helpers_11, button_component_4, prompt_component_2, ColumnView;
     var __moduleName = context_38 && context_38.id;
     return {
         setters: [
@@ -2297,6 +2338,12 @@ System.register("column/column.view", ["components/card.component", "components/
             },
             function (helpers_11_1) {
                 helpers_11 = helpers_11_1;
+            },
+            function (button_component_4_1) {
+                button_component_4 = button_component_4_1;
+            },
+            function (prompt_component_2_1) {
+                prompt_component_2 = prompt_component_2_1;
             }
         ],
         execute: function () {
@@ -2313,6 +2360,19 @@ System.register("column/column.view", ["components/card.component", "components/
                 }
                 renderHeading(container) {
                     this.draggableAreaElement = container;
+                    switch (this.state.toolbarState) {
+                        case 'delete-prompt':
+                            const columnNameElement = this.createColumnName();
+                            const deletePromptElement = this.createDeletePrompt();
+                            container.append(columnNameElement, deletePromptElement);
+                            break;
+                        default:
+                            const headingFieldElement = this.createHeadingField();
+                            const deleteBtn = this.createHeadingDeleteBtn();
+                            container.append(headingFieldElement, deleteBtn);
+                    }
+                }
+                createHeadingField() {
                     const options = {
                         value: this.state.column.name,
                         placeholder: 'Column\'s name',
@@ -2325,7 +2385,36 @@ System.register("column/column.view", ["components/card.component", "components/
                         onOpened: () => this.eventEmitter.emit('disable-drag'),
                         onClosed: () => this.eventEmitter.emit('enable-drag')
                     };
-                    this.createComponent(container, editable_field_component_2.EditableFieldComponent, options, 'heading-field');
+                    const field = this.createComponent('div', editable_field_component_2.EditableFieldComponent, options, 'heading-field');
+                    return field.container;
+                }
+                createHeadingDeleteBtn() {
+                    const deleteBtn = this.createComponent('div', button_component_4.ButtonComponent, {
+                        className: 'delete-column-btn',
+                        icon: icons_2.Icon.delete,
+                        onClick: () => this.eventEmitter.emit('update-toolbar-state', 'delete-prompt')
+                    });
+                    return deleteBtn.container;
+                }
+                createColumnName() {
+                    const columnName = this.createDOMElement('div', 'column-name');
+                    columnName.innerText = this.state.column.name;
+                    return columnName;
+                }
+                createDeletePrompt() {
+                    const prompt = this.createComponent('div', prompt_component_2.PromptComponent, {
+                        text: 'Delete this column?',
+                        onConfirm: () => this.eventEmitter.emit('delete-column-confirmed'),
+                        onCancel: () => this.eventEmitter.emit('update-toolbar-state', 'default')
+                    });
+                    this.eventEmitter.emit('disable-column-drag');
+                    setTimeout(() => {
+                        const mouseDownHandler = () => this.eventEmitter.emit('update-toolbar-state', 'default');
+                        document.addEventListener('click', mouseDownHandler);
+                        this.onClearRenderElement('heading', () => document.removeEventListener('click', mouseDownHandler));
+                        this.onClearRenderElement('heading', () => this.eventEmitter.emit('enable-column-drag'));
+                    });
+                    return prompt.container;
                 }
                 renderCards(container) {
                     this.dropContainer = container;
@@ -2347,14 +2436,24 @@ System.register("column/column.view", ["components/card.component", "components/
                     const options = {
                         title: '+ Add new card',
                         placeholder: 'Enter new card\'s name',
-                        submitBtnContent: 'create',
-                        cancelBtnContent: icons_2.Icon.cross.outerHTML,
+                        submitBtnContent: this.getAddCardSubmitBtnContent(),
+                        cancelBtnContent: this.getAddCardCancelBtnContent(),
                         prepareValue: helpers_11.trim,
                         validation: validation_2.cardNameValidation,
                         onSubmit: (value) => this.eventEmitter.emit('create-new-card', value),
                         onOpened: () => this.eventEmitter.emit('add-card-field-opened'),
                     };
                     this.createComponent(container, editable_field_component_2.EditableFieldComponent, options, 'add-card-field');
+                }
+                getAddCardSubmitBtnContent() {
+                    const content = this.createDOMElement('span');
+                    content.innerText = 'create';
+                    return content;
+                }
+                getAddCardCancelBtnContent() {
+                    const content = this.createDOMElement('span');
+                    content.append(icons_2.Icon.cross);
+                    return content;
                 }
             };
             exports_38("ColumnView", ColumnView);
@@ -2386,6 +2485,10 @@ System.register("column/column.controller", ["base/controller", "drag-drop/drop.
                     super();
                     this.eventEmitter
                         .on('change-column-name', this.onChangeColumnName.bind(this))
+                        .on('disable-column-drag', this.onDisableColumnDrag.bind(this))
+                        .on('enable-column-drag', this.onEnableColumnDrag.bind(this))
+                        .on('update-toolbar-state', this.onUpdateToolbarState.bind(this))
+                        .on('delete-column-confirmed', this.onDeleteColumnConfirmed.bind(this))
                         .on('create-new-card', this.onCreateNewCard.bind(this))
                         .on('delete-card', this.onDeleteCard.bind(this))
                         .on('add-card-field-opened', this.onAddCardFieldOpened.bind(this))
@@ -2394,6 +2497,9 @@ System.register("column/column.controller", ["base/controller", "drag-drop/drop.
                 }
                 stateChanged(change) {
                     switch (change.name) {
+                        case 'toolbarState':
+                            this.view.renderElement('heading');
+                            break;
                         case 'column.name':
                             break;
                         case 'column.cards':
@@ -2412,6 +2518,20 @@ System.register("column/column.controller", ["base/controller", "drag-drop/drop.
                 }
                 onChangeColumnName(newName) {
                     this.state.updateByKey('column.name', newName);
+                }
+                onDisableColumnDrag() {
+                    this.view.draggableAreaElement.style.cursor = 'default';
+                    this.eventEmitter.emit('disable-drag');
+                }
+                onEnableColumnDrag() {
+                    this.view.draggableAreaElement.style.removeProperty('cursor');
+                    this.eventEmitter.emit('enable-drag');
+                }
+                onUpdateToolbarState(toolbarState) {
+                    this.state.updateByKey('toolbarState', toolbarState);
+                }
+                onDeleteColumnConfirmed() {
+                    this.eventEmitter.emit('delete-column', this.state.column);
                 }
                 onCreateNewCard(cardName) {
                     this.state.createCard(new types_2.Card(cardName));
@@ -2455,9 +2575,13 @@ System.register("column/column.state", ["base/state", "types", "column/column.co
                 get column() {
                     return this.options.column;
                 }
+                get toolbarState() {
+                    return this.options.toolbarState;
+                }
                 constructor(options) {
                     const defaultOptions = {
                         column: new types_3.Column('__empty-column__'),
+                        toolbarState: 'default',
                     };
                     super(defaultOptions, options, [column_controller_1.ColumnController]);
                 }
@@ -2684,6 +2808,7 @@ System.register("kanban/kanban.view", ["base/view", "components/column.component
                     const columnOptions = { column };
                     const columnComponent = this.createComponent(columnElement, column_component_1.ColumnComponent, columnOptions, `column${column.id}`);
                     columnComponent.eventEmitter.on('update-column', (column) => this.eventEmitter.emit('update-column', column));
+                    columnComponent.eventEmitter.on('delete-column', (column) => this.eventEmitter.emit('delete-column', column));
                     // ===
                     columnComponent.eventEmitter.on('drag-start', () => this.eventEmitter.emit('disable-grab-scroll'));
                     columnComponent.eventEmitter.on('drag-end', () => this.eventEmitter.emit('enable-grab-scroll'));
@@ -2698,13 +2823,23 @@ System.register("kanban/kanban.view", ["base/view", "components/column.component
                     const options = {
                         title: '+ Add new column',
                         placeholder: 'Enter new column\'s name',
-                        submitBtnContent: 'create',
-                        cancelBtnContent: icons_3.Icon.cross.outerHTML,
+                        submitBtnContent: this.getAddColumnSubmitBtnContent(),
+                        cancelBtnContent: this.getAddColumnCancelBtnContent(),
                         prepareValue: helpers_12.trim,
                         onSubmit: (value) => this.eventEmitter.emit('create-new-column', value),
                         validation: validation_3.columnNameValidation
                     };
                     this.createComponent(container, editable_field_component_3.EditableFieldComponent, options, 'add-column-field');
+                }
+                getAddColumnSubmitBtnContent() {
+                    const content = this.createDOMElement('span');
+                    content.innerText = 'create';
+                    return content;
+                }
+                getAddColumnCancelBtnContent() {
+                    const content = this.createDOMElement('span');
+                    content.append(icons_3.Icon.cross);
+                    return content;
                 }
                 addMouseEventListeners() {
                     const mouseMoveHandler = mouse_4.mouse.setPosition.bind(mouse_4.mouse);
@@ -2740,6 +2875,7 @@ System.register("kanban/kanban.controller", ["base/controller", "types"], functi
                     this.eventEmitter
                         .on('create-new-column', this.onCreateNewColumn.bind(this))
                         .on('update-column', this.onUpdateColumn.bind(this))
+                        .on('delete-column', this.onDeleteColumn.bind(this))
                         .on('update-items-order', this.onUpdateColumnsOrder.bind(this));
                 }
                 stateChanged(change) {
@@ -2757,6 +2893,11 @@ System.register("kanban/kanban.controller", ["base/controller", "types"], functi
                 }
                 onUpdateColumn(column) {
                     this.state.updateColumn(column.id, column);
+                }
+                onDeleteColumn(column) {
+                    const index = this.state.columns.findIndex(_column => _column.id === column.id);
+                    this.state.deleteColumn(column);
+                    this.container.querySelectorAll('.kanban-column')[index].remove();
                 }
                 onUpdateColumnsOrder(columns) {
                     this.state.updateColumns(columns);
