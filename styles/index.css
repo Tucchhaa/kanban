@@ -1,3 +1,11 @@
+@import "./kanban.css";
+@import "./editable-field.css";
+@import "./column.css";
+@import "./column-heading.css";
+@import "./add-column.css";
+@import "./card.css";
+@import "./add-card.css";
+
 body {
     height: 100vh;
     margin: 0;
