@@ -1,29 +1,68 @@
 .kanban-column .heading {
-    padding: 9px 18px;
+    padding: 9px 7px;
     font-size: 17px;
     font-weight: 600;
     color: #1d2934;
     cursor: pointer;
+    box-sizing: border-box;
+    position: relative;
 }
 
 .kanban-column.state-dragging .heading {
     cursor: grabbing;
 }
 
-.kanban-column .heading.editable-field.state-opened {
-    padding: 5px 6px 0px 6px;
+/*
+Column name field
+*/
+.kanban-column .heading .editable-field.state-closed {
+    padding: 4px;
 }
 
-.kanban-column .heading.editable-field .input-wrapper {
+.kanban-column .heading .editable-field.state-opened {
+    padding: 0;
+}
+
+.kanban-column .heading .editable-field.state-opened .buttons {
+    display: none;
+}
+
+.kanban-column .heading .editable-field .input-wrapper {
     border: 2px solid rgb(21, 129, 201);
-    padding: 2px 10px 2px 10px;
+    box-sizing: border-box;
+    padding: 2px;
     background-color: #ecf0f1;
     border-radius: 3px;
     cursor: text;
 }
 
-.kanban-column .heading.editable-field .validation-msg {
+.kanban-column .heading .editable-field .validation-msg {
     font-weight: normal;
     font-size: 14px;
     padding: 1px 5px;
+}
+
+/*
+Delete button
+*/
+.kanban-column .heading .delete-column-btn {
+    padding: 3px 5px;
+
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.kanban-column .column:hover .heading .delete-column-btn {
+    visibility: visible;
+}
+
+/* Delete prompt */
+.kanban-column .heading .column-name {
+    padding: 4px;
+}
+.kanban-column .heading .prompt {
+    /* padding: 9px 7px; */
+    padding: 0 4px;
+    font-weight:normal;
 }

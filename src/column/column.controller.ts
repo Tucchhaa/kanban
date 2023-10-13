@@ -13,6 +13,12 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
         
         this.eventEmitter
             .on('change-column-name', this.onChangeColumnName.bind(this))
+
+            .on('disable-column-drag', this.onDisableColumnDrag.bind(this))
+            .on('enable-column-drag', this.onEnableColumnDrag.bind(this))
+            .on('update-toolbar-state', this.onUpdateToolbarState.bind(this))
+
+            .on('delete-column-confirmed', this.onDeleteColumnConfirmed.bind(this))
             
             .on('create-new-card', this.onCreateNewCard.bind(this))
             .on('delete-card', this.onDeleteCard.bind(this))
@@ -24,6 +30,10 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
 
     public stateChanged(change: StateChange): void {
         switch(change.name) {
+            case 'toolbarState':
+                this.view.renderElement('heading');
+                break;
+
             case 'column.name':
                 break;
 
@@ -47,6 +57,24 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
 
     private onChangeColumnName(newName: string) {
         this.state.updateByKey('column.name', newName);
+    }
+
+    private onDisableColumnDrag() {
+        this.view.draggableAreaElement!.style.cursor = 'default';
+        this.eventEmitter.emit('disable-drag');
+    }
+
+    private onEnableColumnDrag() {
+        this.view.draggableAreaElement!.style.removeProperty('cursor');
+        this.eventEmitter.emit('enable-drag');
+    }
+
+    private onUpdateToolbarState(toolbarState: 'default' | 'delete-prompt') {
+        this.state.updateByKey('toolbarState', toolbarState);
+    }
+
+    private onDeleteColumnConfirmed() {
+        this.eventEmitter.emit('delete-column', this.state.column);
     }
 
     private onCreateNewCard(cardName: string) {

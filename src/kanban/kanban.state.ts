@@ -31,6 +31,12 @@ export class KanbanState extends BaseState<KanbanOptions> {
             options.columns![columnIndex] = column;
         });
     }
+
+    public deleteColumn(column: Column) {
+        const updatedColumns = this.columns.filter(_column => _column.id !== column.id);
+
+        this.updateColumns(updatedColumns);
+    }
     
     public updateColumns(columns: Column[]) {
         this.updateByKey('columns', columns);

@@ -22,20 +22,18 @@ export class PromptView extends BaseView<PromptState> {
     }
 
     private renderButtons(container: HTMLElement) {
-        const confirmBtnContainer = this.createDOMElement('span');
-        this.createComponent<ButtonOptions>(confirmBtnContainer, ButtonComponent, {
+        const confirmBtn = this.createComponent<ButtonOptions>('span', ButtonComponent, {
             text: 'confirm',
             className: 'prompt-confirm',
             onClick: this.state.onConfirm
         }, 'prompt-confirm-btn');
 
-        const cancelBtnContainer = this.createDOMElement('span');
-        this.createComponent<ButtonOptions>(cancelBtnContainer, ButtonComponent, {
+        const cancelBtn = this.createComponent<ButtonOptions>('span', ButtonComponent, {
             text: 'cancel',
             className: 'prompt-cancel',
             onClick: this.state.onCancel
         }, 'prompt-cancel-btn');
 
-        container.append(confirmBtnContainer, cancelBtnContainer);
+        container.append(confirmBtn.container, cancelBtn.container);
     }
 }

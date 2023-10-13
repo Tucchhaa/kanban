@@ -26,61 +26,13 @@
     text-align: right;
 }
 
-.kanban-column .card:hover .toolbar.toolbar-default {
-    opacity: 1;
-}
-.kanban-column .card .toolbar.toolbar-default {
-    opacity: 0;
-}
-
 .kanban-column .card .toolbar.toolbar-default button {
-    outline: none;
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-    color: #696969;
     padding: 5px 7px;
-    border-radius: 3px;
 }
 
-.kanban-column .card .toolbar.toolbar-default button:hover {
-    color: #494848;
-    background-color: #cccaca;
-}
-
-/* Toolbar prompt */
+/* Delete prompt */
 .kanban-column .card .toolbar.toolbar-delete-prompt {
     padding: 9px 7px;
-}
-
-.kanban-column .card .toolbar.toolbar-delete-prompt .prompt-text {
-    margin-bottom: 5px;
-    color: #494848;
-    font-size: 15px;
-}
-
-.kanban-column .card .toolbar.toolbar-delete-prompt button {
-    padding: 5px 7px;
-    border-radius: 2px;
-    font-size: 13px;
-    cursor: pointer;
-    outline: none;
-    border: none;
-}
-
-.kanban-column .card .toolbar.toolbar-delete-prompt button.prompt-confirm {
-    color: white;
-    background-color:#1581c9;
-    margin-right: 5px;
-}
-
-.kanban-column .card .toolbar.toolbar-delete-prompt button.prompt-confirm:hover {
-    background-color:#05558b;
-}
-
-.kanban-column .card .toolbar.toolbar-delete-prompt button.prompt-cancel:hover {
-    color: #494848;
-    background-color: #cccaca;
 }
 
 /* Car name Input */

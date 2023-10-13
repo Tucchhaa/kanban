@@ -111,21 +111,19 @@ export class CardView extends BaseView<CardState> {
 
                 break;
             default:
-                const changeNameBtn = this.createDOMElement('span');
-                this.createComponent<ButtonOptions>(changeNameBtn, ButtonComponent, {
+                const changeNameBtn = this.createComponent<ButtonOptions>('span', ButtonComponent, {
                     className: 'change-name',
                     icon: Icon.pencil,
                     onClick: () => this.eventEmitter.emit('change-card-name-click')
                 }, 'change-name-btn');
 
-                const deleteBtn = this.createDOMElement('span');
-                this.createComponent<ButtonOptions>(deleteBtn, ButtonComponent, {
+                const deleteBtn = this.createComponent<ButtonOptions>('span', ButtonComponent, {
                     className: 'delete-card',
                     icon: Icon.delete,
                     onClick: () => this.eventEmitter.emit('update-toolbar-state', 'delete-prompt')
                 }, 'delete-card');
         
-                container.append(changeNameBtn, deleteBtn);
+                container.append(changeNameBtn.container, deleteBtn.container);
         }
     }
 }

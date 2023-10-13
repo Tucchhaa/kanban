@@ -13,8 +13,8 @@ The app architecture is designed based on MVC pattern with some improvements. Th
 The full functionality of the application is as follows: 
 
 * dragging cards inside and between columns
-* creating/deleting/changing cards
-* creating/changing columns, dragging columns
+* creating/deleting/editing cards
+* creating/deleteing/editing columns, dragging columns
 * scrolling columns when dragging a card to the edge
 * scrolling the board when dragging a column to the edge
 * scrolling the board by 'grabbing' it.

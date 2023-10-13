@@ -51,6 +51,7 @@ export class KanbanView extends BaseView<KanbanState> {
 
         const columnComponent = this.createComponent(columnElement, ColumnComponent, columnOptions, `column${column.id}`);
         columnComponent.eventEmitter.on('update-column', (column: Column) => this.eventEmitter.emit('update-column', column));
+        columnComponent.eventEmitter.on('delete-column', (column: Column) => this.eventEmitter.emit('delete-column', column));
 
         // ===
         columnComponent.eventEmitter.on('drag-start', () => this.eventEmitter.emit('disable-grab-scroll'));
