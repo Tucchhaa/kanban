@@ -1107,6 +1107,7 @@ System.register("drag-drop/drop.controller", ["base/component", "base/controller
                     });
                     this.eventEmitter
                         .on('process-drag', this.onProcessDrag.bind(this))
+                        .on('drag-deleted', this.onDragDeleted.bind(this))
                         .on('rendered', () => {
                         const { dropContainer, dropScrollElement } = this.view;
                         if (!dropContainer)
@@ -1144,6 +1145,9 @@ System.register("drag-drop/drop.controller", ["base/component", "base/controller
                             // .unsubscribe('drag', onDrag)
                             .unsubscribe('drag-end', onDragEnd);
                     });
+                }
+                onDragDeleted(item) {
+                    this.removeDragByItem(item);
                 }
                 // === DRAG EVENTS
                 startDrag(drag) {
@@ -1299,6 +1303,9 @@ System.register("drag-drop/drop.controller", ["base/component", "base/controller
                     if (this.scrollDirection)
                         return this.scrollDirection === 'start';
                     return this.draggingDirection === 'vertical' ? mouse_2.mouse.vertical === 'up' : mouse_2.mouse.horizontal === 'left';
+                }
+                removeDragByItem(item) {
+                    this.drags = this.drags.filter(drag => !this.isItemsEqual(drag.item, item));
                 }
             };
             exports_18("DropController", DropController);
@@ -2678,7 +2685,7 @@ System.register("drag-drop/shared-drop.controller", ["base/component", "base/con
                     // this.eventEmitter.emit('update-items-order', this.dropController.drags.map(drag => drag.item));
                 }
                 removeDrag(dragController) {
-                    this.dropController.drags = this.dropController.drags.filter(drag => !this.isItemsEqual(drag.item, dragController.item));
+                    this.dropController.removeDragByItem(dragController.item);
                 }
             };
             exports_41("SharedDropController", SharedDropController);
@@ -2898,6 +2905,7 @@ System.register("kanban/kanban.controller", ["base/controller", "types"], functi
                     const index = this.state.columns.findIndex(_column => _column.id === column.id);
                     this.state.deleteColumn(column);
                     this.container.querySelectorAll('.kanban-column')[index].remove();
+                    this.eventEmitter.emit('drag-deleted', column);
                 }
                 onUpdateColumnsOrder(columns) {
                     this.state.updateColumns(columns);
