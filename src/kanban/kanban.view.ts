@@ -71,8 +71,8 @@ export class KanbanView extends BaseView<KanbanState> {
             title: '+ Add new column',
             placeholder: 'Enter new column\'s name',
             
-            submitBtnContent: 'create',
-            cancelBtnContent: Icon.cross.outerHTML,
+            submitBtnContent: this.getAddColumnSubmitBtnContent(),
+            cancelBtnContent: this.getAddColumnCancelBtnContent(),
 
             prepareValue: trim,
             onSubmit: (value: string) => this.eventEmitter.emit('create-new-column', value),
@@ -80,6 +80,20 @@ export class KanbanView extends BaseView<KanbanState> {
         };
         
         this.createComponent(container, EditableFieldComponent, options, 'add-column-field');
+    }
+
+    private getAddColumnSubmitBtnContent() {
+        const content = this.createDOMElement('span');
+        content.innerText = 'create';
+        
+        return content;
+    }
+
+    private getAddColumnCancelBtnContent() {
+        const content = this.createDOMElement('span');
+        content.append(Icon.cross);
+        
+        return content;
     }
 
     private addMouseEventListeners() {

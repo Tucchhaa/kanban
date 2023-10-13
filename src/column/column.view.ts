@@ -86,8 +86,8 @@ export class ColumnView extends BaseView<ColumnState> {
             title: '+ Add new card',
             placeholder: 'Enter new card\'s name',
 
-            submitBtnContent: 'create',
-            cancelBtnContent: Icon.cross.outerHTML,
+            submitBtnContent: this.getAddCardSubmitBtnContent(),
+            cancelBtnContent: this.getAddCardCancelBtnContent(),
 
             prepareValue: trim,
             validation: cardNameValidation,
@@ -96,5 +96,19 @@ export class ColumnView extends BaseView<ColumnState> {
             onOpened: () => this.eventEmitter.emit('add-card-field-opened'),
         };
         this.createComponent(container, EditableFieldComponent, options, 'add-card-field');
+    }
+
+    private getAddCardSubmitBtnContent() {
+        const content = this.createDOMElement('span');
+        content.innerText = 'create';
+        
+        return content;
+    }
+
+    private getAddCardCancelBtnContent() {
+        const content = this.createDOMElement('span');
+        content.append(Icon.cross);
+        
+        return content;
     }
 }

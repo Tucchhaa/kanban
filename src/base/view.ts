@@ -85,7 +85,6 @@ export abstract class BaseView<TState extends BaseStateType = BaseStateType> ext
         key = key ?? newComponent.constructor.name;
 
         if(this.components[key]) {
-            debugger;
             throw new Error(`Render error: Elements of the same component must contain unique keys. Repating key: ${key}`);    
         }
 

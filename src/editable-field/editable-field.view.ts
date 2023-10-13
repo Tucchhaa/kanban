@@ -101,16 +101,18 @@ export class EditableFieldView extends BaseView<EditableFieldState> {
         }
         else {
             const submitBtn = this.createDOMElement('span');
+
+
             this.createComponent(submitBtn, ButtonComponent, {
                 className: 'submit',
-                text: this.state.submitBtnContent, 
+                content: this.state.submitBtnContent, 
                 onClick: submitAction
             }, 'submit-btn');
 
             const cancelBtn = this.createDOMElement('span');
             this.createComponent(cancelBtn, ButtonComponent, {
                 className: 'cancel',
-                text: this.state.cancelBtnContent, 
+                content: this.state.cancelBtnContent, 
                 onClick: closeAction
             }, 'cancel-btn');
             
