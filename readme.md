@@ -1,14 +1,14 @@
 # Kanban desk
 
+You can play with project here: https://tucchhaa.github.io/kanban/
+
 In this project I didn't use any of the JavaScript libraries or frameworks. I used only TypeScript for typings.
 
-This project can hardly bring any practical benefit, because it implements only the basic functions of the kanban board. Nevertheless, it was not created for this, but so that I could test myself and create a more or less complex application without frameworks.
+This project can hardly bring any practical benefit, because it implements only the basic functions of the kanban board. Nevertheless, it was not created for this, but so that I could test myself in creating complex application without any frameworks.
 
-I think it turned out well. I like the result and functionality of this Kanban board. Although I had to redesign the application architecture many times and carry out significant refactoring of the code with the expansion of functionality.
+I think it turned out well. I like the result and functionality of this Kanban board. Even though during development I had to redesign the application architecture many times and carry out significant refactoring of the code with the expansion of functionality, I learned a lot of how flexible and scalable architerture should look like.
 
-The architecture of the application is an MVC pattern (who would have thought?), but I think it is somewhat improved and optimized. Although I don't know exactly how well I used the concepts of MVC, since I found only such articles about MVC on the Internet, where an example was a flashlight application. In fact, for a slightly complex application, the architecture of "flashlight applications" is no good.
-
-!["kanban desk screenshot"](https://github.com/Tucchhaa/kanban/blob/master/readme-images/kanban-preview.png?raw=true)
+The app architecture is designed based on MVC pattern with some improvements. The thing that I am really proud of about this project, is that I developed powerful and reusable drag-and-drop algorithm from scratch which allows to change elements order with minimum DOM operations.  
 
 The full functionality of the application is as follows: 
 
@@ -18,3 +18,7 @@ The full functionality of the application is as follows:
 * scrolling columns when dragging a card to the edge
 * scrolling the board when dragging a column to the edge
 * scrolling the board by 'grabbing' it.
+
+!["kanban desk screenshot"](https://github.com/Tucchhaa/kanban/blob/master/readme-images/kanban-card-drag.png?raw=true)
+
+!["kanban desk screenshot"](https://github.com/Tucchhaa/kanban/blob/master/readme-images/kanban-column-drag.png?raw=true)
