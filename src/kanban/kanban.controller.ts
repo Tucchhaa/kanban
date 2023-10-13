@@ -26,7 +26,11 @@ export class KanbanController extends BaseController<KanbanState, KanbanView> {
     }
 
     private onCreateNewColumn(columnName: string) {
-        this.state.createColumn(new Column(columnName));
+        const column = new Column(columnName);
+
+        this.state.createColumn(column);
+
+        this.view.appendNewColumn(column);
     }
 
     private onUpdateColumn(column: Column) {
