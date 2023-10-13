@@ -24,10 +24,12 @@ export class ButtonView extends BaseView<ButtonState> {
         if(this.state.icon)
             fragment.append(this.state.icon);
 
-        const textElement = this.createDOMElement('span');
-        textElement.innerText = this.state.text;
+        if(this.state.text) {
+            const textElement = this.createDOMElement('span');
+            textElement.innerText = this.state.text;
 
-        fragment.append(textElement);
+            fragment.append(textElement);
+        }
 
         return fragment;
     }

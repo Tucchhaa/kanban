@@ -33,7 +33,7 @@ export class ButtonState extends BaseState<ButtonOptions> {
     constructor(state: ButtonOptions) {
         const defaultOptions = {
             icon: undefined,
-            text: "",
+            text: undefined,
             content: undefined,
             className: "",
             onClick: noop
