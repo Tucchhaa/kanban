@@ -54,7 +54,6 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
     }
 
     private onDeleteCard(card: Card) {
-        console.log(card);
         this.state.deleteCard(card);
     }
 
@@ -65,7 +64,6 @@ export class ColumnController extends BaseController<ColumnState, ColumnView> {
     }
 
     private onUpdateCard(card: Card) {
-        console.log('daupte')
         this.state.updateCard(card.id, card);
     }
 
