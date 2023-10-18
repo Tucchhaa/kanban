@@ -1,5 +1,5 @@
 # Kanban desk
-Here's the playground: https://tucchhaa.github.io/kanban/
+Here's the playground: https://tucchhaa.github.io/demos/kanban/demo.html
 
 In this project, I didn't use any of the JavaScript libraries or frameworks. I used only TypeScript for typing.
 
